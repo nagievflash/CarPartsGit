@@ -18,6 +18,19 @@
 
     <section class="section">
         <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">File import form</h4>
+            </div>
+            <div class="card-body">
+                <form action="">
+                    @csrf
+                    <x-maz-input :id="'csvimport'"
+                                 :name="'csvimport'"
+                                 :label="'Download correct CSV File with products'"
+                                 :type="'file'">
+                    </x-maz-input>
+                </form>
+            </div>
 
         </div>
     </section>
