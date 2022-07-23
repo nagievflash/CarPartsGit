@@ -16,4 +16,13 @@ class Product extends Model
      */
     protected array $guarded = [];
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected array $casts = [
+        'images' => 'array'
+    ];
+
 }
