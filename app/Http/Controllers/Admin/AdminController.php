@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function ListProducts() {
-        //
+    public function importProductsFromCSV() {
+        return view('importCSVItem');
     }
 }
