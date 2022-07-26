@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Vtiful\Kernel\Excel;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,4 +28,12 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     })->name('dashboard');
 
     Route::get('/import',  [App\Http\Controllers\Admin\AdminController::class, 'importProductsFromCSV'])->name('import');
+    Route::get('/categories',  [App\Http\Controllers\Admin\CategoriesController::class, 'createCategoriesFromJson'])->name('categoriesList');
 });
+
+Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->post('import', function () {
+    Excel::import(new \App\Imports\ProductImport, request()->file('csv-import'));
+    return redirect()->back()->with('success','Data Imported Successfully');
+});
+
+Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->post('/getSuggestedCategories',  [App\Http\Controllers\Admin\EbayController::class, 'getSuggestedCategories'])->name('getSuggestedCategories');

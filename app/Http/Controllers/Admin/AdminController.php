@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function importProductsFromCSV() {
-        return view('importCSVItem');
+    public function importProductsFromCSV(Request $request) {
+        $code = $request->has('code') ? $request->input('code') : '';
+        return view('importCSVItem')->with('code', $code);
     }
 }
