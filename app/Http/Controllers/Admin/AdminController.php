@@ -9,6 +9,6 @@ class AdminController extends Controller
 {
     public function importProductsFromCSV(Request $request) {
         $code = $request->has('code') ? $request->input('code') : '';
-        return view('importCSVItem')->with('code', $code);
+        return view('admin.importCSVItem')->with('code', $code);
     }
 }

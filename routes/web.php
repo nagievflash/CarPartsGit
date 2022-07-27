@@ -18,9 +18,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
 
 Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
@@ -29,6 +26,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
 
     Route::get('/import',  [App\Http\Controllers\Admin\AdminController::class, 'importProductsFromCSV'])->name('import');
     Route::get('/categories',  [App\Http\Controllers\Admin\CategoriesController::class, 'createCategoriesFromJson'])->name('categoriesList');
+    Route::get('/products',  [App\Http\Controllers\Admin\ProductsController::class, 'index'])->name('products.list');
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->post('import', function () {
