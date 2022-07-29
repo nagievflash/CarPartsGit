@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
+/**
+ * @method static paginate(int $int)
+ * @method static where(string $string, mixed $input)
+ */
 class Product extends Model
 {
     use HasFactory;
@@ -14,14 +19,14 @@ class Product extends Model
      *
      * @var array
      */
-    protected array $guarded = [];
+    protected $guarded = [];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
-    protected array $casts = [
+    protected $casts = [
         'images' => 'array'
     ];
 
