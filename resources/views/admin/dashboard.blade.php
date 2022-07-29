@@ -15,7 +15,7 @@
         </div>
     </x-slot>
 
-    
+
     <section class="section">
         <div class="card">
             <div class="card-header">
@@ -30,4 +30,11 @@
             </div>
         </div>
     </section>
+
+    <x-slot name="scripts">
+        <script>
+
+        </script>
+    </x-slot>
+
 </x-app-layout>
