@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
@@ -21,14 +22,15 @@ class EbayController extends Controller
     public function __construct()
     {
         $this->middleware(function (Request $request, $next) {
-            $this->token = $request->has('token') ? $request->input('token') : '';
+//            $this->token = $request->has('token') ? $request->input('token') : '';
+            $this->token = 'v^1.1#i^1#p^3#I^3#r^1#f^0#t^Ul4xMF8yOjc0M0Q3OUNCNjJCNjRERjBENEY4RURDQzNENzc5NkVFXzJfMSNFXjI2MA==';
             $this->headers = array(
                 "Content-Type"                      => "content-type: application/xml; charset=UTF-8",
                 "X-EBAY-API-APP-NAME"               => "fastdeal-autoelem-PRD-4f2fb35bc-cbb0b166",
                 "X-EBAY-API-DEV-NAME"               => "f4927169-5c25-41f4-9751-3c7455b20912",
                 "X-EBAY-API-CERT-NAME"              => "PRD-f2fb35bc9102-6d45-460b-a53a-aa4a",
                 "X-EBAY-API-SITEID"                 => 0,
-                "X-EBAY-API-COMPATIBILITY-LEVEL"    => 723,
+                "X-EBAY-API-COMPATIBILITY-LEVEL"    => 967,
                 "X-EBAY-API-CALL-NAME"              => "",
                 "X-EBAY-API-DETAIL-LEVEL"           => "0",
                 "Transfer-Encoding"                 => 'chunked'
@@ -41,14 +43,14 @@ class EbayController extends Controller
 
     /**
      * Запрос на получение рекомендуемой категории
-     * @param Request $request
+     * @param string $query
      * @return PromiseInterface|Response
      * @throws \Exception
      */
-    public function getSuggestedCategories(Request $request): PromiseInterface|Response
+    public function getSuggestedCategories(string $query): PromiseInterface|Response
     {
         $this->headers["X-EBAY-API-CALL-NAME"] = 'GetSuggestedCategories';
-        $query = $request->has('query') ? $request->input('query') : '';
+        // $query = $request->has('query') ? $request->input('query') : '';
 
         $xmlWriter = new XMLWriter();
         $xmlWriter->openMemory();
@@ -72,14 +74,36 @@ class EbayController extends Controller
      * @return PromiseInterface|Response
      * @throws \Exception
      */
-    public function addFixedPriceItem(Request $request): PromiseInterface|Response
+    public function addFixedPriceItem(Request $request)
     {
-        $this->headers["X-EBAY-API-CALL-NAME"] = 'AddFixedPriceItem';
+        $product = Product::where('sku', $request->input('sku'))->firstOrFail();
+        $response = $this->getSuggestedCategories($product->title);
+        $body = simplexml_load_string($response->body());
+        $xml = (array)$body->SuggestedCategoryArray[0]->SuggestedCategory->Category->CategoryID;
+        $categoryID = $xml[0];
 
+        if (empty($product->images)) {
+            for ($i = 1; $i < 8; $i++) {
+                $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . $product->sku . '_' . $i;
+                $ch = curl_init($file);
+                curl_setopt($ch, CURLOPT_NOBODY, true);
+                curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                if ($httpCode == 200) {
+                    $images[] = $file;
+                }
+                else break;
+            }
+            $product->images = implode(',', $images);
+            $product->save();
+        }
+        $this->headers["X-EBAY-API-CALL-NAME"] = 'AddFixedPriceItem';
+        $this->headers["X-EBAY-API-SITEID"] = '100';
         $xmlWriter = new XMLWriter();
         $xmlWriter->openMemory();
         $xmlWriter->startDocument('1.0', 'utf-8');
-        $xmlWriter->startElement('AddFixedPriceItemRequestsRequest');
+        $xmlWriter->startElement('AddFixedPriceItemRequest');
             $xmlWriter->writeAttribute('xmlns', "urn:ebay:apis:eBLBaseComponents");
             $xmlWriter->startElement('RequesterCredentials');
                 $xmlWriter->writeElement('eBayAuthToken', $this->token);
@@ -88,18 +112,19 @@ class EbayController extends Controller
             $xmlWriter->writeElement('WarningLevel', 'High');
 
             // Start Item
-            $xmlWriter->startElement('RequesterCredentials');
-                $xmlWriter->writeElement('title', 'Beck Arnley Air Filter');  // Need Title with masking
+            $xmlWriter->startElement('Item');
+                $xmlWriter->writeElement('title', $product->title);  // Need Title with masking
                 $xmlWriter->startElement('PrimaryCategory');
-                    $xmlWriter->writeElement('CategoryID', '43509'); // Need Category ID
+                    $xmlWriter->writeElement('CategoryID', $categoryID); // Need Category ID
                 $xmlWriter->endElement();
+                $xmlWriter->writeElement('StartPrice', '1');
                 $xmlWriter->writeElement('ConditionID', '1000');
-                $xmlWriter->writeElement('ConditionDisplayName', 'New');
-                $xmlWriter->writeElement('StartPrice', '0');
                 $xmlWriter->writeElement('CategoryMappingAllowed', 'true');
                 $xmlWriter->writeElement('Country', 'US');
                 $xmlWriter->writeElement('Currency', 'USD');
-                $xmlWriter->writeElement('Description', 'Template');  // Need HTML Template
+                $xmlWriter->startElement('Description');  // Need HTML Template
+                $xmlWriter->text('<![CDATA[ desc ]]>');
+                $xmlWriter->endElement();
                 $xmlWriter->writeElement('DispatchTimeMax', '3');
                 $xmlWriter->writeElement('ListingDuration', 'GTC');
                 $xmlWriter->writeElement('ListingType', 'FixedPriceItem');
@@ -108,7 +133,10 @@ class EbayController extends Controller
                 $xmlWriter->startElement('PictureDetails');
                     $xmlWriter->writeElement('GalleryType', 'Gallery');
                     $xmlWriter->writeElement('PhotoDisplay', 'PicturePack');
-                    $xmlWriter->writeElement('PictureURL', 'https://i.ebayimg.com/00/s/MTUyNlgxNjAw/z/0JUAAOSwAhNhhAwF/$_57.JPG?set_id=8800005007'); //NEED SOME URLS
+                    foreach (explode(',', $product->images) as $image) {
+                        $xmlWriter->writeElement('PictureURL', $image); //NEED SOME URLS
+                    }
+
                 $xmlWriter->endElement();
                 $xmlWriter->writeElement('Quantity', '0');
                 $xmlWriter->startElement('ReservePrice');
@@ -130,7 +158,7 @@ class EbayController extends Controller
                     $xmlWriter->writeElement('eBayGoodStanding', 'true');
                     $xmlWriter->writeElement('NewUser', 'false');
                     $xmlWriter->writeElement('RegistrationDate', '2021-04-16T16:13:24.000Z');
-                    $xmlWriter->writeElement('Site', 'US');
+                    $xmlWriter->writeElement('Site', 'eBayMotors');
                     $xmlWriter->writeElement('Status', 'Confirmed');
                     $xmlWriter->writeElement('UserID', 'motor_elements');
                     $xmlWriter->writeElement('UserIDChanged', 'false');
@@ -162,17 +190,17 @@ class EbayController extends Controller
 
                     $xmlWriter->startElement('ConvertedCurrentPrice');
                         $xmlWriter->writeAttribute('currencyID', "USD");
-                        $xmlWriter->text("36.75");
+                        $xmlWriter->text("1.0");
                     $xmlWriter->endElement();
 
                     $xmlWriter->startElement('CurrentPrice');
                         $xmlWriter->writeAttribute('currencyID', "USD");
-                        $xmlWriter->text("36.75");
+                        $xmlWriter->text("1.0");
                     $xmlWriter->endElement();
 
                     $xmlWriter->startElement('MinimumToBid');
                         $xmlWriter->writeAttribute('currencyID', "USD");
-                        $xmlWriter->text("36.75");
+                        $xmlWriter->text("1.0");
                     $xmlWriter->endElement();
 
 
@@ -180,7 +208,6 @@ class EbayController extends Controller
                     $xmlWriter->writeElement('QuantitySold', '0');
                     $xmlWriter->writeElement('ReserveMet', 'true');
                     $xmlWriter->writeElement('SecondChanceEligible', 'false');
-                    $xmlWriter->writeElement('ListingStatus', 'active');
                     $xmlWriter->writeElement('QuantitySoldByPickupInStore', '0');
 
                 $xmlWriter->endElement();
@@ -255,11 +282,7 @@ class EbayController extends Controller
                 $xmlWriter->startElement('ItemSpecifics');
                     $xmlWriter->startElement('NameValueList');
                         $xmlWriter->writeElement('Name', 'Brand');
-                        $xmlWriter->writeElement('Value', 'Beck Arnley');
-                    $xmlWriter->endElement();
-                    $xmlWriter->startElement('NameValueList');
-                        $xmlWriter->writeElement('Name', 'Type');
-                        $xmlWriter->writeElement('Value', 'Custom');
+                        $xmlWriter->writeElement('Value', 'Motor Elements');
                     $xmlWriter->endElement();
                 $xmlWriter->endElement();
                 // End ItemSpecifics
@@ -270,7 +293,7 @@ class EbayController extends Controller
         $xmlWriter->endElement();
         $xmlWriter->endDocument();
 
-        return $this->sendRequest($xmlWriter->outputMemory());
+        return htmlspecialchars($this->sendRequest($xmlWriter->outputMemory()));
     }
 
     /**
