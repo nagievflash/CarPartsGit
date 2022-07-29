@@ -21,17 +21,16 @@ Route::get('/', function () {
 
 Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        return view('admin.dashboard');
     })->name('dashboard');
 
     Route::get('/import',  [App\Http\Controllers\Admin\AdminController::class, 'importProductsFromCSV'])->name('import');
     Route::get('/categories',  [App\Http\Controllers\Admin\CategoriesController::class, 'createCategoriesFromJson'])->name('categoriesList');
     Route::get('/products',  [App\Http\Controllers\Admin\ProductsController::class, 'index'])->name('products.list');
+
+    Route::post('/import',  [App\Http\Controllers\Admin\RequestController::class, 'importProductsBasics']);
+    Route::get('/ebay/upload',  [App\Http\Controllers\Admin\EbayController::class, 'addFixedPriceItem']);
 });
 
-Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->post('import', function () {
-    Excel::import(new \App\Imports\ProductImport, request()->file('csv-import'));
-    return redirect()->back()->with('success','Data Imported Successfully');
-});
 
 Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->post('/getSuggestedCategories',  [App\Http\Controllers\Admin\EbayController::class, 'getSuggestedCategories'])->name('getSuggestedCategories');
