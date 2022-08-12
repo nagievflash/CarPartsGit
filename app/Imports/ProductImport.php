@@ -19,7 +19,7 @@ class ProductImport implements ToModel, WithHeadingRow, WithChunkReading, WithBa
 
     public function startRow(): int
     {
-        return 2092;
+        return 2;
     }
 
     public function getCsvSettings(): array

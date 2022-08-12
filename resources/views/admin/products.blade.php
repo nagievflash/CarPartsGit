@@ -21,6 +21,28 @@
         <section class="section">
             <div class="card">
                 <div class="card-body">
+                    @if (\Session::has('success'))
+                        <div class="alert alert-success">
+                            <ul>
+                                <li>{{ \Session::get('success') }}</li>
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if (\Session::has('error'))
+                        <div class="alert alert-danger">
+                            <ul>
+                                <li>{!! \Session::get('error') !!}</li>
+                            </ul>
+                        </div>
+                    @endif
+                    <div class="col-md-6 mb-1">
+                        <form action="/admin/products" method="GET" class="input-group mb-3 align-items-center">
+                            @csrf
+                            <input type="text" class="form-control" placeholder="Product SKU" aria-label="Product SKU" name="search" value="{{ app('request')->input('search') }}">
+                            <button class="btn btn-outline-secondary" type="submit">Search</button>
+                        </form>
+                    </div>
                     <table class="table table-striped" id="table1">
                         <thead>
                         <tr>
@@ -50,9 +72,9 @@
                             </td>
                             <td style=""><img src="{{$image}}" alt="{{$product->title}}" width="75px" /></td>
                             <td>{{$product->sku}}</td>
-                            <td>{{$product->title}}</td>
+                            <td>{{$product->getTitle()}}</td>
                             <td>{{$product->qty}}</td>
-                            <td>{{$product->price}}</td>
+                            <td>{{$price = $product->price + $product->price * .3}}</td>
                             <td>
                                 <span class="badge bg-danger">Inactive</span>
                             </td>
