@@ -2,14 +2,14 @@
     <x-slot name="header">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Products</h3>
-                <p class="text-subtitle text-muted">Product listings</p>
+                <h3>{{$product->getTitle()}}</h3>
             </div>
             <div class="col-12 col-md-6 order-md-2 order-first">
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Products</li>
+                        <li class="breadcrumb-item"><a href="/admin">Products</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{$product->getTitle()}}</li>
                     </ol>
                 </nav>
             </div>
@@ -22,19 +22,19 @@
             <div class="card">
                 <div class="card-body">
                     @if (\Session::has('success'))
-                        <div class="alert alert-success">
-                            <ul>
-                                <li>{{ \Session::get('success') }}</li>
-                            </ul>
-                        </div>
+                    <div class="alert alert-success">
+                        <ul>
+                            <li>{!! \Session::get('success') !!}</li>
+                        </ul>
+                    </div>
                     @endif
 
                     @if (\Session::has('error'))
-                        <div class="alert alert-danger">
-                            <ul>
-                                <li>{!! \Session::get('error') !!}</li>
-                            </ul>
-                        </div>
+                    <div class="alert alert-danger">
+                        <ul>
+                            <li>{!! \Session::get('error') !!}</li>
+                        </ul>
+                    </div>
                     @endif
                     <div class="col-md-6 mb-1">
                         <form action="/admin/products" method="GET" class="input-group mb-3 align-items-center">
@@ -72,7 +72,7 @@
                             </td>
                             <td style=""><img src="{{$image}}" alt="{{$product->title}}" width="75px" /></td>
                             <td>{{$product->sku}}</td>
-                            <td>{{$product->getTitle()}}</td>
+                            <td></td>
                             <td>{{$product->qty}}</td>
                             <td>{{$price = $product->price + $product->price * .3}}</td>
                             <td>

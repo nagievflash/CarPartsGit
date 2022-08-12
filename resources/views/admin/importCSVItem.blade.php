@@ -22,7 +22,7 @@
                 <h4 class="card-title">File import form</h4>
             </div>
             <div class="card-body">
-                <form action="">
+                <form action="/admin/import" method="POST" enctype="multipart/form-data">
                     @csrf
                     <x-maz-input :id="'csv-import'"
                                  :name="'csv-import'"
@@ -36,20 +36,15 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-
-                    <form action="">
-                        @csrf
-                        <div class="form-field mt-3">
-                            <textarea class="form-control" name="token">{{$code}}</textarea>
-                        </div>
-                        <div class="form-field mt-3">
-                            <input type="text" class="form-control" name="query" placeholder="Название категории">
-                        </div>
-                        <div class="form-field mt-3">
-                            <a href="#" class="btn btn-success form-submit">Отправить запрос</a>
-                        </div>
-
-                    </form>
+{{--                 <div class="form-field mt-3">
+                        <textarea class="form-control" name="token">{{$code}}</textarea>
+                    </div>
+                    <div class="form-field mt-3">
+                        <input type="text" class="form-control" name="query" placeholder="Название категории">
+                    </div>--}}
+                    <div class="form-field mt-3">
+                        <button type="submit" class="btn btn-success form-submit">Отправить запрос</button>
+                    </div>
                 </form>
             </div>
 
@@ -59,7 +54,7 @@
 
     <x-slot name="scripts">
         <script>
-            $('document').ready(function(){
+/*            $('document').ready(function(){
                 $('.form-submit').click(function(e){
                     e.preventDefault()
                     let data = {
@@ -74,7 +69,7 @@
                         console.log( data );
                     });
                 })
-            })
+            })*/
         </script>
     </x-slot>
 </x-app-layout>

@@ -16,11 +16,18 @@ class ProductsController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
      * @return Application|Factory|View
      */
-    public function index(): View|Factory|Application
+    public function index(Request $request)
     {
-        $products = Product::paginate(25);
+/*        foreach (Product::all() as $product) {
+            $product->title = $product->getTitle();
+            $product->save();
+        }*/
+        $products = Product::when($request->has("search"), function($q) use($request){
+            return $q->where("sku", "like", "%" . $request->get("search") . "%");
+        })->paginate(10);
         return view('admin.products')->with('products', $products);
     }
 
@@ -46,11 +53,12 @@ class ProductsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param int $id
+     * @param string $sku
      */
-    public function show(int $id)
+    public function show(string $sku)
     {
-        //
+        $product = Product::findOrFail('sku', $sku);
+        return view('admin.product')->with('product', $product);
     }
 
     /**
