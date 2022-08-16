@@ -26,7 +26,7 @@ class ProductsController extends Controller
             $product->save();
         }*/
         $products = Product::when($request->has("search"), function($q) use($request){
-            return $q->where("sku", "like", "%" . $request->get("search") . "%");
+            return $q->where("sku", $request->get("search"));
         })->paginate(10);
         return view('admin.products')->with('products', $products);
     }
