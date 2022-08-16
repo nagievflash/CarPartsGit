@@ -1,6 +1,7 @@
 <font rwr="1" style="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Motor Elements</title>
-    <style media="screen">
+    <style type="text/css">
         * {
             margin:0;
             padding:0;
@@ -53,7 +54,7 @@
             line-height: 28px;
         }
         .customer-support a span {
-            color: #f51812;
+            color: #5376f7;
         }
         .hold-toogle {
             display: none;
@@ -96,7 +97,7 @@
             height:7px;
             bottom:0px;
             left:0;
-            background-color:#ff5c5c;
+            background-color:#5376f7;
             position: absolute;
             transform:translateX(-200px);
             transition:.3s ease-in-out all;
@@ -164,9 +165,9 @@
         .gallery-controls-images img {
             opacity: 0;
             transition: .4s ease-in-out all;
-            width:85%;
+            width: 75%;
             position: absolute;
-            color:#fff;
+            color: #fff;
         }
         #preview_id1:checked ~ .gallery-images .gallery-controls-images img#preview_img_1 {
             opacity: 1;
@@ -220,24 +221,24 @@
         }
         .information-tabs .tabs-header label {
             line-height: 45px;
-            font-size: 28px;
+            font-size: 22px;
             padding: 15px 5px;
             cursor:pointer;
             overflow: hidden;
-            margin:0 15px;
+            margin:20px 15px;
             transition: .1s ease border;
         }
         .information-tabs input#specifications-tab:checked ~ label#specifications-tab-label {
-            border-top:4px solid #ff5c5c;
+            border-top:4px solid #5376f7;
         }
         .information-tabs input#compatibilities-tab:checked ~ label#compatibilities-tab-label {
-            border-top:4px solid #ff5c5c;
+            border-top:4px solid #5376f7;
         }
         .information-tabs input#shipping-tab:checked ~ label#shipping-tab-label {
-            border-top:4px solid #ff5c5c;
+            border-top:4px solid #5376f7;
         }
         .information-tabs input#warranty-tab:checked ~ label#warranty-tab-label {
-            border-top:4px solid #ff5c5c;
+            border-top:4px solid #5376f7;
         }
 
         .tabs-header .tab-content {
@@ -281,6 +282,153 @@
         #specifications .PropertyList {
             margin:20px 0;
         }
+
+        @media only screen and (max-width: 1024px) {
+            .tabs-header .tab-content {
+                padding-left:30px;
+                padding-right:30px;
+            }
+            .tabs-header .tab-content .PropertyList {
+                font-size: 16px;
+                line-height: 34px;
+            }
+            #specifications .PropertyList {
+                margin: 15px 0;
+                font-size:18px;
+            }
+            .tabs-header .tab-content {
+                width:100%;
+            }
+            .information-tabs .tabs-header label {
+                display:block;
+                padding-left:25px;
+                margin: 10px 15px;
+            }
+            .information-tabs input#specifications-tab:checked ~ label#specifications-tab-label {
+                background: #5376f7;
+                color: #fff;
+                padding: 10px 25px;
+                border-radius: 15px;
+            }
+            .information-tabs input#compatibilities-tab:checked ~ label#compatibilities-tab-label {
+                background: #5376f7;
+                color: #fff;
+                padding: 10px 25px;
+                border-radius: 15px;
+            }
+            .information-tabs input#shipping-tab:checked ~ label#shipping-tab-label {
+                background: #5376f7;
+                color: #fff;
+                padding: 10px 25px;
+                border-radius: 15px;
+            }
+            .information-tabs input#warranty-tab:checked ~ label#warranty-tab-label {
+                background: #5376f7;
+                color: #fff;
+                padding: 10px 25px;
+                border-radius: 15px;
+            }
+            .menu-holder ul {
+                display: flex;
+                width: 100%;
+                list-style: none;
+                justify-content: center;
+                align-items: center;
+                margin: 10px 0;
+                font-size: 14px;
+                font-weight: 600;
+            }
+            #top-nav {
+                display: none;
+            }
+            .menu-holder {
+                justify-content: flex-end;
+            }
+            .hold-toogle {
+                display: flex;
+                padding: 15px;
+                color: #fff;
+                justify-content: flex-end;
+                align-items: center;
+            }
+            .hold-toogle a {
+                color:#fff;
+            }
+            .hold-toogle label {
+                margin-left: 10px;
+                display: flex;
+                align-items: center;
+            }
+            .hold-toogle label .menu-text {
+                margin-right:10px;
+            }
+            .hold-toogle label span.menu-icon span {
+                width: 28px;
+                height: 2px;
+                margin: 6px;
+                background: #fff;
+                display: flex;
+            }
+            .menu-holder ul li a:before {transform: translateX(-300px);}
+            .gallery .gallery-controls {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding-top: 0;
+                position: absolute;
+                top: 0px;
+                right: 0;
+                left: 0;
+                width: 100%;
+                flex-wrap: wrap;
+                height: 120px;
+                z-index: 1;
+                overflow: auto;
+            }
+            .gallery-section {
+                padding:70px 0 30px;
+            }
+            .footer {
+                padding: 30px 0;
+                font-weight: 600;
+                font-size: 14px;
+                text-align: center;
+                background: #f5f5f5;
+            }
+            .gallery .small_label {
+                margin: 0 10px;
+                width:50px;
+                height:50px;
+            }
+            .gallery {
+                padding-right:0;
+                padding-top: 120px;
+                height:400px;
+            }
+            .information-box {
+                padding:60px 0;
+            }
+            .information-tabs .tabs-header label {
+                font-size: 18px;
+            }
+            .open-check:checked ~ .menu-holder #top-nav {
+                display:block;
+                transition: .2s ease-in-out all;
+            }
+            .menu-holder ul {
+                padding-bottom: 25px;
+                padding-top: 0;
+                margin-top: 0;
+            }
+            .menu-holder ul li a {
+                text-align: left;
+                padding: 10px 20px;
+                font-size: 18px;
+            }
+            .menu-holder ul li a:before {
+                content:none;
+            }
+        }
     </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -292,7 +440,7 @@
             <div class="header-top">
                 <div class="logo">
                     <a href="https://www.ebay.com/str/motorelements" target="_blank">
-                        <img alt="image" src="https://i.ebayimg.com/images/g/OykAAOSwIwBherRk/s-l500.png">
+                        <img alt="image" src="{{ env('APP_URL') . '/images/bg/ebay-4.png' }}">
                     </a>
                 </div>
                 <div class="customer-support">
@@ -308,10 +456,17 @@
                 <div class="container">
                     <input class="open-check" id="open-menu" type="checkbox">
                     <div class="hold-toogle">
-                        <label class="toogle-menu" for="open-menu">Menu <span class="t"></span> <span class="c"></span> <span class="b"></span> </label>
+                        <label class="toogle-menu" for="open-menu">
+                            <span class="menu-text">Menu</span>
+                            <span class="menu-icon">
+                                <span class="t"></span>
+                                <span class="c"></span>
+                                <span class="b"></span>
+                            </span>
+                        </label>
                     </div>
                     <div class="menu-holder">
-                        <label class="close-menu" for="open-menu">Close Menu <i class="fa fa-close" aria-hidden="true"></i> </label>
+                        <label class="close-menu" for="open-menu">Close Menu </label>
                         <ul id="top-nav" data-editor="nav">
                             <li><a href="https://www.ebay.com/str/motorelements" target="_blank">Shop</a></li>
                             <li><a href="https://www.ebay.com/str/motorelements" target="_blank">Visit Our Store</a></li>
@@ -347,7 +502,7 @@
                     <div class="gallery-images">
                         <div class="gallery-controls-images">
                             @foreach ($images as $key => $image)
-                                <img class="big_preview_img" id="preview_img_{{$key}}" src="{{$image}}">
+                                <img class="big_preview_img" id="preview_img_{{ $key + 1 }}" src="{{$image}}">
                             @endforeach
                         </div>
                     </div>
