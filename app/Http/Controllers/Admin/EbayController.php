@@ -10,6 +10,9 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 use XMLWriter;
 
 class EbayController extends Controller
@@ -73,7 +76,6 @@ class EbayController extends Controller
      * This method is adding fixed price items to Ebay Listings
      * Using Ebay Trading API
      * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
     public function addFixedPriceItem(Request $request)
@@ -88,37 +90,52 @@ class EbayController extends Controller
         $fitments = Fitment::where('sku', $product->sku)->get();
         $attributes = Attribute::where('sku', $product->sku)->get();
 
-        if (empty($product->images)) {
-            for ($i = 1; $i < 8; $i++) {
-                $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . $product->sku . '_' . $i;
-                $ch = curl_init($file);
-                curl_setopt($ch, CURLOPT_NOBODY, true);
-                curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                curl_close($ch);
-                if ($httpCode == 200) {
-                    $images[] = $file;
-                } else break;
-            }
-            $product->images = implode(',', $images);
-            $product->save();
-        }
-
         $result = $fitments->groupBy(['submodel_name']);
         $fits = array();
-        foreach ($result as $item) {
-            $fits[] = $item->first()->make_name . ' ' . $item->first()->model_name . ' ' . $item->first()->submodel_name . ' ' . $item->first()->year . '-' . $item->last()->year;
+        foreach ($result as $items) {
+            foreach ($items as $item) {
+                $fits[] = array('name' => $item->make_name . ' ' . $item->model_name . ' ' . $item->submodel_name, 'year' => $item->year );
+            }
         }
+        $fitmentItems = array();
+        $collection = collect($fits);
+        foreach ($collection->groupBy('name') as $item) {
+            $fitmentItems[] = count($item) > 1 ? $item[0]['name'] . ' ' . $item[0]['year'] . '-' . $item[count($item) - 1]['year'] : $item[0]['name'] . ' ' . $item[0]['year'];
+        }
+        rsort($fitmentItems);
+
+
+        for ($i = 1; $i < 8; $i++) {
+            $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . $product->sku . '_' . $i;
+            $ch = curl_init($file);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
+            curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            if ($httpCode == 200) {
+                $images[] = $file;
+            } else break;
+        }
+
+        $images[0] = $this->renderImageSpecifications($images[0]);
+
+        $product->images = implode(',', $images);
+        $product->save();
+
+
         $template = View('ebay.template', [
             'title'         => $title,
-            'fitments'      => $fits,
+            'fitments'      => $fitmentItems,
             'attributes'    => $attributes,
             'images'        => explode(',', $product->images)
         ])->render();
 
         //return $template;
 
-        $price = $product->price + $product->price * .3;
+        $price = $product->price + $product->price / 4;
+        $stock = ($product->qty - 3) > 0 ? $product->qty - 3 : 0;
+        if ($stock > 9) $stock = 9;
+
         $this->headers["X-EBAY-API-CALL-NAME"] = 'AddFixedPriceItem';
         $this->headers["X-EBAY-API-SITEID"] = '100';
         $xmlWriter = new XMLWriter();
@@ -135,6 +152,7 @@ class EbayController extends Controller
         // Start Item
         $xmlWriter->startElement('Item');
         $xmlWriter->writeElement('title', $title);  // Need Title with masking
+        $xmlWriter->writeElement('SKU', $product->sku);  // Need Title with masking
         $xmlWriter->startElement('PrimaryCategory');
         $xmlWriter->writeElement('CategoryID', $categoryID); // Need Category ID
         $xmlWriter->endElement();
@@ -159,7 +177,7 @@ class EbayController extends Controller
         }
 
         $xmlWriter->endElement();
-        $xmlWriter->writeElement('Quantity', $product->qty);
+        $xmlWriter->writeElement('Quantity', $stock);
         $xmlWriter->startElement('ReservePrice');
         $xmlWriter->writeAttribute('currencyID', "USD");
         $xmlWriter->text($price);
@@ -170,34 +188,34 @@ class EbayController extends Controller
 
         // Seller block
         $xmlWriter->startElement('Seller');
-        $xmlWriter->writeElement('AboutMePage', 'false');
-        $xmlWriter->writeElement('Email', 'motorelementss@gmail.com');
-        $xmlWriter->writeElement('FeedbackScore', '134');
-        $xmlWriter->writeElement('PositiveFeedbackPercent', '100.0');
-        $xmlWriter->writeElement('FeedbackPrivate', 'false');
-        $xmlWriter->writeElement('IDVerified', 'false');
-        $xmlWriter->writeElement('eBayGoodStanding', 'true');
-        $xmlWriter->writeElement('NewUser', 'false');
-        $xmlWriter->writeElement('RegistrationDate', '2021-04-16T16:13:24.000Z');
-        $xmlWriter->writeElement('Site', 'eBayMotors');
-        $xmlWriter->writeElement('Status', 'Confirmed');
-        $xmlWriter->writeElement('UserID', 'motor_elements');
-        $xmlWriter->writeElement('UserIDChanged', 'false');
-        $xmlWriter->writeElement('UserIDLastChanged', '2021-10-19T20:28:38.000Z');
-        $xmlWriter->writeElement('VATStatus', 'NoVATTax');
-        $xmlWriter->startElement('SellerInfo');
-        $xmlWriter->writeElement('AllowPaymentEdit', 'true');
-        $xmlWriter->writeElement('CheckoutEnabled', 'true');
-        $xmlWriter->writeElement('CIPBankAccountStored', 'false');
-        $xmlWriter->writeElement('GoodStanding', 'true');
-        $xmlWriter->writeElement('LiveAuctionAuthorized', 'false');
-        $xmlWriter->writeElement('MerchandizingPref', 'OptIn');
-        $xmlWriter->writeElement('QualifiesForB2BVAT', 'false');
-        $xmlWriter->writeElement('StoreOwner', 'true');
-        $xmlWriter->writeElement('StoreURL', 'https://stores.ebay.com/motorelements');
-        $xmlWriter->writeElement('SafePaymentExempt', 'false');
-        $xmlWriter->endElement();
-        $xmlWriter->writeElement('MotorsDealer', 'false');
+            $xmlWriter->writeElement('AboutMePage', 'false');
+            $xmlWriter->writeElement('Email', 'motorelementss@gmail.com');
+            $xmlWriter->writeElement('FeedbackScore', '134');
+            $xmlWriter->writeElement('PositiveFeedbackPercent', '100.0');
+            $xmlWriter->writeElement('FeedbackPrivate', 'false');
+            $xmlWriter->writeElement('IDVerified', 'false');
+            $xmlWriter->writeElement('eBayGoodStanding', 'true');
+            $xmlWriter->writeElement('NewUser', 'false');
+            $xmlWriter->writeElement('RegistrationDate', '2021-04-16T16:13:24.000Z');
+            $xmlWriter->writeElement('Site', 'eBayMotors');
+            $xmlWriter->writeElement('Status', 'Confirmed');
+            $xmlWriter->writeElement('UserID', 'motor_elements');
+            $xmlWriter->writeElement('UserIDChanged', 'false');
+            $xmlWriter->writeElement('UserIDLastChanged', '2021-10-19T20:28:38.000Z');
+            $xmlWriter->writeElement('VATStatus', 'NoVATTax');
+            $xmlWriter->startElement('SellerInfo');
+                $xmlWriter->writeElement('AllowPaymentEdit', 'true');
+                $xmlWriter->writeElement('CheckoutEnabled', 'true');
+                $xmlWriter->writeElement('CIPBankAccountStored', 'false');
+                $xmlWriter->writeElement('GoodStanding', 'true');
+                $xmlWriter->writeElement('LiveAuctionAuthorized', 'false');
+                $xmlWriter->writeElement('MerchandizingPref', 'OptIn');
+                $xmlWriter->writeElement('QualifiesForB2BVAT', 'false');
+                $xmlWriter->writeElement('StoreOwner', 'true');
+                $xmlWriter->writeElement('StoreURL', 'https://stores.ebay.com/motorelements');
+                $xmlWriter->writeElement('SafePaymentExempt', 'false');
+            $xmlWriter->endElement();
+            $xmlWriter->writeElement('MotorsDealer', 'false');
         $xmlWriter->endElement();
         // End Seller Section
 
@@ -226,7 +244,7 @@ class EbayController extends Controller
 
 
         $xmlWriter->writeElement('LeadCount', '0');
-        $xmlWriter->writeElement('QuantitySold', $product->qty);
+        $xmlWriter->writeElement('QuantitySold', $stock);
         $xmlWriter->writeElement('ReserveMet', 'true');
         $xmlWriter->writeElement('SecondChanceEligible', 'false');
         $xmlWriter->writeElement('QuantitySoldByPickupInStore', '0');
@@ -244,7 +262,7 @@ class EbayController extends Controller
 
         // Start ShippingServiceOptions
         $xmlWriter->startElement('ShippingServiceOptions');
-        $xmlWriter->writeElement('ShippingService', 'UPSGround');
+        $xmlWriter->writeElement('ShippingService', 'FedExHomeDelivery');
         $xmlWriter->writeElement('ShippingServicePriority', '1');
         $xmlWriter->writeElement('ExpeditedService', 'false');
         $xmlWriter->writeElement('ShippingTimeMin', '1');
@@ -280,8 +298,8 @@ class EbayController extends Controller
         $xmlWriter->startElement('SellerProfiles');
 
         $xmlWriter->startElement('SellerShippingProfile');
-        $xmlWriter->writeElement('ShippingProfileID', '209396841012');
-        $xmlWriter->writeElement('ShippingProfileName', 'Flat:UPS Ground(Free),1 business day');
+        $xmlWriter->writeElement('ShippingProfileID', '224972567012');
+        $xmlWriter->writeElement('ShippingProfileName', 'NEW Products Fedex 4 days (4 listings)');
         $xmlWriter->endElement();
 
         $xmlWriter->startElement('SellerReturnProfile');
@@ -348,10 +366,12 @@ class EbayController extends Controller
         if ($attributes->count() > 0) {
             foreach ($attributes as $attribute) {
                 if ($attribute->name != 'Prop 65 Warning') {
-                    $xmlWriter->startElement('NameValueList');
-                    $xmlWriter->writeElement('Name', $attribute->name);
-                    $xmlWriter->writeElement('Value', $attribute->value);
-                    $xmlWriter->endElement();
+                    if (strlen($attribute->value) < 70) {
+                        $xmlWriter->startElement('NameValueList');
+                        $xmlWriter->writeElement('Name', $attribute->name);
+                        $xmlWriter->writeElement('Value', $attribute->value);
+                        $xmlWriter->endElement();
+                    }
                 }
             }
         }
@@ -364,7 +384,14 @@ class EbayController extends Controller
         $xmlWriter->endElement();
         $xmlWriter->endDocument();
 
-        print_r($this->sendRequest($xmlWriter->outputMemory())->body());
+        $response = $this->sendRequest($xmlWriter->outputMemory());
+/*
+        return response($result->body(), 200, [
+            'Content-Type' => 'application/xml'
+        ]);*/
+        $body = simplexml_load_string($response->body());
+        $itemID = $body->ItemID;
+        return Redirect::back()->with('success', 'The listing successful uploaded on Ebay. <a href="https://www.ebay.com/itm/'.$itemID.'" target="_blank">See Listing</a>');
     }
 
 
@@ -412,4 +439,31 @@ class EbayController extends Controller
         return '';
     }
 
+    /**
+     * Rendering Image Specifications from first Listing's image
+     * @param $imageUrl
+     * @return string
+     */
+    public function renderImageSpecifications($imageUrl): string
+    {
+        $contents = file_get_contents($imageUrl);
+        $url = 'images/ebay/'. substr($imageUrl, strrpos($imageUrl, '/') + 1) . '.jpg';
+        file_put_contents(public_path($url), $contents);
+
+        $width = 600; // your max width
+        $height = 600; // your max height
+        $img = Image::make(public_path($url));
+        $watermark = Image::make(public_path('images/bg/watermark.png'));
+        $canvas = Image::canvas(1200, 1200);
+        $img->resize(1200, 1200, function($constraint)
+        {
+            $constraint->aspectRatio();
+        });
+        $canvas->insert($img, 'center', 0, 100);
+        $canvas->insert($watermark, 'center');
+        $canvas->save(public_path($url));
+
+
+        return env('APP_URL') . '/' . $url;
+    }
 }
