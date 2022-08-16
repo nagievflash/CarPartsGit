@@ -57,7 +57,8 @@ class Product extends Model
         $title = $this->title;
         if ($fitment->count() > 0) {
             $items = $fitment->where('model_name', $fitment->first()->model_name)->sortBy(['year', 'asc']);
-            $title = 'New ' . $items->first()->part_name . ' for ' . $items->first()->make_name . ' ' . $items->first()->model_name . ' ' . $items->first()->year . '-' . $items->last()->year;
+            if ($items->first()->year != $items->last()->year) $title = 'New ' . $items->first()->part_name . ' for ' . $items->first()->make_name . ' ' . $items->first()->model_name . ' ' . $items->first()->year . '-' . $items->last()->year;
+            else $title = 'New ' . $items->first()->part_name . ' for ' . $items->first()->make_name . ' ' . $items->first()->model_name . ' ' . $items->first()->year;
         }
         return $title;
     }
