@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\EbayListing;
 use App\Models\Product;
 use App\Models\Attribute;
 use App\Models\Fitment;
@@ -76,11 +77,26 @@ class EbayController extends Controller
      * This method is adding fixed price items to Ebay Listings
      * Using Ebay Trading API
      * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
     public function addFixedPriceItem(Request $request)
     {
-        $product = Product::where('sku', $request->input('sku'))->firstOrFail();
+        $this->token = 'v^1.1#i^1#p^3#I^3#r^1#f^0#t^Ul4xMF8yOjc0M0Q3OUNCNjJCNjRERjBENEY4RURDQzNENzc5NkVFXzJfMSNFXjI2MA==';
+        $this->headers = array(
+            "Content-Type"                      => "content-type: application/xml; charset=UTF-8",
+            "X-EBAY-API-APP-NAME"               => "fastdeal-autoelem-PRD-4f2fb35bc-cbb0b166",
+            "X-EBAY-API-DEV-NAME"               => "f4927169-5c25-41f4-9751-3c7455b20912",
+            "X-EBAY-API-CERT-NAME"              => "PRD-f2fb35bc9102-6d45-460b-a53a-aa4a",
+            "X-EBAY-API-SITEID"                 => 0,
+            "X-EBAY-API-COMPATIBILITY-LEVEL"    => 967,
+            "X-EBAY-API-CALL-NAME"              => "",
+            "X-EBAY-API-DETAIL-LEVEL"           => "0",
+            "Transfer-Encoding"                 => 'chunked'
+        );
+        $this->url = 'https://api.ebay.com/ws/api.dll';
+        $sku = $request->get('sku') ? $request->get('sku') : $request->input('sku');
+        $product = Product::where('sku', $sku)->first();
         $title = $product->getTitle();
         $response = $this->getSuggestedCategories($title);
         $body = simplexml_load_string($response->body());
@@ -133,8 +149,8 @@ class EbayController extends Controller
         //return $template;
 
         $price = $product->price + $product->price / 4;
-        $stock = ($product->qty - 3) > 0 ? $product->qty - 3 : 0;
-        if ($stock > 9) $stock = 9;
+        $stock = ($product->qty - 2) > 0 ? $product->qty - 2 : 0;
+        if ($stock > 7) $stock = 7;
 
         $this->headers["X-EBAY-API-CALL-NAME"] = 'AddFixedPriceItem';
         $this->headers["X-EBAY-API-SITEID"] = '100';
@@ -385,13 +401,27 @@ class EbayController extends Controller
         $xmlWriter->endDocument();
 
         $response = $this->sendRequest($xmlWriter->outputMemory());
-/*
+
+
+        /*
         return response($result->body(), 200, [
             'Content-Type' => 'application/xml'
         ]);*/
-        $body = simplexml_load_string($response->body());
-        $itemID = $body->ItemID;
-        return Redirect::back()->with('success', 'The listing successful uploaded on Ebay. <a href="https://www.ebay.com/itm/'.$itemID.'" target="_blank">See Listing</a>');
+
+
+        if ($response->body()) {
+            $body = simplexml_load_string($response->body());
+            if (isset($body->ItemID)) {
+                EbayListing::create([
+                    'sku'       => $product->sku,
+                    'ebay_id'   => $body->ItemID
+                ]);
+                return Redirect::back()->with('success', 'The listing successful uploaded on Ebay. <a href="https://www.ebay.com/itm/'.$body->ItemID.'" target="_blank">See the listing</a>');
+            }
+            else return Redirect::back()->with('error', 'Error, this item already uploaded on ebay or server responded with an error');
+        }
+        else return Redirect::back()->with('error', 'Error, this item already uploaded on ebay or server responded with an error');
+
     }
 
 
@@ -409,7 +439,7 @@ class EbayController extends Controller
     }
 
     /**
-     * Метод генерации шаблона
+     * Method for generating Ebay template
      */
     public function generateTemplate($title, $images, $sku, $fitments, $specs): string
     {
@@ -465,5 +495,42 @@ class EbayController extends Controller
 
 
         return env('APP_URL') . '/' . $url;
+    }
+
+    public function reviseFixedPriceItem(Request $request) {
+        $listing = EbayListing::where('ebay_id', $request->input('ebay_id'))->firstOrFail();
+        $price = $listing->product->price + $listing->product->price / 4;
+        $stock = ($listing->product->qty > 2) ? $listing->product->qty - 2 : 0;
+        if ($stock > 7) $stock = 7;
+
+        $this->headers["X-EBAY-API-CALL-NAME"] = 'ReviseFixedPriceItem';
+        $this->headers["X-EBAY-API-SITEID"] = '100';
+        $xmlWriter = new XMLWriter();
+        $xmlWriter->openMemory();
+        $xmlWriter->startDocument('1.0', 'utf-8');
+        $xmlWriter->startElement('ReviseFixedPriceItemRequest');
+            $xmlWriter->writeAttribute('xmlns', "urn:ebay:apis:eBLBaseComponents");
+            $xmlWriter->startElement('RequesterCredentials');
+                $xmlWriter->writeElement('eBayAuthToken', $this->token);
+            $xmlWriter->endElement();
+            $xmlWriter->writeElement('ErrorLanguage', 'en_US');
+            $xmlWriter->writeElement('WarningLevel', 'High');
+
+            // Start Item
+            $xmlWriter->startElement('Item');
+                $xmlWriter->writeElement('ItemID', $listing->ebay_id);
+                $xmlWriter->writeElement('SKU', $listing->product->sku);
+                $xmlWriter->writeElement('Quantity', $stock);
+                $xmlWriter->writeElement('StartPrice', $price);
+            $xmlWriter->endElement();
+        $xmlWriter->endElement();
+        $xmlWriter->endDocument();
+
+        $response = $this->sendRequest($xmlWriter->outputMemory());
+/*        return response($response->body(), 200, [
+            'Content-Type' => 'application/xml'
+        ]);*/
+
+        return Redirect::back()->with('success', 'The listing successful revised');
     }
 }
