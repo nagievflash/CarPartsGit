@@ -86,7 +86,6 @@
                                 {{--<a href="/admin/products/{{$product->id}}/edit" class="text-primary h4 p-1" title="Edit product"><i class="bi bi-pen"></i></a>
                                 <a href="/admin/products/{{$product->id}}/delete" class="text-danger h4 p-1" title="Delete product"><i class="bi bi-trash"></i></a>--}}
                                 <a href="/admin/ebay/upload?sku={{$product->sku}}" class="text-success h4 p-1" title="Upload product to Ebay"><i class="bi bi-cloud-arrow-up"></i></a>
-                                <a href="/admin/ebay/revise?sku={{$product->sku}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-arrow-repeat"></i></a>
                             </td>
                         </tr>
                         @endforeach
