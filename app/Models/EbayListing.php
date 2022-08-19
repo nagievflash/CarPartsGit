@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
+ * @property mixed $product
  * @attribute string $type
  * @attribute string $sku
  * @attribute bigInteger $ebay_id
  * @method static create(array $array)
+ * @method static where(string $string, mixed $input)
  */
 class EbayListing extends Model
 {
