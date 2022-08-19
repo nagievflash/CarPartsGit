@@ -12,6 +12,12 @@ use App\Models\Fitment;
 /**
  * @method static paginate(int $int)
  * @method static where(string $string, mixed $input)
+ * @property string $sku
+ * @property string $title
+ * @property string $partslink
+ * @property integer $price
+ * @property integer $qty
+ * @property mixed|array|string $images
  */
 class Product extends Model
 {
@@ -36,7 +42,7 @@ class Product extends Model
     /**
      * Get the VEHICLE COMPATIBILITY FITMENT
      */
-    public function fitments()
+    public function fitments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Fitment::class, 'sku', 'sku');
     }
@@ -45,14 +51,14 @@ class Product extends Model
     /**
      * Get the product's attributes
      */
-    public function attributes()
+    public function attributes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Attribute::class, 'sku', 'sku');
     }
 
 
-    public function getTitle() {
-        // = 'New ' + PARTNAME + ' for ' + MAKENAME + ' ' + MODELNAME + ' ' + MINYEAR + '-' + MAXYEAR
+    public function getTitle(): string
+    {
         $fitment = Fitment::select('make_name', 'part_name', 'model_name', 'year')->where('sku', $this->sku)->get();
         $title = $this->title;
         if ($fitment->count() > 0) {
