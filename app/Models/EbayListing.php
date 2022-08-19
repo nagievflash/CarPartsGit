@@ -5,6 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @attribute string $type
+ * @attribute string $sku
+ * @attribute bigInteger $ebay_id
+ * @method static create(array $array)
+ */
 class EbayListing extends Model
 {
     use HasFactory;
@@ -23,4 +29,8 @@ class EbayListing extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public function product() {
+        return $this->hasOne(Product::class, 'sku', 'sku');
+    }
 }
