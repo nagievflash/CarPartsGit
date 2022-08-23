@@ -4,7 +4,6 @@ namespace App\Imports;
 
 use App\Models\Product;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Model;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -32,7 +31,7 @@ class InventoryImport implements ToModel, WithHeadingRow, WithChunkReading, With
     /**
      * @param array $row
      *
-     * @return Model|Product|null
+     * @return void
      */
     public function model(array $row)
     {
@@ -41,7 +40,9 @@ class InventoryImport implements ToModel, WithHeadingRow, WithChunkReading, With
             $product = $product->first();
             $price = (float)$row['cost'] + (float)$row['shipping_cost'] + (float)$row['handling_cost'];
             $qty = $row['stock_total'];
+            $product->old_price = $product->price;
             $product->price = $price;
+            $product->old_qty = $product->qty;
             $product->qty = $qty;
             $product->save();
         }
