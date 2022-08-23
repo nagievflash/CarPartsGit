@@ -384,7 +384,12 @@ class EbayUploadHelper
         return $response;
     }
 
-    public function reviseFixedPriceItem(EbayListing $listing) {
+    /**
+     * @param EbayListing $listing
+     * @return PromiseInterface|Response|string
+     */
+    public function reviseFixedPriceItem(EbayListing $listing): PromiseInterface|string|Response
+    {
         $this->headers["X-EBAY-API-CALL-NAME"] = 'ReviseFixedPriceItem';
         $this->headers["X-EBAY-API-SITEID"] = '100';
 
