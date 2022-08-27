@@ -21,10 +21,12 @@
         "laravel/jetstream": "^2.1",
         "laravel/sanctum": "^2.6",
         "laravel/tinker": "^2.5",
+        "league/flysystem-ftp": "^3.0",
         "livewire/livewire": "^2.0",
         "maatwebsite/excel": "^3.1",
         "predis/predis": "^2.0",
-        "sentry/sentry-laravel": "^2.13"
+        "sentry/sentry-laravel": "^2.13",
+        "ext-zip": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",

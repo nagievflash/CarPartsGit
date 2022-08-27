@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property mixed $product
+ * @property mixed $ebay_id
+ * @property mixed $sku
  * @attribute string $type
  * @attribute string $sku
  * @attribute bigInteger $ebay_id

@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\Attribute;
+use App\Models\Backlog;
 use App\Models\EbayListing;
 use App\Models\Fitment;
 use App\Models\Product;
@@ -392,7 +393,6 @@ class EbayUploadHelper
     {
         $this->headers["X-EBAY-API-CALL-NAME"] = 'ReviseFixedPriceItem';
         $this->headers["X-EBAY-API-SITEID"] = '100';
-
 
         $price = $listing->product->price + $listing->product->price / 4;
         $stock = ($listing->product->qty > 2) ? $listing->product->qty - 2 : 0;
