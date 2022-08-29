@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\UpdateInventory;
+use App\Console\Commands\UpdatePricing;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -13,7 +15,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        'App\Console\Commands\UpdateInventory',
+        'App\Console\Commands\UpdatePricing'
     ];
 
     /**
@@ -24,8 +27,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('update:inventory --shop=ebay')->dailyAt('11:40');
-        $schedule->command('update:pricing --shop=ebay')->dailyAt('12:00');
+        //$schedule->command(UpdateInventory::class)->dailyAt('09:35');
+        $schedule->command(UpdatePricing::class)->dailyAt('09:50');
     }
 
     /**

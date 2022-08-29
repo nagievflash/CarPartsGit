@@ -15,8 +15,11 @@ use App\Models\Fitment;
  * @property string $sku
  * @property string $title
  * @property string $partslink
+ * @property mixed $oem_number
  * @property integer $price
  * @property integer $qty
+ * @property integer $old_price
+ * @property integer $old_qty
  * @property mixed|array|string $images
  */
 class Product extends Model
