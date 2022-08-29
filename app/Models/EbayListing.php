@@ -4,21 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property mixed $product
+ * @property string $type
  * @property mixed $ebay_id
  * @property mixed $sku
- * @attribute string $type
- * @attribute string $sku
- * @attribute bigInteger $ebay_id
  * @method static create(array $array)
  * @method static where(string $string, mixed $input)
  */
 class EbayListing extends Model
 {
     use HasFactory;
-
 
     /**
      * The table associated with the model.
@@ -34,7 +32,12 @@ class EbayListing extends Model
      */
     protected $guarded = [];
 
-    public function product() {
+    /**
+     * Get product associated with this Listing
+     * @return HasOne
+     */
+    public function product(): HasOne
+    {
         return $this->hasOne(Product::class, 'sku', 'sku');
     }
 }
