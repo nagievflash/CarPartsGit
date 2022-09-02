@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property mixed $sku
  * @method static create(array $array)
  * @method static where(string $string, mixed $input)
+ * @method static first()
  */
 class EbayListing extends Model
 {

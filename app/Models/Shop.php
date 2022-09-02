@@ -11,9 +11,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string slug
  * @property string email
  * @property string store_url
+ * @property string username
  * @property string token
  * @property float percent
- * @property integer min_qty
+ * @property integer max_qty
  * @property integer qty_reserve
  * @property string shipping_profile_id
  * @property string shipping_profile_name
@@ -23,6 +24,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string payment_profile_name
  * @method static create(array $array)
  * @method static where(string $string, mixed $input)
+ * @method static findOrFail(string $string, string $slug)
+ * @method static updateOrCreate(array $array)
+ * @method static firstOrCreate(array $array, array $array1)
  */
 class Shop extends Model
 {

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\ReviseProductJob;
-use App\Models\Backlog;
+use App\Jobs\UpdateInventoryPricingJob;
 use App\Models\EbayListing;
+use App\Models\Shop;
 use Illuminate\Console\Command;
 
 class UpdatePricing extends Command
@@ -14,7 +14,7 @@ class UpdatePricing extends Command
      *
      * @var string
      */
-    protected $signature = 'update:pricing {--shop=ebay4}';
+    protected $signature = 'update:pricing';
 
     /**
      * The console command description.
@@ -30,15 +30,14 @@ class UpdatePricing extends Command
      */
     public function handle(): string
     {
-        $shop = $this->option('shop');
-        if ($shop == 'ebay4') {
-            foreach (EbayListing::where('type', 'ebay4')->get() as $listing) {
+        foreach (Shop::all() as $shop) {
+            foreach (EbayListing::where('type', $shop->slug)->get() as $listing) {
                 if ($listing->product->qty != $listing->product->old_qty || $listing->product->price != $listing->product->old_price)  {
-                    dispatch(new ReviseProductJob($listing));
+                    dispatch(new UpdateInventoryPricingJob($listing));
                 }
             }
-
         }
+
         return 'The Job started successfully!';
     }
 }

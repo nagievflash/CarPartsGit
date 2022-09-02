@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('store_url')->nullable();
             $table->string('token')->nullable();
             $table->decimal('percent', 5, 2)->nullable();
-            $table->integer('min_qty')->nullable();
+            $table->integer('max_qty')->nullable();
             $table->integer('qty_reserve')->nullable();
             $table->string('shipping_profile_id')->nullable();
             $table->string('shipping_profile_name')->nullable();
@@ -33,7 +33,7 @@ return new class extends Migration
         });
     }
 
-    /**
+    /**чё
      * Reverse the migrations.
      *
      * @return void

@@ -12,7 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ReviseProductJob implements ShouldQueue
+class UpdateInventoryPricingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -37,6 +37,6 @@ class ReviseProductJob implements ShouldQueue
     {
         //Backlog::createBacklog('pricingUpdate', 'Ebay4 Listing updated sku ' . $this->listing->sku);
         $ebayUploader = new EbayUploadHelper(Shop::where('slug', $this->listing->type)->first());
-        $ebayUploader->reviseFixedPriceItem($this->listing);
+        $ebayUploader->updateInventoryPricing($this->listing);
     }
 }

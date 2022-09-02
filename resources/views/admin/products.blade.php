@@ -78,14 +78,19 @@
                             <td>{{$product->sku}}</td>
                             <td>{{$product->getTitle()}}</td>
                             <td>{{$product->qty}}</td>
-                            <td>{{$price = $product->price + $product->price * .25}}</td>
+                            <td>{{$product->price}}</td>
                             <td>
                                 <span class="badge bg-danger">Inactive</span>
                             </td>
                             <td>
                                 {{--<a href="/admin/products/{{$product->id}}/edit" class="text-primary h4 p-1" title="Edit product"><i class="bi bi-pen"></i></a>
                                 <a href="/admin/products/{{$product->id}}/delete" class="text-danger h4 p-1" title="Delete product"><i class="bi bi-trash"></i></a>--}}
-                                <a href="/admin/ebay/upload?sku={{$product->sku}}" class="text-success h4 p-1" title="Upload product to Ebay"><i class="bi bi-cloud-arrow-up"></i></a>
+                                <form action="/admin/ebay/upload" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="type" value="ebay4">
+                                    <input type="hidden" name="sku" value="{{$product->sku}}">
+                                    <button type="submit" class="btn btn-primary"><i class="bi bi-cloud-arrow-up"></i></button>
+                                </form>
                             </td>
                         </tr>
                         @endforeach

@@ -28,7 +28,7 @@ class RequestController extends Controller
     }
 
     /**
-     * Imports basic products
+     * Imports products from file and upload to ebay
      * @param Request $request
      * @return RedirectResponse
      */
@@ -37,8 +37,8 @@ class RequestController extends Controller
         $file = $request->file('csv-import');
 
         Storage::disk('local')->putFileAs('/files/', $file, 'productsCustom.csv');
-
-        Excel::queueImport(new CustomProductsImport, storage_path().'/app/files/productsCustom.csv');
+        $shop = $request->input('shop');
+        Excel::queueImport(new CustomProductsImport($shop), storage_path().'/app/files/productsCustom.csv');
         return redirect()->back()->with('success', 'The Job started successfully!');
     }
 }

@@ -24,6 +24,16 @@
             <div class="card-body">
                 <form action="/admin/import/products/custom/" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <div class="form-group">
+                        <label for="shop">Select shop, to upload listings</label>
+                        <select class="form-select" name="shop" id="shop">
+                            @foreach(\App\Models\Shop::all() as $shop)
+                                <option value="{{$shop->slug}}">{{$shop->title}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+
                     <x-maz-input :id="'csv-import'"
                                  :name="'csv-import'"
                                  :label="'Download correct txt or csv products file'"

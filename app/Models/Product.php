@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Compatibility;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Compatibility;
 use App\Models\Attribute;
 use App\Models\Fitment;
 
@@ -62,13 +62,32 @@ class Product extends Model
 
     public function getTitle(): string
     {
-        $fitment = Fitment::select('make_name', 'part_name', 'model_name', 'year')->where('sku', $this->sku)->get();
+        $fitment = Compatibility::select('make_name', 'part_name', 'model_name', 'year', 'position')->where('sku', $this->sku)->get();
+        $positions = $fitment->where('position', '!=', '')->unique('position')->count() > 0 ? ' '.strtolower($fitment->where('position', '!=', '')->unique('position')->implode('position', ', ')) : '';
         $title = $this->title;
         if ($fitment->count() > 0) {
             $items = $fitment->where('model_name', $fitment->first()->model_name)->sortBy(['year', 'asc']);
-            if ($items->first()->year != $items->last()->year) $title = 'New ' . $items->first()->part_name . ' for ' . $items->first()->make_name . ' ' . $items->first()->model_name . ' ' . $items->first()->year . '-' . $items->last()->year;
-            else $title = 'New ' . $items->first()->part_name . ' for ' . $items->first()->make_name . ' ' . $items->first()->model_name . ' ' . $items->first()->year;
+            if ($items->first()->year != $items->last()->year) $title = 'New ' . $items->first()->part_name . $positions . ' for ' . $items->first()->year . '-' . $items->last()->year . ' ' . $items->first()->make_name . ' ' . $items->first()->model_name;
+            else $title = 'New ' . $items->first()->part_name . $positions . ' for ' . $items->first()->year . ' ' . $items->first()->make_name . ' ' . $items->first()->model_name;
         }
+        return $title;
+    }
+
+    public function getTitleShort(): string
+    {
+        $fitment = Fitment::select('make_name', 'part_name', 'model_name', 'year')->where('sku', $this->sku)->get();
+        $title = '';
+        if ($fitment->count() > 0) {
+            $items = $fitment->where('model_name', $fitment->first()->model_name)->sortBy(['year', 'asc']);
+            if ($items->first()->year != $items->last()->year) $title = 'New ' . $items->first()->part_name . ' for ' . $items->first()->year . '-' . $items->last()->year . ' ' . $items->first()->make_name . ' ' . $items->first()->model_name;
+            else $title = 'New ' . $items->first()->part_name . ' for ' . $items->first()->year . ' ' . $items->first()->make_name . ' ' . $items->first()->model_name;
+        }
+
+        if (strlen($title) > 70)  {
+            $items = $fitment->where('model_name', $fitment->first()->model_name)->sortBy(['year', 'asc']);
+            $title = 'New ' . $this->title . 'For ' .$items->first()->make_name . ' ' . $items->first()->model_name;
+        }
+
         return $title;
     }
 

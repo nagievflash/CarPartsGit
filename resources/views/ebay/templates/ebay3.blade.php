@@ -23,7 +23,7 @@
         }
         header .logo img {
             display: block;
-            width: 150px;
+            width: 200px;
             height: auto;
             text-align: center;
             padding-left: 0px;
@@ -54,7 +54,7 @@
             line-height: 28px;
         }
         .customer-support a span {
-            color: #5376f7;
+            color: #f01813;
         }
         .hold-toogle {
             display: none;
@@ -72,7 +72,7 @@
             display: flex;
             width: 100%;
             list-style: none;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
             margin: 0 -15px;
             font-size: 18px;
@@ -97,7 +97,7 @@
             height:7px;
             bottom:0px;
             left:0;
-            background-color:#5376f7;
+            background-color:#f01813;
             position: absolute;
             transform:translateX(-200px);
             transition:.3s ease-in-out all;
@@ -115,6 +115,8 @@
         }
         .gallery-section h3 {
             font-size:28px;
+            text-align: center;
+            color: #dd0000;
         }
         .gallery {
             height: 800px;
@@ -229,24 +231,27 @@
             transition: .1s ease border;
         }
         .information-tabs input#specifications-tab:checked ~ label#specifications-tab-label {
-            border-top:4px solid #5376f7;
+            border-top:4px solid #f01813;
         }
         .information-tabs input#compatibilities-tab:checked ~ label#compatibilities-tab-label {
-            border-top:4px solid #5376f7;
+            border-top:4px solid #f01813;
         }
         .information-tabs input#shipping-tab:checked ~ label#shipping-tab-label {
-            border-top:4px solid #5376f7;
+            border-top:4px solid #f01813;
         }
         .information-tabs input#warranty-tab:checked ~ label#warranty-tab-label {
-            border-top:4px solid #5376f7;
+            border-top:4px solid #f01813;
         }
-
+        .tabs-header {
+            text-align: center;
+        }
         .tabs-header .tab-content {
             display: none;
             transition: .2s ease-in-out all;
             padding: 50px 50px 70px;
             margin-top: 50px;
             background: #f5f5f5;
+            text-align: left;
         }
         .information-tabs input#specifications-tab:checked ~ #specifications {
             display: block;
@@ -277,13 +282,18 @@
             padding: 60px 0 50px;
             font-size: 24px;
             text-align: center;
-            background: #f5f5f5;
+            background: #ff3e3e;
+            color: #fff;
+            font-weight: 600;
         }
         #specifications .PropertyList {
             margin:20px 0;
         }
 
         @media only screen and (max-width: 1024px) {
+            header .logo img {
+                width:150px;
+            }
             .tabs-header .tab-content {
                 padding-left:30px;
                 padding-right:30px;
@@ -305,25 +315,25 @@
                 margin: 10px 15px;
             }
             .information-tabs input#specifications-tab:checked ~ label#specifications-tab-label {
-                background: #5376f7;
+                background: #f01813;
                 color: #fff;
                 padding: 10px 25px;
                 border-radius: 15px;
             }
             .information-tabs input#compatibilities-tab:checked ~ label#compatibilities-tab-label {
-                background: #5376f7;
+                background: #f01813;
                 color: #fff;
                 padding: 10px 25px;
                 border-radius: 15px;
             }
             .information-tabs input#shipping-tab:checked ~ label#shipping-tab-label {
-                background: #5376f7;
+                background: #f01813;
                 color: #fff;
                 padding: 10px 25px;
                 border-radius: 15px;
             }
             .information-tabs input#warranty-tab:checked ~ label#warranty-tab-label {
-                background: #5376f7;
+                background: #f01813;
                 color: #fff;
                 padding: 10px 25px;
                 border-radius: 15px;
@@ -393,7 +403,6 @@
                 font-weight: 600;
                 font-size: 14px;
                 text-align: center;
-                background: #f5f5f5;
             }
             .gallery .small_label {
                 margin: 0 10px;
@@ -439,12 +448,12 @@
         <div class="container">
             <div class="header-top">
                 <div class="logo">
-                    <a href="https://www.ebay.com/str/motorelements" target="_blank">
-                        <img alt="image" src="{{ env('APP_URL') . '/images/bg/ebay-4.png' }}">
+                    <a href="https://www.ebay.com/str/autoglassusa" target="_blank">
+                        <img alt="image" src="{{ env('APP_URL') . '/images/bg/ebay-3.png' }}">
                     </a>
                 </div>
                 <div class="customer-support">
-                    <a href="https://www.ebay.com/cnt/IntermediatedFAQ?ReturnUserEmail=&requested=motor_elements&_caprdt=1">
+                    <a href="https://www.ebay.com/cnt/IntermediatedFAQ?ReturnUserEmail=&requested=auto_glass_usa&_caprdt=1">
                         Customer <span>Support</span>
                     </a>
                 </div>
@@ -468,11 +477,11 @@
                     <div class="menu-holder">
                         <label class="close-menu" for="open-menu">Close Menu </label>
                         <ul id="top-nav" data-editor="nav">
-                            <li><a href="https://www.ebay.com/str/motorelements" target="_blank">Shop</a></li>
-                            <li><a href="https://www.ebay.com/str/motorelements" target="_blank">Visit Our Store</a></li>
-                            <li><a href="https://www.ebay.com/usr/motor_elements" target="_blank">About Us</a></li>
-                            <li><a href="https://www.ebay.com/fdbk/feedback_profile/motor_elements?filter=feedback_page:All" target="_blank">Reviews</a></li>
-                            <li><a href="https://www.ebay.com/cnt/IntermediatedFAQ?ReturnUserEmail=&amp;requested=motor_elements&amp;_caprdt=1" target="_blank">Contact Us</a></li>
+                            <li><a href="https://www.ebay.com/sch/auto_glass_usa/m.html?item=174919014915&rt=nc&_trksid=p2047675.m3561.l2562" target="_blank">Shop</a></li>
+                            <li><a href="https://www.ebay.com/usr/auto_glass_usa" target="_blank">Visit Our Store</a></li>
+                            <li><a href="https://www.ebay.com/usr/auto_glass_usa?_trksid=p2047675.m3561.l2559" target="_blank">About Us</a></li>
+                            <li><a href="https://www.ebay.com/fdbk/feedback_profile/auto_glass_usa?filter=feedback_page:All" target="_blank">Reviews</a></li>
+                            <li><a href="https://www.ebay.com/cnt/IntermediatedFAQ?ReturnUserEmail=&requested=auto_glass_usa&_caprdt=1" target="_blank">Contact Us</a></li>
                         </ul>
                     </div>
                 </div>
@@ -533,7 +542,7 @@
                                 @endif
                             @endforeach
                             <div class="PropertyList">
-                                <p><span>Warranty:</span> 3-year warranty</p>
+                                <p><span>Warranty:</span> 1-year warranty</p>
                             </div>
                             @if ($positions != '')
                                 <div class="PropertyList">
@@ -546,9 +555,9 @@
                         <div id="compatibilities" class="tab-content">
                             <h4>Compatibilities</h4>
                             @foreach ($fitments as $fitment)
-                            <div class="PropertyList">
-                                <p>{{$fitment}}</p>
-                            </div>
+                                <div class="PropertyList">
+                                    <p>{{$fitment}}</p>
+                                </div>
                             @endforeach
                         </div>
 
@@ -566,7 +575,7 @@
                             </div>
                             <h4 style="margin-top:50px;">Warranty</h4>
                             <div class="PropertyList">
-                                This item comes with a 3 year warranty that is valid for a one time replacement of the purchased product. Should the product be unavailable at the time a replacement is requested, we will refund your payment less return shipping and handling charges. See further details below.
+                                This item comes with a 1 year warranty that is valid for a one time replacement of the purchased product. Should the product be unavailable at the time a replacement is requested, we will refund your payment less return shipping and handling charges. See further details below.
                             </div>
                             <h4 style="margin-top:50px;">Returns</h4>
                             <div class="PropertyList">
@@ -579,7 +588,7 @@
         </div>
         <div class="footer">
             <div class="container">
-                <p>Copyright @ Motor Elements, All Rights Reserved</p>
+                <p>Copyright @ Autoglass USA, All Rights Reserved</p>
             </div>
         </div>
     </main>

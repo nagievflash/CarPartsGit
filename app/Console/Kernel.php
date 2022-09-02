@@ -16,7 +16,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         'App\Console\Commands\UpdateInventory',
-        'App\Console\Commands\UpdatePricing'
+        'App\Console\Commands\UpdatePricing',
+        'App\Console\Commands\ReviseAllItems'
     ];
 
     /**
@@ -27,8 +28,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //$schedule->command(UpdateInventory::class)->dailyAt('09:35');
-        $schedule->command(UpdatePricing::class)->dailyAt('09:50');
+        $schedule->command(UpdateInventory::class)->dailyAt('07:46');
     }
 
     /**

@@ -53,6 +53,7 @@
                             <th>Qty</th>
                             <th>Price</th>
                             <th>Status</th>
+                            <th>Ebay Link</th>
                             <th>Actions</th>
                         </tr>
                         </thead>
@@ -81,6 +82,9 @@
                                 <td>{{$listing->product = $listing->product->price + $listing->product->price * .25}}</td>
                                 <td>
                                     <span class="badge bg-success">{{$listing->type}}</span>
+                                </td>
+                                <td>
+                                    <a href="https://www.ebay.com/itm/{{$listing->ebay_id}}" class="text-success" target="_blank">See listing</a>
                                 </td>
                                 <td>
                                     <a href="/admin/ebay/revise?ebay_id={{$listing->ebay_id}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-arrow-repeat"></i></a>

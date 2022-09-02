@@ -3,6 +3,10 @@
 namespace App\Imports;
 
 use App\Http\Controllers\Admin\EbayController;
+use App\Jobs\AddFixedPriceItemJob;
+use App\Jobs\ReviseProductJob;
+use App\Models\Backlog;
+use App\Models\Fitment;
 use App\Models\Product;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -15,10 +19,18 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithUpserts;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Events\AfterImport;
 
 class CustomProductsImport implements ToModel, WithChunkReading, WithBatchInserts, WithStartRow, ShouldQueue
 {
     use RemembersRowNumber;
+
+    public string $shop;
+
+    public function  __construct(string $shop = 'ebay4')
+    {
+        $this->shop = $shop;
+    }
 
     public function startRow(): int
     {
@@ -35,26 +47,27 @@ class CustomProductsImport implements ToModel, WithChunkReading, WithBatchInsert
     /**
      * @param array $row
      *
-     * @return Model|Product|null
      */
     public function model(array $row)
     {
-        $product = Product::where('sku', $row[0]);
-        if ($product->fitment->exists()) {
-            $request = new Request();
-            $request->request->set('sku' , $row[0]);
-            $ebay = new EbayController($request);
-            $ebay->addFixedPriceItem($request);
+        if (Fitment::where('sku', $row[0])->exists()) {
+            $product = Product::where('sku', $row[0])->first();
+            dispatch(new AddFixedPriceItemJob($product, $this->shop));
         }
     }
 
     public function chunkSize(): int
     {
-        return 5;
+        return 100;
     }
 
     public function batchSize(): int
     {
-        return 5;
+        return 100;
+    }
+
+    public static function afterImport(AfterImport $event)
+    {
+        Backlog::createBacklog('CustomProductsImport', 'Custom listings upload job started');
     }
 }
