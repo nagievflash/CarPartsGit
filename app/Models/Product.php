@@ -12,6 +12,7 @@ use App\Models\Fitment;
 /**
  * @method static paginate(int $int)
  * @method static where(string $string, mixed $input)
+ * @method static when(bool $has, \Closure $param)
  * @property string $sku
  * @property string $title
  * @property string $partslink

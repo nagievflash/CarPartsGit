@@ -509,10 +509,11 @@ class EbayUploadHelper
             $xmlWriter->endElement();
 
 
-            $xmlWriter->writeElement('Title', $title);
+            /*$xmlWriter->writeElement('Title', $title);
+
             $xmlWriter->startElement('Description');  // Need HTML Template
                 $xmlWriter->text($template);
-            $xmlWriter->endElement();
+            $xmlWriter->endElement();*/
 
         // Start ItemSpecifics
         $xmlWriter->startElement('ItemCompatibilityList');

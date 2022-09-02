@@ -25,4 +25,15 @@ class Compatibility extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * Return list of attributes usable in fitments
+     * @return array
+     */
+    public function getUsableAttributes(): array
+    {
+        $attributes = $this->attributesToArray();
+        $except = ['id', 'application_id', 'brand_name', 'part_name', 'pcdb_part_name', 'sku', 'team', 'sku_merchant'];
+        return array_diff_key($attributes, array_flip((array) $except));
+    }
 }

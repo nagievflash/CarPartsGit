@@ -21,10 +21,6 @@ class ProductsController extends Controller
      */
     public function index(Request $request)
     {
-/*        foreach (Product::all() as $product) {
-            $product->title = $product->getTitle();
-            $product->save();
-        }*/
         $products = Product::when($request->has("search"), function($q) use($request){
             return $q->where("sku", $request->get("search"));
         })->paginate(10);
