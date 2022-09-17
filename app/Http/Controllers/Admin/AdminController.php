@@ -32,9 +32,10 @@ class AdminController extends Controller
      */
     public function ebayListings(Request $request): Factory|View|Application
     {
-        $listings = EbayListing::when($request->has("search"), function($q) use($request){
-            return $q->where("sku", $request->get("search"));
-        })->paginate(15);
+        if ($request->has('search')) {
+            $listings = EbayListing::where("sku", $request->get("search"))->exists() ? EbayListing::where("sku", $request->get("search"))->paginate(15) : EbayListing::where("ebay_id", $request->get("search"))->paginate(15);
+        }
+        else $listings = EbayListing::paginate(15);
         return view('ebay.listings')->with('listings', $listings);
     }
 
@@ -90,5 +91,16 @@ class AdminController extends Controller
             'attributes'    => $attributes,
             'images'        => explode(',', $product->images)
         ])->render();
+    }
+
+
+    /**
+     * Ebay upload fitments page
+     * @param Request $request
+     * @return Factory|View|Application
+     */
+    public function importFitments(Request $request): Factory|View|Application
+    {
+        return view('admin.importFitments');
     }
 }

@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class ProductsController extends Controller
 {
@@ -19,10 +17,11 @@ class ProductsController extends Controller
      * @param Request $request
      * @return Application|Factory|View
      */
-    public function index(Request $request)
+    public function index(Request $request): View|Factory|Application
     {
         $products = Product::when($request->has("search"), function($q) use($request){
-            return $q->where("sku", $request->get("search"));
+            if ($q->where("sku", $request->get("search"))->exists()) return $q->where("sku", $request->get("search"));
+            else return \App\Models\Product::where("partslink", $request->get("search"));
         })->paginate(10);
         return view('admin.products')->with('products', $products);
     }
@@ -50,8 +49,9 @@ class ProductsController extends Controller
      * Display the specified resource.
      *
      * @param string $sku
+     * @return Factory|View|Application
      */
-    public function show(string $sku)
+    public function show(string $sku): Factory|View|Application
     {
         $product = Product::findOrFail('sku', $sku);
         return view('admin.product')->with('product', $product);

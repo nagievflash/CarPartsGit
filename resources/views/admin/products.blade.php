@@ -39,7 +39,7 @@
                     <div class="col-md-6 mb-1">
                         <form action="/admin/products" method="GET" class="input-group mb-3 align-items-center">
                             @csrf
-                            <input type="text" class="form-control" placeholder="Product SKU" aria-label="Product SKU" name="search" value="{{ app('request')->input('search') }}">
+                            <input type="text" class="form-control" placeholder="Search by product sku or partslink" aria-label="Search by product sku or partslink" name="search" value="{{ app('request')->input('search') }}">
                             <button class="btn btn-outline-secondary" type="submit">Search</button>
                         </form>
                     </div>

@@ -39,7 +39,7 @@
                     <div class="col-md-6 mb-1">
                         <form action="{{Route('ebay.listings')}}" method="GET" class="input-group mb-3 align-items-center">
                             @csrf
-                            <input type="text" class="form-control" placeholder="Product SKU" aria-label="Product SKU" name="search" value="{{ app('request')->input('search') }}">
+                            <input type="text" class="form-control" placeholder="Product SKU or Ebay Listing ID" aria-label="Product SKU" name="search" value="{{ app('request')->input('search') }}">
                             <button class="btn btn-outline-secondary" type="submit">Search</button>
                         </form>
                     </div>

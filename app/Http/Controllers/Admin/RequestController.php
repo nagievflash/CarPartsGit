@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Imports\CustomProductsImport;
+use App\Imports\FitmentImport;
 use App\Imports\InventoryImport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -39,6 +40,20 @@ class RequestController extends Controller
         Storage::disk('local')->putFileAs('/files/', $file, 'productsCustom.csv');
         $shop = $request->input('shop');
         Excel::queueImport(new CustomProductsImport($shop), storage_path().'/app/files/productsCustom.csv');
+        return redirect()->back()->with('success', 'The Job started successfully!');
+    }
+
+    /**
+     * Imports fitments from file
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function importFitments(Request $request): RedirectResponse
+    {
+        $file = $request->file('csv-import');
+
+        //Storage::disk('local')->putFileAs('/files/', $file, 'fitments.csv');
+        Excel::queueImport(new FitmentImport(), storage_path().'/app/files/fitments.csv');
         return redirect()->back()->with('success', 'The Job started successfully!');
     }
 }

@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
-use App\Models\Compatibility;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Attribute;
-use App\Models\Fitment;
 
 
 /**
  * @method static paginate(int $int)
  * @method static where(string $string, mixed $input)
  * @method static when(bool $has, \Closure $param)
+ * @method static findOrFail(string $string, string $sku)
+ * @method static whereHas(string $string, \Closure $param)
  * @property string $sku
  * @property string $title
  * @property string $partslink
@@ -42,6 +41,10 @@ class Product extends Model
     protected $casts = [
         'images' => 'array'
     ];
+
+/*    protected $appends = [
+        'imagesArray'
+    ];*/
 
     /**
      * Get the VEHICLE COMPATIBILITY FITMENT
@@ -91,5 +94,31 @@ class Product extends Model
 
         return $title;
     }
+
+    /**
+     * @return string[]
+     */
+    /*public function getImagesArrayAttribute(): array
+    {
+        if (!$this->attributes['images']) {
+
+            for ($i = 1; $i < 8; $i++) {
+                $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . $this->attributes['sku'] . '_' . $i;
+                $ch = curl_init($file);
+                curl_setopt($ch, CURLOPT_NOBODY, true);
+                curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                if ($httpCode == 200) {
+                    $images[] = $file;
+                } else break;
+            }
+
+            $this->images = implode(',', $images);
+            $this->save();
+        }
+
+        return explode(',', $this->attributes['images']);
+    }*/
 
 }

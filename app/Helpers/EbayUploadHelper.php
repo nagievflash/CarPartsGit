@@ -9,10 +9,12 @@ use App\Models\Compatibility;
 use App\Models\Fitment;
 use App\Models\Product;
 use App\Models\Shop;
+use Exception;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 use XMLWriter;
 
@@ -43,36 +45,12 @@ class EbayUploadHelper
         $this->url = 'https://api.ebay.com/ws/api.dll';
     }
 
-    /**
-     * Request for getting suggested categories by title from Ebay
-     * @param string $query
-     * @return PromiseInterface|Response
-     * @throws \Exception
-     */
-    public function getSuggestedCategories(string $query): PromiseInterface|Response
-    {
-        $this->headers["X-EBAY-API-CALL-NAME"] = 'GetSuggestedCategories';
-
-        $xmlWriter = new XMLWriter();
-        $xmlWriter->openMemory();
-        $xmlWriter->startDocument('1.0', 'utf-8');
-        $xmlWriter->startElement('GetSuggestedCategoriesRequest');
-        $xmlWriter->writeAttribute('xmlns', "urn:ebay:apis:eBLBaseComponents");
-        $xmlWriter->startElement('RequesterCredentials');
-        $xmlWriter->writeElement('eBayAuthToken', $this->shop->token);
-        $xmlWriter->endElement();
-        $xmlWriter->writeElement('Query', $query);
-        $xmlWriter->endElement();
-        $xmlWriter->endDocument();
-
-        return $this->sendRequest($xmlWriter->outputMemory());
-    }
 
     /**
      * Method for listing a fixed price item at Ebay
      * @param Product $product
      * @return PromiseInterface|Response|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function addFixedPriceItem(Product $product): PromiseInterface|string|Response
     {
@@ -165,7 +143,7 @@ class EbayUploadHelper
             $xmlWriter->writeElement('DispatchTimeMax', '3');
             $xmlWriter->writeElement('ListingDuration', 'GTC');
             $xmlWriter->writeElement('ListingType', 'FixedPriceItem');
-            $xmlWriter->writeElement('Location', 'AZ CA NY FL TX WA');
+            $xmlWriter->writeElement('Location', 'NV CA PA IL TX FL');
             $xmlWriter->writeElement('PrivateListing', 'false');
             $xmlWriter->startElement('PictureDetails');
             $xmlWriter->writeElement('GalleryType', 'Gallery');
@@ -343,10 +321,17 @@ class EbayUploadHelper
                 $xmlWriter->writeElement('Name', 'Model');
                 $xmlWriter->writeElement('Value', $fitment->model_name);
                 $xmlWriter->endElement();
+
                 if ($fitment->submodel_name) {
                     $xmlWriter->startElement('NameValueList');
                     $xmlWriter->writeElement('Name', 'Submodel');
                     $xmlWriter->writeElement('Value', $fitment->submodel_name);
+                    $xmlWriter->endElement();
+                }
+                if ($fitment->bodytypename) {
+                    $xmlWriter->startElement('NameValueList');
+                    $xmlWriter->writeElement('Name', 'Trim');
+                    $xmlWriter->writeElement('Value', $fitment->bodytypename);
                     $xmlWriter->endElement();
                 }
                 $xmlWriter->endElement();
@@ -409,7 +394,7 @@ class EbayUploadHelper
 
             try {
                 $response = $this->sendRequest($xmlWriter->outputMemory());
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return 'Error while sending request to Ebay API';
             }
 
@@ -423,14 +408,22 @@ class EbayUploadHelper
      * Method for revise fixed price item at Ebay
      * @param EbayListing $listing
      * @return PromiseInterface|Response|string
+     * @throws Exception
      */
     public function reviseFixedPriceItem(EbayListing $listing): PromiseInterface|string|Response
     {
+        $title = strlen($listing->product->getTitle()) < 70 ? $listing->product->getTitle() : $listing->product->getTitleShort();
+        $response = $this->getSuggestedCategories($title);
+        $body = simplexml_load_string($response->body());
+        $categoryID = 0;
+        if (count((array)$body->SuggestedCategoryArray[0]) != 0) {
+            $xml = (array)$body->SuggestedCategoryArray[0]->SuggestedCategory->Category->CategoryID;
+            $categoryID = $xml[0];
+        }
         $this->headers["X-EBAY-API-CALL-NAME"] = 'ReviseFixedPriceItem';
         $this->headers["X-EBAY-API-SITEID"] = '100';
 
-        $title = strlen($listing->product->getTitle()) < 70 ? $listing->product->getTitle() : $listing->product->getTitleShort();
-        $fitments = Compatibility::where('sku', $listing->product->sku)->get();
+        $fitments = Compatibility::select('id', 'sku', 'year', 'make_name', 'model_name', 'submodel_name', 'bodytypename')->where('sku', $listing->product->sku)->get();
         $attributes = Attribute::where('sku', $listing->product->sku)->get();
 
         $positions = $fitments->where('position', '!=', '')->unique('position')->implode('position', ', ');
@@ -450,7 +443,7 @@ class EbayUploadHelper
         rsort($fitmentItems);
 
 
-        for ($i = 1; $i < 8; $i++) {
+/*        for ($i = 1; $i < 8; $i++) {
             $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . $listing->product->sku . '_' . $i;
             $ch = curl_init($file);
             curl_setopt($ch, CURLOPT_NOBODY, true);
@@ -474,7 +467,7 @@ class EbayUploadHelper
             'attributes'    => $attributes,
             'positions'      => $positions,
             'images'        => explode(',', $listing->product->images)
-        ])->render();
+        ])->render();*/
 
         $price = $listing->product->price + $listing->product->price  * $this->shop->percent / 100;
         $stock = ($listing->product->qty - $this->shop->qty_reserve) > 0 ? $listing->product->qty - $this->shop->qty_reserve : 0;
@@ -493,12 +486,13 @@ class EbayUploadHelper
 
         // Start Item
         $xmlWriter->startElement('Item');
+            $xmlWriter->writeElement('Location', 'NV CA PA IL TX FL');
             $xmlWriter->writeElement('ItemID', $listing->ebay_id);
             $xmlWriter->writeElement('SKU', $listing->product->sku);
             $xmlWriter->writeElement('Quantity', $stock);
             $xmlWriter->writeElement('StartPrice', $price);
 
-            $xmlWriter->startElement('PictureDetails');
+/*            $xmlWriter->startElement('PictureDetails');
             $xmlWriter->writeElement('GalleryType', 'Gallery');
             $xmlWriter->writeElement('PhotoDisplay', 'PicturePack');
 
@@ -506,7 +500,7 @@ class EbayUploadHelper
                 $xmlWriter->writeElement('PictureURL', $image); //NEED SOME URLS
             }
 
-            $xmlWriter->endElement();
+            $xmlWriter->endElement();*/
 
 
             /*$xmlWriter->writeElement('Title', $title);
@@ -517,42 +511,74 @@ class EbayUploadHelper
 
         // Start ItemSpecifics
         $xmlWriter->startElement('ItemCompatibilityList');
+        foreach ($fitments->groupBy(['year', 'make_name', 'model_name']) as $year => $y) {
+            foreach ($y as $make => $m) {
+                foreach ($m as $model => $ml) {
+                    $ebayFitments = $this->getCompatibilityTrimsFromEbay($categoryID, $year, $make, $model);
+                    foreach ($ml as $item) {
+                        $xmlWriter->startElement('Compatibility');
+                            $compatibilityNotes = $fitments->where('make_name', $make)->where('year', $year)->where('model_name', $model)->first();
+                            $notes = 'For';
+                            if ($compatibilityNotes->cylinders) $notes .= ' ' . $compatibilityNotes->cylinders.'Cyl';
+                            if ($compatibilityNotes->liter) $notes .= ' ' . $compatibilityNotes->liter.'L';
+                            $notes .= ' ' . $compatibilityNotes->make_name . ' ' . $compatibilityNotes->model_name . ' ' . $compatibilityNotes->part_name;
+                            if ($compatibilityNotes->position) $notes .= ' ' . $compatibilityNotes->position;
+                            $xmlWriter->writeElement('CompatibilityNotes', $notes);
 
-        $compatibilityNotes = '';
-
-        foreach ($fitments as $fitment) {
-            $xmlWriter->startElement('Compatibility');
-
-            $compatibilityNotes = $fitments->where('make_name', $fitment->make_name)->where('year', $fitment->year)->where('model_name', $fitment->model_name)->first();
-            $notes = 'For';
-            if ($compatibilityNotes->cylinders) $notes .= ' ' . $compatibilityNotes->cylinders.'Cyl';
-            if ($compatibilityNotes->liter) $notes .= ' ' . $compatibilityNotes->liter.'L';
-            $notes .= ' ' . $compatibilityNotes->make_name . ' ' . $compatibilityNotes->model_name . ' ' . $compatibilityNotes->part_name;
-            if ($compatibilityNotes->position) $notes .= ' ' . $compatibilityNotes->position;
-
-            $xmlWriter->writeElement('CompatibilityNotes', $notes);
-
-            $xmlWriter->startElement('NameValueList');
-            $xmlWriter->writeElement('Name', 'Year');
-            $xmlWriter->writeElement('Value', $fitment->year);
-            $xmlWriter->endElement();
-            $xmlWriter->startElement('NameValueList');
-            $xmlWriter->writeElement('Name', 'Make');
-            $xmlWriter->writeElement('Value', $fitment->make_name);
-            $xmlWriter->endElement();
-            $xmlWriter->startElement('NameValueList');
-            $xmlWriter->writeElement('Name', 'Model');
-            $xmlWriter->writeElement('Value', $fitment->model_name);
-            $xmlWriter->endElement();
-            if ($fitment->submodel_name) {
-                $xmlWriter->startElement('NameValueList');
-                $xmlWriter->writeElement('Name', 'Submodel');
-                $xmlWriter->writeElement('Value', $fitment->submodel_name);
-                $xmlWriter->endElement();
+                            $xmlWriter->startElement('NameValueList');
+                            $xmlWriter->writeElement('Name', 'Year');
+                            $xmlWriter->writeElement('Value', $year);
+                            $xmlWriter->endElement();
+                            $xmlWriter->startElement('NameValueList');
+                            $xmlWriter->writeElement('Name', 'Make');
+                            $xmlWriter->writeElement('Value', $make);
+                            $xmlWriter->endElement();
+                            $xmlWriter->startElement('NameValueList');
+                            $xmlWriter->writeElement('Name', 'Model');
+                            $xmlWriter->writeElement('Value', $model);
+                            $xmlWriter->endElement();
+                            if (is_array($ebayFitments)) {
+                                if ($item->submodel_name) {
+                                    $trim = '';
+                                    foreach ($ebayFitments as $fit) {
+                                        if ($item->bodytypename != "") {
+                                            if (Str::contains($fit["value"], $item->submodel_name) && Str::contains($fit["value"], $item->bodytypename)) {
+                                                $trim = $fit["value"];
+                                            }
+                                        }
+                                        else {
+                                            if (Str::contains($fit["value"], $item->submodel_name)) {
+                                                $trim = $fit["value"];
+                                            }
+                                        }
+                                    }
+                                    $xmlWriter->startElement('NameValueList');
+                                    $xmlWriter->writeElement('Name', 'Trim');
+                                    $xmlWriter->writeElement('Value', $trim);
+                                    $xmlWriter->endElement();
+                                }
+                                else {
+                                    if ($item->bodytypename) {
+                                        $trim = '';
+                                        foreach ($ebayFitments as $fit) {
+                                            if (Str::contains($fit["value"], $item->bodytypename)) {
+                                                $trim = $fit["value"];
+                                            }
+                                        }
+                                        $xmlWriter->startElement('NameValueList');
+                                        $xmlWriter->writeElement('Name', 'Trim');
+                                        $xmlWriter->writeElement('Value', $trim);
+                                        $xmlWriter->endElement();
+                                    }
+                                }
+                            }
+                        $xmlWriter->endElement();
+                    }
+                }
             }
-            $xmlWriter->endElement();
-            $xmlWriter->writeElement('ReplaceAll', 'true');
         }
+
+
         $xmlWriter->endElement();
         // End ItemSpecifics
 
@@ -612,7 +638,7 @@ class EbayUploadHelper
         try {
             $response = $this->sendRequest($xmlWriter->outputMemory());
         }
-        catch (\Exception $e) {
+        catch (Exception $e) {
             return 'Error while sending request to Ebay API';
         }
 
@@ -659,7 +685,7 @@ class EbayUploadHelper
         try {
             $response = $this->sendRequest($xmlWriter->outputMemory());
         }
-        catch (\Exception $e) {
+        catch (Exception $e) {
             return 'Error while sending request to Ebay API';
         }
 
@@ -670,7 +696,7 @@ class EbayUploadHelper
      * Method for sending a request to Ebay
      * @param $body
      * @return PromiseInterface|Response
-     * @throws \Exception
+     * @throws Exception
      */
     public function sendRequest($body): PromiseInterface|Response
     {
@@ -709,4 +735,56 @@ class EbayUploadHelper
 
         return env('APP_URL') . '/' . $url;
     }
+
+    /**
+     * Get product fitments from Ebay
+     * @param int $category_id
+     * @param string $year
+     * @param string $make
+     * @param string $model
+     * @return mixed
+     * @throws Exception
+     */
+    public function getCompatibilityTrimsFromEbay(int $category_id, string $year, string $make, string $model): mixed
+    {
+        $headers = array();
+        $headers["Authorization"] = 'Bearer ' . env('OAUTH_TOKEN');
+        $headers["Accept"] = 'application/json';
+        $headers["Content-Type"] = 'application/json';
+        $headers["Accept-Encoding"] = 'gzip';
+        $url = 'https://api.ebay.com/commerce/taxonomy/v1/category_tree/100/get_compatibility_property_values?compatibility_property=Trim&category_id='.$category_id
+            .'&filter=Year:'.$year.',Make:'.$make.',Model:'.$model;
+        $response = Http::withHeaders($headers)->send('GET', $url);
+        if ($response->json() != null) {
+            return array_key_exists('compatibilityPropertyValues', $response->json()) ? $response->json()["compatibilityPropertyValues"] : false;
+        }
+        else return false;
+    }
+
+
+    /**
+     * Request for getting suggested categories by title from Ebay
+     * @param string $query
+     * @return PromiseInterface|Response
+     * @throws Exception
+     */
+    public function getSuggestedCategories(string $query): PromiseInterface|Response
+    {
+        $this->headers["X-EBAY-API-CALL-NAME"] = 'GetSuggestedCategories';
+
+        $xmlWriter = new XMLWriter();
+        $xmlWriter->openMemory();
+        $xmlWriter->startDocument('1.0', 'utf-8');
+        $xmlWriter->startElement('GetSuggestedCategoriesRequest');
+        $xmlWriter->writeAttribute('xmlns', "urn:ebay:apis:eBLBaseComponents");
+        $xmlWriter->startElement('RequesterCredentials');
+        $xmlWriter->writeElement('eBayAuthToken', $this->shop->token);
+        $xmlWriter->endElement();
+        $xmlWriter->writeElement('Query', $query);
+        $xmlWriter->endElement();
+        $xmlWriter->endDocument();
+
+        return $this->sendRequest($xmlWriter->outputMemory());
+    }
+
 }

@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static select(string $string, string $string1, string $string2, string $string3, string $string4)
+ * @method static paginate()
+ * @method static where(string $string, mixed $input)
+ * @method static firstOrNew(array $update)
+ * @method static create(array $fitment)
  */
 class Compatibility extends Model
 {

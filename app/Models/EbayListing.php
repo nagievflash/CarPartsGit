@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static where(string $string, mixed $input)
  * @method static first()
  * @method static when(bool $has, \Closure $param)
+ * @method static paginate(int $int)
+ * @method static take(int $int)
  */
 class EbayListing extends Model
 {

@@ -15,7 +15,7 @@ class ReviseAllItems extends Command
      *
      * @var string
      */
-    protected $signature = 'update:listings';
+    protected $signature = 'update:listings {--limit=}';
 
     /**
      * The console command description.
@@ -32,6 +32,7 @@ class ReviseAllItems extends Command
     public function handle(): string
     {
         foreach (EbayListing::all() as $listing) {
+            // dispatch(new ReviseProductJob($listing));
             dispatch(new ReviseProductJob($listing));
         }
 

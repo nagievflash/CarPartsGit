@@ -17,7 +17,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         'App\Console\Commands\UpdateInventory',
         'App\Console\Commands\UpdatePricing',
-        'App\Console\Commands\ReviseAllItems'
+        'App\Console\Commands\ReviseAllItems',
+        'App\Console\Commands\FlushRedis'
     ];
 
     /**
