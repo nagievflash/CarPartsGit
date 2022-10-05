@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Helpers\EbayUploadHelper;
+use App\Helpers\EbayHelper;
 use App\Models\Backlog;
 use App\Models\EbayListing;
 use App\Models\Product;
@@ -42,7 +42,7 @@ class AddFixedPriceItemJob implements ShouldQueue
     public function handle()
     {
         //Backlog::createBacklog('pricingUpdate', 'Ebay4 Listing updated sku ' . $this->listing->sku);
-        $ebayUploader = new EbayUploadHelper(Shop::where('slug', $this->shop)->first());
+        $ebayUploader = new EbayHelper(Shop::where('slug', $this->shop)->first());
         $response = $ebayUploader->addFixedPriceItem($this->product);
 
         if ($response->body()) {

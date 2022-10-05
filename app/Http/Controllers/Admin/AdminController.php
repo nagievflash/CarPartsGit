@@ -103,4 +103,14 @@ class AdminController extends Controller
     {
         return view('admin.importFitments');
     }
+
+
+    /**
+     * @param Request $request
+     * @return Factory|View|Application
+     */
+    public function updateListingId(Request $request): Factory|View|Application
+    {
+        return view('admin.updateListingId');
+    }
 }

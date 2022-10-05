@@ -42,16 +42,20 @@ class Product extends Model
         'images' => 'array'
     ];
 
-/*    protected $appends = [
-        'imagesArray'
-    ];*/
+    /**
+     * @return string
+     */
+    public function getTitleAttribute(): string
+    {
+        return $this->getTitle();
+    }
 
     /**
      * Get the VEHICLE COMPATIBILITY FITMENT
      */
     public function fitments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Fitment::class, 'sku', 'sku');
+        return $this->hasMany(Compatibility::class, 'sku', 'sku');
     }
 
 
@@ -68,7 +72,7 @@ class Product extends Model
     {
         $fitment = Compatibility::select('make_name', 'part_name', 'model_name', 'year', 'position')->where('sku', $this->sku)->get();
         $positions = $fitment->where('position', '!=', '')->unique('position')->count() > 0 ? ' '.strtolower($fitment->where('position', '!=', '')->unique('position')->implode('position', ', ')) : '';
-        $title = $this->title;
+        $title = '';
         if ($fitment->count() > 0) {
             $items = $fitment->where('model_name', $fitment->first()->model_name)->sortBy(['year', 'asc']);
             if ($items->first()->year != $items->last()->year) $title = 'New ' . $items->first()->part_name . $positions . ' for ' . $items->first()->year . '-' . $items->last()->year . ' ' . $items->first()->make_name . ' ' . $items->first()->model_name;
@@ -87,7 +91,7 @@ class Product extends Model
             else $title = 'New ' . $items->first()->part_name . ' for ' . $items->first()->year . ' ' . $items->first()->make_name . ' ' . $items->first()->model_name;
         }
 
-        if (strlen($title) > 70)  {
+        if (strlen($title) > 80)  {
             $items = $fitment->where('model_name', $fitment->first()->model_name)->sortBy(['year', 'asc']);
             $title = 'New ' . $this->title . 'For ' .$items->first()->make_name . ' ' . $items->first()->model_name;
         }
@@ -95,30 +99,15 @@ class Product extends Model
         return $title;
     }
 
-    /**
-     * @return string[]
-     */
-    /*public function getImagesArrayAttribute(): array
+    public function scopeHasFitments($query)
     {
-        if (!$this->attributes['images']) {
+        return $query->has('fitments');
+    }
 
-            for ($i = 1; $i < 8; $i++) {
-                $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . $this->attributes['sku'] . '_' . $i;
-                $ch = curl_init($file);
-                curl_setopt($ch, CURLOPT_NOBODY, true);
-                curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                curl_close($ch);
-                if ($httpCode == 200) {
-                    $images[] = $file;
-                } else break;
-            }
 
-            $this->images = implode(',', $images);
-            $this->save();
-        }
-
-        return explode(',', $this->attributes['images']);
-    }*/
+    public function scopeIsAvailable($query)
+    {
+        return $query->where('qty', '>', 0);
+    }
 
 }

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
+ * @property mixed $id
  * @property mixed $product
  * @property string $type
  * @property mixed $ebay_id

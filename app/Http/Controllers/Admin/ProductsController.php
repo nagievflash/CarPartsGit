@@ -22,7 +22,7 @@ class ProductsController extends Controller
         $products = Product::when($request->has("search"), function($q) use($request){
             if ($q->where("sku", $request->get("search"))->exists()) return $q->where("sku", $request->get("search"));
             else return \App\Models\Product::where("partslink", $request->get("search"));
-        })->paginate(10);
+        })->hasFitments()->paginate(10);
         return view('admin.products')->with('products', $products);
     }
 

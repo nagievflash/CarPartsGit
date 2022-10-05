@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\EbayController;
 use App\Jobs\AddFixedPriceItemJob;
 use App\Jobs\ReviseProductJob;
 use App\Models\Backlog;
+use App\Models\Compatibility;
+use App\Models\EbayListing;
 use App\Models\Fitment;
 use App\Models\Product;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -50,9 +52,11 @@ class CustomProductsImport implements ToModel, WithChunkReading, WithBatchInsert
      */
     public function model(array $row)
     {
-        if (Fitment::where('sku', $row[0])->exists()) {
-            $product = Product::where('sku', $row[0])->first();
-            dispatch(new AddFixedPriceItemJob($product, $this->shop));
+        if (!EbayListing::where('sku', $row[0])->where('type', $this->shop)->exists()) {
+            if (Compatibility::where('sku', $row[0])->exists()) {
+                $product = Product::where('sku', $row[0]);
+                if ($product->exists()) dispatch(new AddFixedPriceItemJob($product->first(), $this->shop));
+            }
         }
     }
 

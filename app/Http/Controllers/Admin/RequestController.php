@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Imports\CustomProductsImport;
 use App\Imports\FitmentImport;
 use App\Imports\InventoryImport;
+use App\Imports\UpdateEbayListingIDImport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -54,6 +55,21 @@ class RequestController extends Controller
 
         //Storage::disk('local')->putFileAs('/files/', $file, 'fitments.csv');
         Excel::queueImport(new FitmentImport(), storage_path().'/app/files/fitments.csv');
+        return redirect()->back()->with('success', 'The Job started successfully!');
+    }
+
+
+    /**
+     * Update Ebay Listing Id
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function updateEbayListingId(Request $request): RedirectResponse
+    {
+        $file = $request->file('csv-import');
+        $shop = $request->input('shop');
+        //Storage::disk('local')->putFileAs('/files/', $file, 'fitments.csv');
+        Excel::import(new UpdateEbayListingIDImport($shop), $file);
         return redirect()->back()->with('success', 'The Job started successfully!');
     }
 }

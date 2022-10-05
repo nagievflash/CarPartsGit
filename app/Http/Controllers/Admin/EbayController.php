@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Helpers\EbayUploadHelper;
+use App\Helpers\EbayHelper;
 use App\Http\Controllers\Controller;
 use App\Jobs\ReviseProductJob;
+use App\Models\Backlog;
 use App\Models\EbayListing;
 use App\Models\Product;
 use App\Models\Shop;
@@ -26,7 +27,7 @@ class EbayController extends Controller
         $sku = $request->get('sku') ? $request->get('sku') : $request->input('sku');
         $shop = Shop::where('slug', $request->get('type'))->first();
         $product = Product::where('sku', $sku)->first();
-        $ebayUploader = new EbayUploadHelper($shop);
+        $ebayUploader = new EbayHelper($shop);
         $response = $ebayUploader->addFixedPriceItem($product);
 
         if ($response->body()) {
@@ -54,8 +55,9 @@ class EbayController extends Controller
     {
         $listing = EbayListing::where('ebay_id', $request->input('ebay_id'))->firstOrFail();
 
-        $ebayUploader = new EbayUploadHelper(Shop::where('slug', $listing->type)->first());
+        $ebayUploader = new EbayHelper(Shop::where('slug', $listing->type)->first());
 
+        $response = $ebayUploader->removeItemCompatibility($listing);
         $response = $ebayUploader->reviseFixedPriceItem($listing);
 
         if ($response->body()) {
