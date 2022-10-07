@@ -28,6 +28,7 @@ trait GetItem
         $xmlWriter->writeElement('eBayAuthToken', $this->shop->token);
         $xmlWriter->endElement();
         $xmlWriter->writeElement('ItemID', $ebay_id);
+        $xmlWriter->writeElement('IncludeItemCompatibilityList', true);
         $xmlWriter->endElement();
         $xmlWriter->endDocument();
         return $this->sendRequest($xmlWriter->outputMemory());

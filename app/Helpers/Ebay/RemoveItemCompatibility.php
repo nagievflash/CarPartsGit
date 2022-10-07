@@ -19,6 +19,8 @@ trait RemoveItemCompatibility
      */
     public function removeItemCompatibility(EbayListing $listing): PromiseInterface|string|Response
     {
+        $response = $this->getItem($listing->ebay_id);
+        $body = simplexml_load_string($response->body());
         $this->headers["X-EBAY-API-CALL-NAME"] = 'ReviseFixedPriceItem';
         $this->headers["X-EBAY-API-SITEID"] = '100';
 

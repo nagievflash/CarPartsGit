@@ -31,7 +31,7 @@ class ReviseAllItems extends Command
      */
     public function handle(): string
     {
-        foreach (EbayListing::where('id', '=', 4)->get() as $listing) {
+        foreach (EbayListing::where('id', '>', 3239)->get() as $listing) {
             dispatch(new ReviseProductJob($listing));
         }
 

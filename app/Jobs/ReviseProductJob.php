@@ -37,7 +37,6 @@ class ReviseProductJob implements ShouldQueue
     public function handle()
     {
         $ebayUploader = new EbayHelper(Shop::where('slug', $this->listing->type)->first());
-        $ebayUploader->removeItemCompatibility($this->listing);
         $ebayUploader->reviseFixedPriceItem($this->listing);
         Backlog::createBacklog('pricingUpdate', 'Ebay4 Listing updated sku ' . $this->listing->id . ' ' . $this->listing->ebay_id);
     }

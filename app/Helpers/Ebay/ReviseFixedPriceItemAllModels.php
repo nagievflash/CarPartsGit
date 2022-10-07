@@ -8,22 +8,19 @@ use App\Models\Compatibility;
 use App\Models\EbayListing;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
-use Illuminate\Support\Str;
 use XMLWriter;
 use Exception;
 
-trait ReviseFixedPriceItem
+trait ReviseFixedPriceItemAllModels
 {
-
     /**
      * Method for revise fixed price item at Ebay
      * @param EbayListing $listing
      * @return PromiseInterface|Response|string
      * @throws Exception
      */
-    public function reviseFixedPriceItem(EbayListing $listing): PromiseInterface|string|Response
+    public function ReviseFixedPriceItemAllModels(EbayListing $listing): PromiseInterface|string|Response
     {
-        $this->reviseFixedPriceItemAllModels($listing);
         $response = $this->getItem($listing->ebay_id);
         $body = (array)simplexml_load_string($response->body());
         $categoryID = 0;
@@ -32,7 +29,6 @@ trait ReviseFixedPriceItem
             $itemsFromEbay = $body['Item'];
             $xml = $itemsFromEbay->PrimaryCategory->CategoryID;
             $categoryID = $xml[0];
-            $this->removeItemCompatibility($listing);
 
             $this->headers["X-EBAY-API-CALL-NAME"] = 'ReviseFixedPriceItem';
             $this->headers["X-EBAY-API-SITEID"] = '100';
@@ -85,50 +81,21 @@ trait ReviseFixedPriceItem
                 $year = $item->year;
                 $make = $item->make_name;
                 $model = $item->model_name;
-                $bodytypename = $item->bodytypename == '' || !$item->bodytypename ? ' ' : $item->bodytypename;
-                $liter = $item->liter == '' || !$item->liter ? 'L' : $item->liter.'L';
-                $submodel = $item->submodel_name == '' || !$item->submodel_name ? '' : $item->submodel_name;
-                foreach ($itemsFromEbay->ItemCompatibilityList->Compatibility as $itemFromEbay) {
-                    // $itemFromEbay->NameValueList[4]->Value
-                    $ebayYear   = (string)$itemFromEbay->NameValueList[1]->Value;
-                    $ebayMake   = (string)$itemFromEbay->NameValueList[2]->Value;
-                    $ebayModel  = (string)$itemFromEbay->NameValueList[3]->Value;
-                    $ebayTrim   = (string)$itemFromEbay->NameValueList[4]->Value;
-                    $ebayEngine = (string)$itemFromEbay->NameValueList[5]->Value;
-                    if (Str::contains($ebayTrim, $submodel.' ')
-                        && Str::contains($ebayEngine, $liter)
-                        && Str::contains($ebayTrim, $bodytypename)
-                        && $year    == $ebayYear
-                        && $make    == $ebayMake
-                        && $model   == $ebayModel
-                    ) {
-                        $notes = 'For ' . $ebayEngine. ' ' . $ebayYear . ' ' . $ebayMake . ' ' . $ebayModel . ' ' . $ebayTrim;
-                        if ($item->position) $notes .= ' ' . $item->position;
-                        $xmlWriter->startElement('Compatibility');
-                        $xmlWriter->writeElement('CompatibilityNotes', $notes);
-                        $xmlWriter->startElement('NameValueList');
-                        $xmlWriter->writeElement('Name', 'Year');
-                        $xmlWriter->writeElement('Value', $year);
-                        $xmlWriter->endElement();
-                        $xmlWriter->startElement('NameValueList');
-                        $xmlWriter->writeElement('Name', 'Make');
-                        $xmlWriter->writeElement('Value', $make);
-                        $xmlWriter->endElement();
-                        $xmlWriter->startElement('NameValueList');
-                        $xmlWriter->writeElement('Name', 'Model');
-                        $xmlWriter->writeElement('Value', $model);
-                        $xmlWriter->endElement();
-                        $xmlWriter->startElement('NameValueList');
-                        $xmlWriter->writeElement('Name', 'Trim');
-                        $xmlWriter->writeElement('Value', $ebayTrim);
-                        $xmlWriter->endElement();
-                        $xmlWriter->startElement('NameValueList');
-                        $xmlWriter->writeElement('Name', 'Engine');
-                        $xmlWriter->writeElement('Value', $ebayEngine);
-                        $xmlWriter->endElement();
-                        $xmlWriter->endElement();
-                    }
-                }
+                $xmlWriter->startElement('Compatibility');
+                $xmlWriter->writeElement('CompatibilityNotes', '');
+                $xmlWriter->startElement('NameValueList');
+                $xmlWriter->writeElement('Name', 'Year');
+                $xmlWriter->writeElement('Value', $year);
+                $xmlWriter->endElement();
+                $xmlWriter->startElement('NameValueList');
+                $xmlWriter->writeElement('Name', 'Make');
+                $xmlWriter->writeElement('Value', $make);
+                $xmlWriter->endElement();
+                $xmlWriter->startElement('NameValueList');
+                $xmlWriter->writeElement('Name', 'Model');
+                $xmlWriter->writeElement('Value', $model);
+                $xmlWriter->endElement();
+                $xmlWriter->endElement();
             }
 
 

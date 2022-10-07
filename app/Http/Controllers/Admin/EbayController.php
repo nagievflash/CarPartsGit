@@ -57,7 +57,6 @@ class EbayController extends Controller
 
         $ebayUploader = new EbayHelper(Shop::where('slug', $listing->type)->first());
 
-        $response = $ebayUploader->removeItemCompatibility($listing);
         $response = $ebayUploader->reviseFixedPriceItem($listing);
 
         if ($response->body()) {

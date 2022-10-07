@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * @method updateOrCreate(array $array, array $array1)
+ * @method static where(string $string, string $string1)
+ */
 class Setting extends Model
 {
     use HasFactory;
@@ -24,12 +28,12 @@ class Setting extends Model
                 $oauthToken = Http::withHeaders([
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/x-www-form-urlencoded',
-                    'Authorization' => 'Basic ' . base64_encode('fastdeal-autoelem-PRD-4f2fb35bc-cbb0b166:PRD-f2fb35bc9102-6d45-460b-a53a-aa4a'),
+                    'Authorization' => 'Basic ' . base64_encode(env('EBAY_APP_ID').':'.env('EBAY_SECRET')),
                 ])->send('POST', 'https://api.ebay.com/identity/v1/oauth2/token', [
                     'form_params' => [
                         'grant_type' => 'refresh_token',
                         'refresh_token' => Setting::where('key', 'ebay_refresh_token')->first()->value,
-                        'redirect_uri' => 'fastdeal24-fastdeal-autoel-ymxyoese',
+                        'redirect_uri' => env('EBAY_RUNAME'),
                     ]
                 ]);
                 Cache::put('access_token', $oauthToken->json()['access_token'], 7100);
@@ -39,5 +43,13 @@ class Setting extends Model
             }
         }
         return Cache::get('access_token');
+    }
+    public static function setAccessToken($token) {
+        (new Setting)->updateOrCreate([
+            'key'   => 'ebay_refresh_token',
+        ],[
+            'key'   => 'ebay_refresh_token',
+            'value' => $token
+        ]);
     }
 }

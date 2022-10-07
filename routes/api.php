@@ -1,10 +1,15 @@
 <?php
 
 use App\Models\Compatibility;
+use App\Models\Order;
 use App\Models\Product;
+use App\Models\Setting;
+use App\Models\User;
 use App\Models\Year;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -130,5 +135,52 @@ Route::get('/categories/{title}', function ($title) {
 
 
 Route::post('/orders/add', function (Request $request) {
-    return $request->all();
+    $data = $request->all();
+    $user = User::updateOrCreate([
+        'email' => $data["userdata"]["email"]
+    ],[
+        'email'         => $data["userdata"]["email"],
+        'name'          => $data["userdata"]["firstname"],
+        'lastname'      => $data["userdata"]["lastname"],
+        'address'       => $data["userdata"]["address"],
+        'address2'      => $data["userdata"]["address2"],
+        'city'          => $data["userdata"]["city"],
+        'zipcode'       => $data["userdata"]["zipcode"],
+        'password'      => md5("password"),
+    ]);
+
+    $order = Order::create([
+        'user_id'       => $user->id,
+        'status'        => 'created'
+    ]);
+
+    foreach ($data["items"] as $item) {
+        $order->products()->attach($item["sku"],  ['qty' => $item["quantity"]]);
+    }
+
+    return $order->id;
+});
+
+
+Route::get('/oauth2/authorize', function (Request $request) {
+    $code = $request->input('code');
+    try {
+        $oauthToken = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'Authorization' => 'Basic ' . base64_encode(env('EBAY_APP_ID').':'.env('EBAY_SECRET')),
+        ])->send('POST', 'https://api.ebay.com/identity/v1/oauth2/token', [
+            'form_params' => [
+                'grant_type' => 'authorization_code',
+                'code' => $code,
+                'redirect_uri' => env('EBAY_RUNAME'),
+            ]
+        ]);
+        $code = $oauthToken->json()['refresh_token'];
+        Setting::setAccessToken($code);
+
+    } catch (\Exception $e) {
+        abort(404);
+    }
+    return 'Successful updated code: ' . $code;
 });

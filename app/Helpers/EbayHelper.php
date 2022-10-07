@@ -11,6 +11,7 @@ use App\Helpers\Ebay\RenderImageSpecifications;
 use App\Helpers\Ebay\ReviseFixedPriceItem;
 use App\Helpers\Ebay\RemoveItemCompatibility;
 use App\Helpers\Ebay\UpdateInventoryPricing;
+use App\Helpers\Ebay\ReviseFixedPriceItemAllModels;
 use App\Models\Shop;
 use App\Models\Setting;
 use Exception;
@@ -28,7 +29,8 @@ class EbayHelper {
         RenderImageSpecifications,
         GetCompatibilityEnginesFromEbay,
         GetSuggestedCategories,
-        GetItem;
+        GetItem,
+        ReviseFixedPriceItemAllModels;
 
     private string $url;
 
