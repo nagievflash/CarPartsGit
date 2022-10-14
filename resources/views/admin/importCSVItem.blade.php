@@ -29,7 +29,9 @@
                                  :label="'Download correct txt or csv inventory pricing file'"
                                  :type="'file'">
                     </x-maz-input>
-
+                    <select name="supplier">
+                        <option value="JC">JC inventory file</option>
+                    </select>
                     @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             {{ session('success') }}

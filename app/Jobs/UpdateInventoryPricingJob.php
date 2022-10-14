@@ -35,8 +35,9 @@ class UpdateInventoryPricingJob implements ShouldQueue
      */
     public function handle()
     {
-        //Backlog::createBacklog('pricingUpdate', 'Ebay4 Listing updated sku ' . $this->listing->sku);
-        $ebayUploader = new EbayHelper(Shop::where('slug', $this->listing->type)->first());
-        $ebayUploader->updateInventoryPricing($this->listing);
+        if ($this->listing->getPrice() > 0) {
+            $ebayUploader = new EbayHelper(Shop::where('slug', $this->listing->shop)->first());
+            $ebayUploader->updateInventoryPricing($this->listing);
+        }
     }
 }

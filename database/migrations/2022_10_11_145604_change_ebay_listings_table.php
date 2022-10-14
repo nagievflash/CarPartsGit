@@ -13,12 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('suppliers', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->float('shipping');
-            $table->float('handling');
-            $table->timestamps();
+        Schema::table('ebay_listings', function (Blueprint $table) {
+            $table->renameColumn('type', 'shop');
         });
     }
 
@@ -29,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('suppliers');
+        Schema::table('ebay_listings', function (Blueprint $table) {
+            $table->dropColumn('type');
+        });
     }
 };

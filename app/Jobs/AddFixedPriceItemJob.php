@@ -48,11 +48,12 @@ class AddFixedPriceItemJob implements ShouldQueue
         if ($response->body()) {
             $body = simplexml_load_string($response->body());
             if (isset($body->ItemID)) {
-                EbayListing::create([
+                $ebaylisting = EbayListing::create([
                     'sku'       => $this->product->sku,
                     'ebay_id'   => $body->ItemID,
                     'type'      => $this->shop
                 ]);
+                $ebayUploader->reviseFixedPriceItem($ebaylisting);
             }
         }
     }

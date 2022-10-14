@@ -31,10 +31,8 @@ class UpdatePricing extends Command
     public function handle(): string
     {
         foreach (Shop::all() as $shop) {
-            foreach (EbayListing::where('type', $shop->slug)->get() as $listing) {
-                if ($listing->product->qty != $listing->product->old_qty || $listing->product->price != $listing->product->old_price)  {
-                    dispatch(new UpdateInventoryPricingJob($listing));
-                }
+            foreach (EbayListing::all() as $listing) {
+                dispatch(new UpdateInventoryPricingJob($listing));
             }
         }
 

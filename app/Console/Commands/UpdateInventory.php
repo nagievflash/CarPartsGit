@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Imports\InventoryImport;
+use App\Imports\InventoryImportLKQ;
+use App\Imports\InventoryImportPF;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -15,7 +17,7 @@ class UpdateInventory extends Command
      *
      * @var string
      */
-    protected $signature = 'update:inventory';
+    protected $signature = 'update:inventory {supplier}';
 
     /**
      * The console command description.
@@ -27,43 +29,60 @@ class UpdateInventory extends Command
     /**
      * Execute the console command.
      *
-     * @return int
      */
     public function handle()
     {
-        $disk = Storage::disk('ftp');
-        $files = $disk->files();
-        $fileData = collect();
-        foreach($files as $file) {
-            $fileData->push([
-                'file' => $file,
-                'date' => $disk->lastModified($file)
-            ]);
-        }
-        $newest = $fileData->sortByDesc('date')->first();
+        if ($this->argument('supplier') == 'pf') {
+            $disk = Storage::disk('pf');
+            $files = $disk->files();
+            $fileData = collect();
+            foreach($files as $file) {
+                $fileData->push([
+                    'file' => $file,
+                    'date' => $disk->lastModified($file)
+                ]);
+            }
+            $newest = $fileData->sortByDesc('date')->first();
 
-        $zip = new ZipArchive;
-        Storage::disk('local')->put('files/inventory.zip', Storage::disk('ftp')->get($newest['file']));
-        $zip_status = $zip->open(storage_path('app/files/inventory.zip'));
-        if ($zip_status === true)
-        {
-            $zip->setPassword("LwrG9z0cC8");
-            $zip->extractTo(storage_path('app/files/inventories'));
-            $zip->close();
+            $zip = new ZipArchive;
+            Storage::disk('local')->put('files/inventory.zip', $disk->get($newest['file']));
+            $zip_status = $zip->open(storage_path('app/files/inventory.zip'));
+            if ($zip_status === true)
+            {
+                $zip->setPassword(env('PF_ZIP_PASSWORD'));
+                $zip->extractTo(storage_path('app/files/inventories'));
+                $zip->close();
+            }
+
+            $disk = Storage::disk('local');
+            $files = $disk->files('files/inventories');
+            $fileData = collect();
+            foreach($files as $file) {
+                $fileData->push([
+                    'file' => $file,
+                    'date' => $disk->lastModified($file)
+                ]);
+            }
+            $newest = $fileData->sortByDesc('date')->first();
+
+            Excel::queueImport(new InventoryImportPF, storage_path().'/app/'.$newest['file']);
+            return 'The Job started successfully!';
         }
 
-        $disk = Storage::disk('local');
-        $files = $disk->files('files/inventories');
-        $fileData = collect();
-        foreach($files as $file) {
-            $fileData->push([
-                'file' => $file,
-                'date' => $disk->lastModified($file)
-            ]);
-        }
-        $newest = $fileData->sortByDesc('date')->first();
+        if ($this->argument('supplier') == 'lkq') {
+            $disk = Storage::disk('lkq');
+            $inventoryFile = '';
+            foreach ($disk->files() as $file) {
+                if (pathinfo($file, PATHINFO_EXTENSION) == 'csv') {
+                    $inventoryFile = $file;
+                }
+            }
+            if ($inventoryFile != '') Storage::disk('local')->put('files/lkq_inventory.csv', $disk->get($inventoryFile));
+            else dd('file not found');
 
-        Excel::queueImport(new InventoryImport, storage_path().'/app/'.$newest['file']);
-        return 'The Job started successfully!';
+            Excel::queueImport(new InventoryImportLKQ, storage_path().'/app/files/lkq_inventory.csv');
+            return 'The Job started successfully!';
+        }
+
     }
 }

@@ -86,13 +86,22 @@ Route::get('/submodel/{year}/{make}/{model}', function ($year, $make, $model) {
 });
 
 Route::get('/categories/{year}/{make}/{model}/{submodel?}', function ($year, $make, $model, $submodel) {
-    if ($submodel) {
+    if ($submodel && $submodel != 0) {
         return DB::table('filters')
             ->select('part_name')
             ->where('year', $year)
             ->where('make_name', $make)
             ->where('model_name', $model)
             ->where('submodel_name', $submodel)
+            ->orderBy('part_name')
+            ->distinct()->get();
+    }
+    else {
+        return DB::table('filters')
+            ->select('part_name')
+            ->where('year', $year)
+            ->where('make_name', $make)
+            ->where('model_name', $model)
             ->orderBy('part_name')
             ->distinct()->get();
     }

@@ -38,6 +38,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     // Settings shop
     Route::get('/settings/',  [App\Http\Controllers\Admin\AdminController::class, 'settings'])->name('settings');
     Route::get('/settings/shop',  [App\Http\Controllers\Admin\ShopController::class, 'index'])->name('settings.shop');
+    Route::get('/settings/suppliers',  [App\Http\Controllers\Admin\SuppliersController::class, 'index'])->name('settings.suppliers');
     Route::get('/settings/shop/create',  [App\Http\Controllers\Admin\ShopController::class, 'create'])->name('settings.shop.create');
     Route::get('/settings/shop/{slug}',  [App\Http\Controllers\Admin\ShopController::class, 'show']);
     Route::post('/settings/shop/store',  [App\Http\Controllers\Admin\ShopController::class, 'store'])->name('settings.shop.store');

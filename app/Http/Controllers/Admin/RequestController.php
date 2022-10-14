@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Imports\CustomProductsImport;
 use App\Imports\FitmentImport;
 use App\Imports\InventoryImport;
+use App\Imports\InventoryImportJC;
 use App\Imports\UpdateEbayListingIDImport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,10 +23,16 @@ class RequestController extends Controller
     public function importProductsBasics(Request $request): RedirectResponse
     {
         $file = $request->file('csv-import');
+        $supplier = $request->input('supplier');
+        if ($supplier == 'JC') {
+            Storage::disk('local')->putFileAs('/files/', $file, 'inventoryJC.csv');
+            Excel::queueImport(new InventoryImportJC, storage_path().'/app/files/inventoryJC.csv');
+        }
+        else {
+            Storage::disk('local')->putFileAs('/files/', $file, 'inventory.csv');
+            Excel::queueImport(new InventoryImport, storage_path().'/app/files/inventory.csv');
+        }
 
-        Storage::disk('local')->putFileAs('/files/', $file, 'inventory.csv');
-
-        Excel::queueImport(new InventoryImport, storage_path().'/app/files/inventory.csv');
         return redirect()->back()->with('success', 'The Job started successfully!');
     }
 

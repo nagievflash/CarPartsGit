@@ -18,7 +18,8 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\UpdateInventory',
         'App\Console\Commands\UpdatePricing',
         'App\Console\Commands\ReviseAllItems',
-        'App\Console\Commands\FlushRedis'
+        'App\Console\Commands\FlushRedis',
+        'App\Console\Commands\UpdateDatabase'
     ];
 
     /**
@@ -29,7 +30,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command(UpdateInventory::class)->dailyAt('07:46');
+        $schedule->command(UpdateInventory::class, ['supplier' => 'pf'])->dailyAt('07:46');
+        $schedule->command(UpdateInventory::class, ['supplier' => 'lkq'])->dailyAt('08:00');
     }
 
     /**

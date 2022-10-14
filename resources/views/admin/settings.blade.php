@@ -22,7 +22,7 @@
                 <div class="card-body">
                     <ul class="nav">
                         <li class="nav-item">
-                            <a href="{{Route('settings.shop')}}">Shop settings</a>
+                            <a href="{{Route('settings.shop')}}" class="text-xl">Shop settings</a>
                         </li>
                     </ul>
                 </div>

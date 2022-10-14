@@ -2,6 +2,7 @@
 
 namespace App\Helpers\Ebay;
 
+use App\Models\Backlog;
 use App\Models\EbayListing;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
@@ -21,8 +22,8 @@ trait UpdateInventoryPricing
         $this->headers["X-EBAY-API-CALL-NAME"] = 'ReviseFixedPriceItem';
         $this->headers["X-EBAY-API-SITEID"] = '100';
 
-        $price = $listing->product->price + $listing->product->price  * $this->shop->percent / 100;
-        $stock = ($listing->product->qty - $this->shop->qty_reserve) > 0 ? $listing->product->qty - $this->shop->qty_reserve : 0;
+        $price = $listing->getPrice() + $listing->getPrice()  * $this->shop->percent / 100;
+        $stock = ($listing->getQuantity() - $this->shop->qty_reserve) > 0 ? $listing->getQuantity() - $this->shop->qty_reserve : 0;
         if ($stock > $this->shop->max_qty) $stock = $this->shop->max_qty;
 
         $xmlWriter = new XMLWriter();
@@ -39,7 +40,6 @@ trait UpdateInventoryPricing
         // Start Item
         $xmlWriter->startElement('Item');
         $xmlWriter->writeElement('ItemID', $listing->ebay_id);
-        $xmlWriter->writeElement('SKU', $listing->product->sku);
         $xmlWriter->writeElement('Quantity', $stock);
         $xmlWriter->writeElement('StartPrice', $price);
         $xmlWriter->endElement();
@@ -54,7 +54,7 @@ trait UpdateInventoryPricing
         catch (Exception $e) {
             return 'Error while sending request to Ebay API';
         }
-
+        Backlog::createBacklog('update pricing', $listing->ebay_id);
         return $response;
     }
 }

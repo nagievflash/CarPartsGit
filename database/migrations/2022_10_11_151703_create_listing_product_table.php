@@ -13,16 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('warehouses', function (Blueprint $table) {
+        Schema::create('listing_product', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('supplier_id');
-            $table->foreign('supplier_id')
+            $table->unsignedBigInteger('listing_id');
+            $table->unsignedBigInteger('product_id');
+            $table->unsignedInteger('quantity');
+            $table->foreign('listing_id')
                 ->references('id')
-                ->on('suppliers')
+                ->on('ebay_listings')
                 ->onDelete('cascade');
-            $table->string('sku');
-            $table->unsignedInteger('qty')->default(0);
-            $table->unsignedFloat('price')->default(0);
+            $table->foreign('product_id')
+                ->references('id')
+                ->on('products')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -34,6 +37,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('warehouses');
+        Schema::dropIfExists('listing_product');
     }
 };

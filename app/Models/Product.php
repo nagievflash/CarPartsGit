@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static when(bool $has, \Closure $param)
  * @method static findOrFail(string $string, string $sku)
  * @method static whereHas(string $string, \Closure $param)
+ * @method static firstOrCreate(array $array, array $array1)
+ * @method static firstOrNew(array $array)
  * @property string $sku
  * @property string $title
  * @property string $partslink
@@ -58,6 +60,16 @@ class Product extends Model
         return $this->hasMany(Compatibility::class, 'sku', 'sku');
     }
 
+
+    public function listings(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(EbayListing::class, 'listing_product', 'product_id', 'listing_id');
+    }
+
+    public function warehouses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Warehouse::class, 'sku', 'sku');
+    }
 
     /**
      * Get the product's attributes

@@ -47,12 +47,11 @@
                         <thead>
                         <tr>
                             <th></th>
-                            <th>Image</th>
-                            <th>SKU</th>
-                            <th>Title</th>
+                            <th>Shop</th>
+                            <th>Type</th>
+                            <th>Ebay_id</th>
                             <th>Qty</th>
                             <th>Price</th>
-                            <th>Status</th>
                             <th>Ebay Link</th>
                             <th>Actions</th>
                         </tr>
@@ -60,29 +59,23 @@
                         <tbody>
                         @foreach ($listings as $listing)
                             <tr>
-                                @php
-                                    $image = explode(',', $listing->product->images)[0];
-                                @endphp
 
                                 <td style="text-align: center;">
                                     <div class="form-check">
                                         <div class="checkbox">
-                                            <input type="checkbox" class="form-check-input" id="{{$listing->product->sku}}" name="{{$listing->product->sku}}">
+                                            <input type="checkbox" class="form-check-input" id="{{$listing->id}}" name="id">
                                         </div>
                                     </div>
                                 </td>
-                                <td style="">
-                                    @if ($image)
-                                        <img src="{{$image}}" alt="{{$listing->product->getTitle()}}" width="75px" />
-                                    @endif
-                                </td>
-                                <td>{{$listing->product->sku}}</td>
-                                <td>{{$listing->product->getTitle()}}</td>
-                                <td>{{$listing->product->qty}}</td>
-                                <td>{{$listing->product = $listing->product->price + $listing->product->price * .25}}</td>
                                 <td>
-                                    <span class="badge bg-success">{{$listing->type}}</span>
+                                    <span class="badge bg-success">{{$listing->shop}}</span>
                                 </td>
+                                <td>
+                                    {{$listing->type}}
+                                </td>
+                                <td>{{$listing->ebay_id}}</td>
+                                <td>{{$listing->getQuantity()}}</td>
+                                <td>{{$listing->getPrice()}}</td>
                                 <td>
                                     <a href="https://www.ebay.com/itm/{{$listing->ebay_id}}" class="text-success" target="_blank">See listing</a>
                                 </td>

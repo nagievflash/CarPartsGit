@@ -272,78 +272,28 @@ trait AddFixedPriceItem
 
             // Start ItemSpecifics
             $xmlWriter->startElement('ItemCompatibilityList');
-
-            $compatibilityNotes = '';
-
-            foreach ($fitments->groupBy(['year', 'make_name', 'model_name', 'liter']) as $year => $y) {
-                foreach ($y as $make => $m) {
-                    foreach ($m as $model => $ml) {
-                        $ebayFitments = $this->getCompatibilityTrimsFromEbay($categoryID, $year, $make, $model);
-                        foreach ($ml as $item) {
-                            $xmlWriter->startElement('Compatibility');
-                            $compatibilityNotes = $fitments->where('make_name', $make)->where('year', $year)->where('model_name', $model)->first();
-                            $notes = 'For';
-                            if ($compatibilityNotes->cylinders) $notes .= ' ' . $compatibilityNotes->cylinders.'Cyl';
-                            if ($compatibilityNotes->liter) $notes .= ' ' . $compatibilityNotes->liter.'L';
-                            $notes .= ' ' . $compatibilityNotes->make_name . ' ' . $compatibilityNotes->model_name . ' ' . $compatibilityNotes->part_name;
-                            if ($compatibilityNotes->position) $notes .= ' ' . $compatibilityNotes->position;
-                            $xmlWriter->writeElement('CompatibilityNotes', $notes);
-
-                            $xmlWriter->startElement('NameValueList');
-                            $xmlWriter->writeElement('Name', 'Year');
-                            $xmlWriter->writeElement('Value', $year);
-                            $xmlWriter->endElement();
-                            $xmlWriter->startElement('NameValueList');
-                            $xmlWriter->writeElement('Name', 'Make');
-                            $xmlWriter->writeElement('Value', $make);
-                            $xmlWriter->endElement();
-                            $xmlWriter->startElement('NameValueList');
-                            $xmlWriter->writeElement('Name', 'Model');
-                            $xmlWriter->writeElement('Value', $model);
-                            $xmlWriter->endElement();
-
-                            if (is_array($ebayFitments)) {
-                                if ($item->submodel_name) {
-                                    $trim = '';
-                                    foreach ($ebayFitments as $fit) {
-                                        if ($item->bodytypename != "") {
-                                            if (Str::contains($fit["value"], $item->submodel_name) && Str::contains($fit["value"], $item->bodytypename)) {
-                                                $trim = $fit["value"];
-                                            }
-                                        }
-                                        else {
-                                            if (Str::contains($fit["value"], $item->submodel_name)) {
-                                                $trim = $fit["value"];
-                                            }
-                                        }
-                                    }
-                                    $xmlWriter->startElement('NameValueList');
-                                    $xmlWriter->writeElement('Name', 'Trim');
-                                    $xmlWriter->writeElement('Value', $trim);
-                                    $xmlWriter->endElement();
-                                }
-                                else {
-                                    if ($item->bodytypename) {
-                                        $trim = '';
-                                        foreach ($ebayFitments as $fit) {
-                                            if (Str::contains($fit["value"], $item->bodytypename)) {
-                                                $trim = $fit["value"];
-                                            }
-                                        }
-                                        $xmlWriter->startElement('NameValueList');
-                                        $xmlWriter->writeElement('Name', 'Trim');
-                                        $xmlWriter->writeElement('Value', $trim);
-                                        $xmlWriter->endElement();
-                                    }
-                                }
-                            }
-                            // $xmlWriter->writeElement('ReplaceAll', 'true');
-                            $xmlWriter->endElement();
-                            // $xmlWriter->writeElement('ReplaceAll', 'true');
-                        }
-                    }
-                }
+            foreach ($fitments as $item) {
+                $year = $item->year;
+                $make = $item->make_name;
+                $model = $item->model_name;
+                $xmlWriter->startElement('Compatibility');
+                $xmlWriter->writeElement('CompatibilityNotes', '');
+                $xmlWriter->startElement('NameValueList');
+                $xmlWriter->writeElement('Name', 'Year');
+                $xmlWriter->writeElement('Value', $year);
+                $xmlWriter->endElement();
+                $xmlWriter->startElement('NameValueList');
+                $xmlWriter->writeElement('Name', 'Make');
+                $xmlWriter->writeElement('Value', $make);
+                $xmlWriter->endElement();
+                $xmlWriter->startElement('NameValueList');
+                $xmlWriter->writeElement('Name', 'Model');
+                $xmlWriter->writeElement('Value', $model);
+                $xmlWriter->endElement();
+                $xmlWriter->endElement();
             }
+
+
             $xmlWriter->endElement();
             // End ItemSpecifics
 

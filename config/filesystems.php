@@ -66,6 +66,21 @@ return [
             // 'timeout' => 30,
         ],
 
+        'lkq' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_HOST_LKQ'),
+            'username' => env('FTP_USERNAME_LKQ'),
+            'password' => env('FTP_PASSWORD_LKQ'),
+            'encryption' => 'tls',
+            'root' => '/inventory',
+        ],
+
+        'pf' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_HOST_PF'),
+            'username' => env('FTP_USERNAME_PF'),
+            'password' => env('FTP_PASSWORD_PF'),
+        ],
     ],
 
     /*
