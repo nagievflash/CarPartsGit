@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Imports\InventoryImport;
 use App\Imports\InventoryImportLKQ;
 use App\Imports\InventoryImportPF;
+use App\Jobs\UpdateListingsPricesJob;
+use App\Models\EbayListing;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -17,7 +19,7 @@ class UpdateInventory extends Command
      *
      * @var string
      */
-    protected $signature = 'update:inventory {supplier}';
+    protected $signature = 'update:inventory {supplier=none}';
 
     /**
      * The console command description.
@@ -82,6 +84,10 @@ class UpdateInventory extends Command
 
             Excel::queueImport(new InventoryImportLKQ, storage_path().'/app/files/lkq_inventory.csv');
             return 'The Job started successfully!';
+        }
+
+        foreach (EbayListing::all() as $listing) {
+            dispatch(new UpdateListingsPricesJob($listing));
         }
 
     }

@@ -80,7 +80,8 @@
                                     <a href="https://www.ebay.com/itm/{{$listing->ebay_id}}" class="text-success" target="_blank">See listing</a>
                                 </td>
                                 <td>
-                                    <a href="/admin/ebay/revise?ebay_id={{$listing->ebay_id}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-arrow-repeat"></i></a>
+                                    <a href="/admin/ebay/update_price?ebay_id={{$listing->ebay_id}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-arrow-repeat"></i></a>
+                                    <a href="/admin/ebay/listings/{{$listing->ebay_id}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-box-arrow-up-right"></i></a>
                                 </td>
                             </tr>
                         @endforeach

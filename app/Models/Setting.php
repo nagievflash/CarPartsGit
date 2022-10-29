@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Http;
 /**
  * @method updateOrCreate(array $array, array $array1)
  * @method static where(string $string, string $string1)
+ * @method static firstOrNew(int[] $array)
+ * @method static firstOrCreate(string[] $array, int[] $array1)
  */
 class Setting extends Model
 {

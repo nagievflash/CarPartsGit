@@ -5,7 +5,9 @@ namespace App\Imports;
 use App\Models\Backlog;
 use App\Models\EbayListing;
 use App\Models\Product;
+use App\Models\Warehouse;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -63,7 +65,10 @@ class AutoelementsDatabaseImport implements ToModel, WithHeadingRow, WithChunkRe
                 ['ebay_id' => $ebay_id],
                 ['type' => $type, 'shop' => $shop]
             );
-            $listing->products()->detach();
+            DB::table('listing_partslink')
+                ->where('listing_id', $listing->id)
+                ->delete();
+
             $components = array();
             for ($i = 0; $i < 18; $i++) {
                 $components[] = array(
@@ -77,16 +82,15 @@ class AutoelementsDatabaseImport implements ToModel, WithHeadingRow, WithChunkRe
                         Backlog::createBacklog('error', 'Column quantity cannot be null '. $this->rows);
                     }
                     else {
-                        $product = Product::where('sku', $item['sku'])->orWhere('partslink', 'like', '%' . str_replace('ABP', '', $item['sku']) . '%')->orWhere('oem_number', 'like', '%' . str_replace('ABP', '', $item['sku']) . '%')->has('warehouses');
-                        if (!$product->exists()) $product = Product::where('sku', 'like', '%' . str_replace('ABP', '', $item['sku']) . '%')->has('warehouses');
-
-                        if ($product->exists()) {
-                            $listing->products()->attach(
-                                $product->orderBy('price', 'asc')->first(), ['quantity' => $item['qty']]
-                            );
-                        }
-                        else {
-                            Backlog::createBacklog('error', 'Product with sku not found ' . $item['sku']);
+                        DB::table('listing_partslink')->insert([
+                            'listing_id'    => $listing->id,
+                            'partslink'     => $item['sku'],
+                            'quantity'      => $item['qty'],
+                            "created_at" =>  \Carbon\Carbon::now(),
+                            "updated_at" => \Carbon\Carbon::now(),
+                        ]);
+                        if (!Warehouse::where('sku',     $item['sku'])->orWhere('partslink', $item['sku'])->exists()) {
+                            Backlog::createBacklog('error 401', 'SKU or Partslink not founded: '. $item['sku']. ' listing_id: ' . $listing->id);
                         }
                     }
 

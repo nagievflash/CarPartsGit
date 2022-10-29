@@ -50,6 +50,17 @@ class InventoryImportPF implements ToModel, WithHeadingRow, WithChunkReading, Wi
             ['sku' => $row['sku'], 'supplier_id' => 1],
             ['price' => $price, 'qty' => $qty, 'shipping' => (float)$row['shipping_cost'], 'handling' => (float)$row['handling_cost'], 'partslink' => $row['partslink']]
         );
+        Product::updateOrCreate(
+            [
+                'sku' => $row['sku']
+            ],
+            [
+                'price' => $price,
+                'qty'   => $qty,
+                'partslink' => $row['partslink'],
+                'oem_number' => $row['oem_number'],
+            ]
+        );
     }
 
     public function chunkSize(): int

@@ -30,10 +30,8 @@ class UpdatePricing extends Command
      */
     public function handle(): string
     {
-        foreach (Shop::all() as $shop) {
-            foreach (EbayListing::all() as $listing) {
-                dispatch(new UpdateInventoryPricingJob($listing));
-            }
+        foreach (EbayListing::all() as $listing) {
+            dispatch(new UpdateInventoryPricingJob($listing));
         }
 
         return 'The Job started successfully!';

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Models\Compatibility;
 use App\Models\Order;
 use App\Models\Product;
@@ -23,17 +24,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 Route::get('/products', function (Request $request) {
     if ($request->has('search')) {
-        $products = Product::where("sku", $request->get("search"))->exists()
-            ? Product::where("sku", $request->get("search"))->hasFitments()->isAvailable()->paginate(15)
-            : Product::where("partslink", $request->get("search"))->hasFitments()->isAvailable()->paginate(15);
+        $products =  Product::where("sku", $request->get("search"))
+            ->orWhere("partslink", 'like',  '%'.$request->get("search").'%')
+            ->orWhere("oem_number", 'like',  '%'.$request->get("search").'%')
+            ->hasFitments()->isAvailable()->paginate(16);
     }
-    else $products = Product::hasFitments()->paginate(15);
+    else $products = Product::hasFitments()->isAvailable()->paginate(16);
     return $products;
 });
 
@@ -193,3 +192,13 @@ Route::get('/oauth2/authorize', function (Request $request) {
     }
     return 'Successful updated code: ' . $code;
 });
+
+
+// AUTHORIZATION
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+Route::post('/auth/register', [AuthController::class, 'createUser']);
+Route::post('/auth/login', [AuthController::class, 'loginUser']);

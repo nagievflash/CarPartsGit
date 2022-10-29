@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static whereHas(string $string, \Closure $param)
  * @method static firstOrCreate(array $array, array $array1)
  * @method static firstOrNew(array $array)
+ * @method static updateOrCreate(array $array, array $array1)
+ * @method static hasFitments()
  * @property string $sku
  * @property string $title
  * @property string $partslink
@@ -121,5 +123,6 @@ class Product extends Model
     {
         return $query->where('qty', '>', 0);
     }
+
 
 }

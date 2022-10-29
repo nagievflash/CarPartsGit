@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
  * @property string $type
  * @property mixed $ebay_id
  * @property mixed $sku
+ * @property mixed $shop
  * @method static create(array $array)
  * @method static where(string $string, mixed $input)
  * @method static first()
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\DB;
  * @method static paginate(int $int)
  * @method static take(int $int)
  * @method static updateOrCreate(array $array, array $array1)
+ * @method static findOrFail(string $string, string $ebay_id)
  */
 class EbayListing extends Model
 {
@@ -40,76 +42,167 @@ class EbayListing extends Model
      */
     protected $guarded = [];
 
+    public $visited = array();
+
 
     public function products(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'listing_product', 'listing_id', 'product_id')->withPivot('quantity')->withTimestamps();
     }
 
+    public function shops(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Shop::class, 'shop', 'slug');
+    }
+
+    public function partslinks(): \Illuminate\Support\Collection
+    {
+        return DB::table('listing_partslink')
+            ->where('listing_id', $this->id)
+            ->get();
+    }
+
     public function getPrice() {
-        $prices = array();
-        foreach ($this->products as $item) {
-            $prices[$item->sku]['qty'] = $item->pivot->quantity;
-            foreach (Warehouse::where('sku', $item->sku)->orWhere('partslink', $item->sku)->get() as $warehouse) {
-                $prices[$item->sku][$warehouse->supplier->title] = [
-                    'price'     => $warehouse->price + $warehouse->handling,
-                    'qty'       => $warehouse->qty,
-                    'shipping'  => $warehouse->shipping,
-                ];
-                if ($warehouse->supplier->title == 'LKQ') {
-                    $packages = DB::table('lkq_packages')
-                        ->select('method')
-                        ->where('sku', $item->sku);
-                    if ($packages->exists()) $prices[$item->sku][$warehouse->supplier->title]['method'] =
-                        DB::table('lkq_packages')
-                        ->select('method')
-                        ->where('sku', $item->sku)
-                        ->first()->method;
-                    else $prices[$item->sku][$warehouse->supplier->title]['method'] = 'MP';
+        $price = DB::table('listing_price')
+            ->where('listing_id', $this->id)
+            ->first();
+        return $price->price;
+    }
+
+    public function getPriceGraph($graph = false, $needQty = false) {
+        $partslinks = array();
+        $error = false;
+        foreach ($this->partslinks() as $key => $item) {
+            $p = (string)$item->partslink;
+            if (strlen($p) > 6) {
+                $parts = Warehouse::where("sku", $p)->orWhere('partslink', 'like', '%'. $p .'%');
+            }
+            else $parts = Warehouse::where("sku", $p)->orWhere('partslink', $p);
+            if ($parts->exists()) {
+                foreach ($parts->get() as $k => $part) {
+                    if (($part->qty - 1) >= $item->quantity) {
+                        $arr = array(
+                            'supplier'  => $part->supplier->title,
+                            'sku'       => $part->sku,
+                            'partslink' => $part->partslink,
+                            'qty'       => $part->qty,
+                            'nums'      => $item->quantity,
+                            'price'     => $part->price + $part->handling,
+                            'shipping'  => $part->shipping,
+                        );
+                        if ($part->supplier->title == 'LKQ') {
+                            $packages = DB::table('lkq_packages')
+                                ->select('method')
+                                ->where('sku', $part->partslink);
+                            if ($packages->exists()) $arr['method'] =
+                                $packages->first()->method;
+                        }
+                        $partslinks[$key][] = $arr;
+                    }
                 }
-            }
-        }
-        $price = 0;
-        $shippingPF = 0;
-        $shippingLKQ = 0;
-        $priceLKQ = 0;
-        $methodLKQ = 'SP';
-        foreach ($prices as $item) {
-            if (isset($item["PF"])) {
-                $price += $item["PF"]["price"] * $item["qty"];
-                $shippingPF = max($shippingPF, $item["PF"]["shipping"]);
-            }
-            elseif (isset($item["LKQ"])) {
-                $price += $item["LKQ"]["price"] * $item["qty"];
-                $shippingLKQ += $item["qty"];
-                if ($item["LKQ"]["method"] == 'LP' || $item["LKQ"]["method"] == 'LTL') $methodLKQ = $item["LKQ"]["method"];
-                elseif ($item["LKQ"]["method"] == 'MP' && $methodLKQ == 'SP') $methodLKQ = 'MP';
+               // if (!isset($partslinks[$key])) $error = true;
             }
             else {
-                $price = 0;
+                Backlog::createBacklog('error 402', 'Partslink not found: ' . $p . ', listing id: ' . $this->ebay_id);
+                $error = true;
+                // dd('Error 402: some parts not found');
             }
         }
-        $shippingLKQPrice = 0;
-        if ($shippingLKQ > 0) {
-            if ($methodLKQ == 'SP') {
-                $shippingLKQPrice = 16 + ($shippingLKQ - 1) * 5;
+
+        if (!$error && sizeof($partslinks) > 0) {
+            $collection = $this->cartesian($partslinks);
+            $price = 0;
+            $currentItem = array();
+            foreach ($collection as $items) {
+                $localPrice = 0;
+                $shipping = 0;
+                $shippingLKQ = 0;
+                $shippingLKQPrice = 0;
+                $sp = 0;
+                $mp = 0;
+                $lp = 0;
+                $lt = 0;
+                foreach ($items as $item) {
+                    $localPrice += $item['price'] * $item['nums'];
+                    $shipping = max($shipping, $item['shipping']);
+                    if ($item['supplier'] == 'LKQ') {
+                        $shippingLKQ += $item['nums'];
+                        switch ($item['method']) {
+                            case "SP":
+                                $sp += $item['nums'];
+                                break;
+                            case "MP":
+                                $mp += $item['nums'];
+                                break;
+                            case "LP":
+                                $lp += $item['nums'];
+                                break;
+                            case "LTL":
+                            case "LT":
+                                $lt += $item['nums'];
+                                break;
+                        }
+                    }
+                }
+                if ($shippingLKQ > 0) {
+                    if ($sp > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_sp')->first()->value + ($sp - 1) * Setting::where('key','lkq_cost_additional_sp')->first()->value;
+                    if ($mp > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_mp')->first()->value + ($mp - 1) * Setting::where('key','lkq_cost_additional_mp')->first()->value;
+                    if ($lp > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_lp')->first()->value * $lp;
+                    if ($lt > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_lt')->first()->value * $lt;
+                }
+                $localPrice = $localPrice + $shippingLKQPrice + $shipping;
+                if ($price != 0 && $price > $localPrice) {
+                    $price = $localPrice;
+                    $currentItem = $items;
+                }
+                elseif ($price == 0) {
+                    $price = $localPrice;
+                    $currentItem = $items;
+                }
             }
-            if ($methodLKQ == 'MP') {
-                $shippingLKQPrice = 28 + ($shippingLKQ - 1) * 10;
-            }
+            $price = $price + $price  * $this->shops->percent / 100;
+            $currentItem['price'] = $price;
+            if ($graph) return $currentItem;
+            else return $price;
         }
-        return $price + $shippingPF + $shippingLKQPrice;
+        else {
+            if ($graph) return array(0 => array('qty' => 0, 'nums' => 1), 'price' => 0 );
+            else return 0;
+        }
     }
 
     public function getQuantity() {
-        $quantity = 0;
-        foreach ($this->products as $item) {
-            $qty = $item->pivot->quantity;
-            $quantities[$item->sku] = array();
-            foreach ($item->warehouses as $warehouse) {
-                $quantity = max($quantity, (int)($warehouse->qty / $qty));
+        $listing = DB::table('listing_price')
+            ->where('listing_id', $this->id)
+            ->first();
+        return $listing->quantity;
+    }
+
+
+    /**
+     * Function for (decart) cartesian product arrays of variations
+     * @param $arr
+     * @return mixed
+     */
+    public function cartesian($arr): mixed
+    {
+        $variant = array();
+        $result  = array();
+        $sizearr = sizeof($arr);
+
+        return $this->recursiv($arr, $variant, -1, $result, $sizearr);
+    }
+
+    public function recursiv($arr, $variant, $level, $result, $sizearr) {
+        $level++;
+        if ($level < $sizearr){
+            foreach ($arr[$level] as $val) {
+                $variant[$level] = $val;
+                $result = $this->recursiv($arr, $variant, $level, $result, $sizearr);
             }
+        } else {
+            $result[] = $variant;
         }
-        return $quantity;
+        return $result;
     }
 }

@@ -55,7 +55,7 @@ class EbayController extends Controller
     {
         $listing = EbayListing::where('ebay_id', $request->input('ebay_id'))->firstOrFail();
 
-        $ebayUploader = new EbayHelper(Shop::where('slug', $listing->type)->first());
+        $ebayUploader = new EbayHelper(Shop::where('slug', $listing->shop)->first());
 
         $response = $ebayUploader->reviseFixedPriceItem($listing);
 
@@ -70,5 +70,26 @@ class EbayController extends Controller
             'Content-Type' => 'application/xml'
         ]);
         */
+    }
+
+
+    /**
+     * @param Request $request
+     * @return RedirectResponse
+     * @throws Exception
+     */
+    public function updatePriceItem(Request $request): RedirectResponse
+    {
+        $listing = EbayListing::where('ebay_id', $request->input('ebay_id'))->firstOrFail();
+
+        $ebayUploader = new EbayHelper(Shop::where('slug', $listing->shop)->first());
+
+        $response = $ebayUploader->updateInventoryPricing($listing);
+
+        if ($response->body()) {
+            return Redirect::back()->with('success', 'The listing successful revised on Ebay.');
+        }
+        else return Redirect::back()->with('error', 'Error, while sending request to Ebay API');
+
     }
 }

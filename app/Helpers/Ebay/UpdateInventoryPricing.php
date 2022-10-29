@@ -22,7 +22,7 @@ trait UpdateInventoryPricing
         $this->headers["X-EBAY-API-CALL-NAME"] = 'ReviseFixedPriceItem';
         $this->headers["X-EBAY-API-SITEID"] = '100';
 
-        $price = $listing->getPrice() + $listing->getPrice()  * $this->shop->percent / 100;
+        $price = $listing->getPrice();
         $stock = ($listing->getQuantity() - $this->shop->qty_reserve) > 0 ? $listing->getQuantity() - $this->shop->qty_reserve : 0;
         if ($stock > $this->shop->max_qty) $stock = $this->shop->max_qty;
 
