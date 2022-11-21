@@ -151,7 +151,7 @@ return [
     |
     */
 
-    'memory_limit' => 512,
+    'memory_limit' => 1024,
 
     /*
     |--------------------------------------------------------------------------
@@ -167,12 +167,12 @@ return [
     'defaults' => [
         'supervisor-1' => [
             'connection' => 'redis',
-            'queue' => ['default'],
+            'queue' => ['default', 'ebay1', 'ebay2', 'ebay3', 'ebay4', 'pf', 'lkq', 'jc'],
             'balance' => 'auto',
-            'maxProcesses' => 5,
-            'memory' => 1024,
-            'tries' => 2,
-            'timeout' => 900,
+            'maxProcesses' => 15,
+            'memory' => 2048,
+            'tries' => 3,
+            'timeout' => 600,
             'nice' => 0,
         ],
     ],
@@ -180,18 +180,27 @@ return [
     'environments' => [
         'production' => [
             'supervisor-1' => [
-                'maxProcesses' => 10,
-                'balanceMaxShift' => 1,
-                'balanceCooldown' => 3,
-                'balance' => 'simple'
+                'connection' => 'redis',
+                'queue' => ['default', 'ebay1', 'ebay2', 'ebay3', 'ebay4', 'pf', 'lkq', 'jc'],
+                'balance' => 'auto',
+                'maxProcesses' => 15,
+                'memory' => 2048,
+                'tries' => 3,
+                'timeout' => 600,
+                'nice' => 0,
             ],
         ],
 
         'local' => [
             'supervisor-1' => [
                 'connection' => 'redis',
-                'maxProcesses' => 3,
-                'balance' => 'simple'
+                'queue' => ['default', 'ebay1', 'ebay2', 'ebay3', 'ebay4', 'pf', 'lkq', 'jc'],
+                'balance' => 'auto',
+                'maxProcesses' => 15,
+                'memory' => 2048,
+                'tries' => 3,
+                'timeout' => 600,
+                'nice' => 0,
             ],
         ],
     ],

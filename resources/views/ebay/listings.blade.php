@@ -82,6 +82,7 @@
                                 <td>
                                     <a href="/admin/ebay/update_price?ebay_id={{$listing->ebay_id}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-arrow-repeat"></i></a>
                                     <a href="/admin/ebay/listings/{{$listing->ebay_id}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-box-arrow-up-right"></i></a>
+                                    <a data-href="/admin/ebay/remove-listing/{{$listing->id}}" class="text-danger h4 p-1 remove-listing" title="Remove Listing from CRM"><i class="bi bi-trash"></i></a>
                                 </td>
                             </tr>
                         @endforeach
@@ -99,7 +100,21 @@
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
         <script>
             $('document').ready(function(){
-
+                $('.remove-listing').click(function(e){
+                    let result = confirm('Are you want to remove this listing from CRM system?');
+                    if (result) {
+                        $.ajax({
+                            headers: {
+                               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            type: "POST",
+                            url: $(this).data('href'),
+                        })
+                        .done(function() {
+                            location.reload()
+                        });
+                    }
+                })
             })
         </script>
     </x-slot>

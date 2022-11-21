@@ -14,7 +14,7 @@ class UpdatePricing extends Command
      *
      * @var string
      */
-    protected $signature = 'update:pricing';
+    protected $signature = 'update:pricing {shop=all}';
 
     /**
      * The console command description.
@@ -30,9 +30,17 @@ class UpdatePricing extends Command
      */
     public function handle(): string
     {
-        foreach (EbayListing::all() as $listing) {
-            dispatch(new UpdateInventoryPricingJob($listing));
+        if ($this->argument('shop') == 'all') {
+            foreach (EbayListing::all() as $listing) {
+                dispatch(new UpdateInventoryPricingJob($listing))->onQueue($listing->shop);
+            }
         }
+        else {
+            foreach (EbayListing::where('shop', $this->argument('shop'))->get() as $listing) {
+                dispatch(new UpdateInventoryPricingJob($listing))->onQueue($listing->shop);
+            }
+        }
+
 
         return 'The Job started successfully!';
     }

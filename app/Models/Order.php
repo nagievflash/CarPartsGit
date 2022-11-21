@@ -22,11 +22,18 @@ class Order extends Model
 
     public function products(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'order_product', 'product_sku', 'order_id');
+        return $this->belongsToMany(Product::class, 'order_product',  'order_id', 'product_sku');
     }
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getTotal() {
+        $total = 0;
+        foreach ($this->products() as $item) {
+
+        }
     }
 }

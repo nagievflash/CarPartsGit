@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\DB;
  * @method static take(int $int)
  * @method static updateOrCreate(array $array, array $array1)
  * @method static findOrFail(string $string, string $ebay_id)
+ * @method static firstOrFail($id)
  */
 class EbayListing extends Model
 {
@@ -78,9 +79,29 @@ class EbayListing extends Model
                 $parts = Warehouse::where("sku", $p)->orWhere('partslink', 'like', '%'. $p .'%');
             }
             else $parts = Warehouse::where("sku", $p)->orWhere('partslink', $p);
+            $parts = $parts->where('supplier_id', '!=', 3);
             if ($parts->exists()) {
                 foreach ($parts->get() as $k => $part) {
-                    if (($part->qty - 1) >= $item->quantity) {
+                    $packErr = false;
+                    if ($part->supplier->title == 'PF') {
+                        $jc = Warehouse::where('sku', $part->sku)->where('supplier_id', 3);
+                        if ($jc->exists()) {
+                            $jc = $jc->first();
+                            if (($jc->qty - 2) >= $item->quantity) {
+                                $partslinks[$key][] = array(
+                                    'supplier'  => 'JC',
+                                    'sku'       => $jc->sku,
+                                    'partslink' => $part->partslink,
+                                    'qty'       => $jc->qty,
+                                    'nums'      => $item->quantity,
+                                    'price'     => $jc->price,
+                                    'shipping'  => $jc->shipping,
+                                );
+                            }
+                        }
+
+                    }
+                    if (($part->qty - 2) >= $item->quantity) {
                         $arr = array(
                             'supplier'  => $part->supplier->title,
                             'sku'       => $part->sku,
@@ -91,16 +112,24 @@ class EbayListing extends Model
                             'shipping'  => $part->shipping,
                         );
                         if ($part->supplier->title == 'LKQ') {
+                            $str = $part->partslink;
+                            preg_match('/.*[0-9]/', $str, $res);
                             $packages = DB::table('lkq_packages')
                                 ->select('method')
-                                ->where('sku', $part->partslink);
+                                ->where('sku', 'like', '%'.$res[0].'%');
                             if ($packages->exists()) $arr['method'] =
                                 $packages->first()->method;
+                            else {
+                                $packErr = true;
+                                Backlog::createBacklog('error 403', 'Package method not found for: ' . $part->partslink . ', listing id: ' . $this->ebay_id);
+                            }
                         }
-                        $partslinks[$key][] = $arr;
+
+
+                        if (!$packErr) $partslinks[$key][] = $arr;
                     }
                 }
-               // if (!isset($partslinks[$key])) $error = true;
+               if (!isset($partslinks[$key])) $error = true;
             }
             else {
                 Backlog::createBacklog('error 402', 'Partslink not found: ' . $p . ', listing id: ' . $this->ebay_id);
@@ -108,12 +137,52 @@ class EbayListing extends Model
                 // dd('Error 402: some parts not found');
             }
         }
-
         if (!$error && sizeof($partslinks) > 0) {
-            $collection = $this->cartesian($partslinks);
+            $clear = array();
+            foreach ($partslinks as $key => $part) {
+                $minLKQ = array();
+                $minPF  = array();
+                $minJC  = array();
+                foreach ($part as $key => $item) {
+                    if ($item['supplier']  == "PF") {
+                        if (sizeof($minPF) == 0) $minPF = $item;
+                        else {
+                            if ($item['price'] < $minPF['price']) $minPF = $item;
+                        }
+                    }
+                    if ($item['supplier']  == "LKQ") {
+                        if (sizeof($minLKQ) == 0) $minLKQ = $item;
+                        else {
+                            if ($item['price'] < $minLKQ['price']) $minLKQ = $item;
+                        }
+                    }
+                    if ($item['supplier']  == "JC") {
+                        if (sizeof($minJC) == 0) $minJC = $item;
+                        else {
+                            if ($item['price'] < $minJC['price']) $minJC = $item;
+                        }
+                    }
+                }
+                $parts = array();
+                if ((sizeof($minPF) > 0) && (sizeof($minLKQ) > 0)) {
+                    $parts[] = $minPF;
+                    if (($minPF['price'] + $minPF['shipping']) >= ($minLKQ['price'] + Setting::where('key', 'lkq_cost_' . strtolower($minLKQ['method']))->first()->value)) {
+                        $parts[] = $minLKQ;
+                    }
+                }
+                elseif ((sizeof($minPF) > 0) && (sizeof($minLKQ) == 0)) {
+                    $parts[] = $minPF;
+                }
+                elseif ((sizeof($minPF) == 0) && (sizeof($minLKQ) > 0)) {
+                    $parts[] = $minLKQ;
+                }
+                if (sizeof($minJC) > 0) $parts[] = $minJC;
+                $clear[] = $parts;
+            }
+            $collection = $this->cartesian($clear);
             $price = 0;
             $currentItem = array();
-            foreach ($collection as $items) {
+            foreach ($collection as $key => $items) {
                 $localPrice = 0;
                 $shipping = 0;
                 $shippingLKQ = 0;
@@ -144,20 +213,22 @@ class EbayListing extends Model
                         }
                     }
                 }
-                if ($shippingLKQ > 0) {
-                    if ($sp > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_sp')->first()->value + ($sp - 1) * Setting::where('key','lkq_cost_additional_sp')->first()->value;
-                    if ($mp > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_mp')->first()->value + ($mp - 1) * Setting::where('key','lkq_cost_additional_mp')->first()->value;
-                    if ($lp > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_lp')->first()->value * $lp;
-                    if ($lt > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_lt')->first()->value * $lt;
-                }
-                $localPrice = $localPrice + $shippingLKQPrice + $shipping;
-                if ($price != 0 && $price > $localPrice) {
-                    $price = $localPrice;
-                    $currentItem = $items;
-                }
-                elseif ($price == 0) {
-                    $price = $localPrice;
-                    $currentItem = $items;
+                if ($shippingLKQ < 3) {
+                    if ($shippingLKQ > 0) {
+                        if ($sp > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_sp')->first()->value + ($sp - 1) * Setting::where('key','lkq_cost_additional_sp')->first()->value;
+                        if ($mp > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_mp')->first()->value + ($mp - 1) * Setting::where('key','lkq_cost_additional_mp')->first()->value;
+                        if ($lp > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_lp')->first()->value * $lp;
+                        if ($lt > 0) $shippingLKQPrice += Setting::where('key','lkq_cost_lt')->first()->value * $lt;
+                    }
+                    $localPrice = $localPrice + $shippingLKQPrice + $shipping;
+                    if ($price != 0 && $price > $localPrice) {
+                        $price = $localPrice;
+                        $currentItem = $items;
+                    }
+                    elseif ($price == 0) {
+                        $price = $localPrice;
+                        $currentItem = $items;
+                    }
                 }
             }
             $price = $price + $price  * $this->shops->percent / 100;

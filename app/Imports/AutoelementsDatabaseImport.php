@@ -52,13 +52,17 @@ class AutoelementsDatabaseImport implements ToModel, WithHeadingRow, WithChunkRe
         if (!$row['type']) $type = 'single';
         $shop = '';
         $ebay_id = '';
-        if ($row['ebay3']) {
+/*        if ($row['ebay3']) {
             $shop = 'ebay3';
             $ebay_id = $row['ebay3'];
         }
         if ($row['ebay4']) {
             $shop = 'ebay4';
             $ebay_id = $row['ebay4'];
+        }*/
+        if ($row['ebay1']) {
+            $shop = 'ebay1';
+            $ebay_id = $row['ebay1'];
         }
         if ($ebay_id != '') {
             $listing = EbayListing::updateOrCreate(
@@ -86,11 +90,9 @@ class AutoelementsDatabaseImport implements ToModel, WithHeadingRow, WithChunkRe
                             'listing_id'    => $listing->id,
                             'partslink'     => $item['sku'],
                             'quantity'      => $item['qty'],
-                            "created_at" =>  \Carbon\Carbon::now(),
-                            "updated_at" => \Carbon\Carbon::now(),
                         ]);
-                        if (!Warehouse::where('sku',     $item['sku'])->orWhere('partslink', $item['sku'])->exists()) {
-                            Backlog::createBacklog('error 401', 'SKU or Partslink not founded: '. $item['sku']. ' listing_id: ' . $listing->id);
+                        if (!Warehouse::where('sku', $item['sku'])->orWhere('partslink', 'like', '%'.$item['sku'].'%')->exists()) {
+                            Backlog::createBacklog('error 401', 'SKU or Partslink not founded: '. $item['sku']. ' listing_id: ' . $listing->id. ' Ebay_id: ' . $listing->ebay_id);
                         }
                     }
 

@@ -67,7 +67,7 @@ class UpdateInventory extends Command
             }
             $newest = $fileData->sortByDesc('date')->first();
 
-            Excel::queueImport(new InventoryImportPF, storage_path().'/app/'.$newest['file']);
+            Excel::queueImport(new InventoryImportPF, storage_path().'/app/'.$newest['file'])->allOnQueue('pf');
             return 'The Job started successfully!';
         }
 
@@ -82,13 +82,8 @@ class UpdateInventory extends Command
             if ($inventoryFile != '') Storage::disk('local')->put('files/lkq_inventory.csv', $disk->get($inventoryFile));
             else dd('file not found');
 
-            Excel::queueImport(new InventoryImportLKQ, storage_path().'/app/files/lkq_inventory.csv');
+            Excel::queueImport(new InventoryImportLKQ, storage_path().'/app/files/lkq_inventory.csv')->allOnQueue('lkq');
             return 'The Job started successfully!';
         }
-
-        foreach (EbayListing::all() as $listing) {
-            dispatch(new UpdateListingsPricesJob($listing));
-        }
-
     }
 }

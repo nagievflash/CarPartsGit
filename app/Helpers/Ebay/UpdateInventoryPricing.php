@@ -41,7 +41,8 @@ trait UpdateInventoryPricing
         $xmlWriter->startElement('Item');
         $xmlWriter->writeElement('ItemID', $listing->ebay_id);
         $xmlWriter->writeElement('Quantity', $stock);
-        $xmlWriter->writeElement('StartPrice', $price);
+        if ($stock != 0) $xmlWriter->writeElement('StartPrice', $price);
+
         $xmlWriter->endElement();
         // End Item
 

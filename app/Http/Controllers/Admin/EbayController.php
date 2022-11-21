@@ -92,4 +92,10 @@ class EbayController extends Controller
         else return Redirect::back()->with('error', 'Error, while sending request to Ebay API');
 
     }
+
+    public function removeListing($id) {
+        EbayListing::where('id', $id)->delete();
+        return 'Success deleted';
+
+    }
 }

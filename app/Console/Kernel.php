@@ -19,7 +19,8 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\UpdatePricing',
         'App\Console\Commands\ReviseAllItems',
         'App\Console\Commands\FlushRedis',
-        'App\Console\Commands\UpdateDatabase'
+        'App\Console\Commands\UpdateDatabase',
+        'App\Console\Commands\UpdateAllPrices',
     ];
 
     /**

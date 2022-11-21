@@ -123,7 +123,7 @@ Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($yea
                 ->where('make_name', $make)
                 ->where('model_name', $model)
                 ->where('part_name', $category);
-        })->isAvailable()->paginate(16);
+        })->paginate(16);
     }
 });
 
@@ -196,9 +196,22 @@ Route::get('/oauth2/authorize', function (Request $request) {
 
 // AUTHORIZATION
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
     return $request->user();
 });
 
+
 Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
+
+Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::class, 'getSetupIntent']);
+Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 'postPaymentMethods']);
+
+Route::get('/create-payment-intent', function (Request $request) {
+    $request->user()->createSetupIntent();
+    $payment = $request->user()->payWith(
+        10000, ['card']
+    );
+
+    return $payment->client_secret;
+});

@@ -9,6 +9,11 @@
 
         <!-- Styles -->
         @include('layouts.partials.styles')
+        <style>
+            .remove-listing {
+                cursor:pointer;
+            }
+        </style>
     </head>
     <body>
         <div id="app">
