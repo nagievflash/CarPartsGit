@@ -13,12 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('order_product', function (Blueprint $table) {
-            $table->id();
-            $table->integer('order_id');
-            $table->string('product_sku');
-            $table->integer('qty')->unsigned();
-            $table->timestamps();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->string('stripe_id')->nullable();
+            $table->renameColumn('secret', 'stripe_secret');
         });
     }
 
@@ -29,6 +26,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('order_product');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('stripe_id');
+            $table->renameColumn('stripe_secret', 'secret');
+        });
     }
 };

@@ -13,12 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('order_product', function (Blueprint $table) {
-            $table->id();
-            $table->integer('order_id');
-            $table->string('product_sku');
-            $table->integer('qty')->unsigned();
-            $table->timestamps();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->integer('total_quantity')->default(0);
         });
     }
 
@@ -29,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('order_product');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('total_quantity');
+        });
     }
 };

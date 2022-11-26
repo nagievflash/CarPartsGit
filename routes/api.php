@@ -1,11 +1,15 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\CheckoutController;
+use App\Models\Address;
+use App\Models\Category;
 use App\Models\Compatibility;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
+use App\Models\Warehouse;
 use App\Models\Year;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -123,50 +127,26 @@ Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($yea
                 ->where('make_name', $make)
                 ->where('model_name', $model)
                 ->where('part_name', $category);
-        })->paginate(16);
+        })->isAvailable()->paginate(16);
     }
 });
 
 Route::get('/categories-list/', function () {
-    return DB::table('compatibilities')
-        ->select('part_name')
-        ->orderBy('part_name')
-        ->distinct()
-        ->get();
+    return Category::all();
 });
 
 Route::get('/categories/{title}', function ($title) {
-    return Product::whereHas('fitments', function ($query) use ($title) {
-        return $query->where('part_name', '=', $title);
-    })->isAvailable()->paginate(16);
-});
-
-
-Route::post('/orders/add', function (Request $request) {
-    $data = $request->all();
-    $user = User::updateOrCreate([
-        'email' => $data["userdata"]["email"]
-    ],[
-        'email'         => $data["userdata"]["email"],
-        'name'          => $data["userdata"]["firstname"],
-        'lastname'      => $data["userdata"]["lastname"],
-        'address'       => $data["userdata"]["address"],
-        'address2'      => $data["userdata"]["address2"],
-        'city'          => $data["userdata"]["city"],
-        'zipcode'       => $data["userdata"]["zipcode"],
-        'password'      => md5("password"),
-    ]);
-
-    $order = Order::create([
-        'user_id'       => $user->id,
-        'status'        => 'created'
-    ]);
-
-    foreach ($data["items"] as $item) {
-        $order->products()->attach($item["sku"],  ['qty' => $item["quantity"]]);
-    }
-
-    return $order->id;
+    $title = urldecode($title);
+    return Product::select('products.id as id','sku', 'title', 'partslink', 'oem_number', 'price', 'qty', 'images','mcat_name','mscat_name', 'categories.part_name as part_name')
+        ->join('categories', 'products.title', '=', 'categories.part_name')
+        ->where(function($query) use ($title)
+        {
+            $query->where('categories.mcat_name', '=', $title)
+                ->orWhere('categories.mscat_name', '=', $title)
+                ->orWhere('categories.part_name', '=', $title);
+        })
+        ->hasFitments()
+        ->paginate(16);
 });
 
 
@@ -193,14 +173,6 @@ Route::get('/oauth2/authorize', function (Request $request) {
     return 'Successful updated code: ' . $code;
 });
 
-
-// AUTHORIZATION
-
-Route::middleware('auth:sanctum')->get('/profile', function (Request $request) {
-    return $request->user();
-});
-
-
 Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
 
@@ -210,8 +182,82 @@ Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 
 Route::get('/create-payment-intent', function (Request $request) {
     $request->user()->createSetupIntent();
     $payment = $request->user()->payWith(
-        10000, ['card']
+        10000, ['card', 'paypal']
     );
-
     return $payment->client_secret;
+
+})->middleware('auth:sanctum');
+
+
+Route::group(['middleware' => ['auth:sanctum']], function () {
+
+    Route::get('/profile', function (Request $request) {
+        return $request->user();
+    });
+
+    Route::get('/checkout/intent', [CheckoutController::class, 'intent']);
+    Route::post('/checkout/pay', [CheckoutController::class, 'pay']);
+
+    Route::post('/orders/add', function (Request $request) {
+        $data = $request->all();
+        $user = $request->user();
+
+        $order = Order::create([
+            'user_id'       => $user->id,
+            'status'        => 'created'
+        ]);
+
+        $total = 0;
+        $qty = 0;
+        $shipping = 0;
+        $handling = 0;
+        foreach ($data["items"] as $item) {
+            $product = Warehouse::where('sku', $item["sku"])->where('supplier_id', 1)->first();
+            $order->products()->attach($item["sku"],  ['qty' => $item["quantity"], 'price' => $product->price, 'total' => $product->price * $item["quantity"]]);
+            $total += $item['quantity'] * $product->price;
+            $shipping += $item['quantity'] * $product->shipping;
+            $handling += $item['quantity'] * $product->handling;
+            $qty += $item["quantity"];
+        }
+        $total = $total + $shipping + $handling;
+        $total = $total + $total / 4;
+        $payment = $user->payWith(
+            number_format((float)$total, 2, '.', '') * 100, ['card']
+        );
+
+        $address = Address::firstOrCreate([
+            'address'   => $data["userdata"]["address"],
+            'address2'  => $data["userdata"]["address2"],
+            'city'      => $data["userdata"]["city"],
+            'zipcode'   => $data["userdata"]["zipcode"],
+        ]);
+
+        $user->addresses()->syncWithoutDetaching($address->id);
+
+        $order->total_quantity = $qty;
+        $order->total = $total;
+        $order->stripe_secret = $payment->client_secret;
+        $order->stripe_id = $payment->id;
+        $order->addresses()->attach($address->id);
+        $order->save();
+
+        return $order->id;
+    });
+
+    Route::get('/orders/get', function (Request $request) {
+        $user = $request->user();
+        return Order::where('user_id', $user->id)->with('products')->with('addresses')->orderBy('id', 'DESC')->paginate(10);
+    });
+
+    Route::get('/orders/get/{id}', function (Request $request) {
+        $user = $request->user();
+        $order = Order::where('user_id', $user->id)->firstOrFail();
+
+        return Order::where('user_id', $user->id)->where('id', $request->id)->with('products')->with('addresses')->firstOrFail()->toJson(JSON_PRETTY_PRINT);
+    });
+
+    Route::get('/profile/addresses', function (Request $request) {
+        $user = $request->user();
+        return User::where('id', $user->id)->first()->addresses()->get();
+    });
 });

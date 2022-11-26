@@ -48,7 +48,7 @@ class InventoryImportPF implements ToModel, WithHeadingRow, WithChunkReading, Wi
 
         Warehouse::updateOrCreate(
             ['sku' => $row['sku'], 'supplier_id' => 1],
-            ['price' => $price, 'qty' => $qty, 'shipping' => (float)$row['shipping_cost'], 'handling' => (float)$row['handling_cost'], 'partslink' => $row['partslink']]
+            ['price' => $price, 'qty' => $qty, 'shipping' => (float)$row['shipping_cost'], 'handling' => (float)$row['handling_cost'], 'partslink' => $row['partslink'], 'category' => $row['part_name']]
         );
         Product::updateOrCreate(
             [

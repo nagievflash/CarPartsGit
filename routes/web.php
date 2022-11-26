@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Vtiful\Kernel\Excel;
@@ -31,10 +32,10 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::get('/import',  [App\Http\Controllers\Admin\AdminController::class, 'importProductsFromCSV'])->name('import');
     Route::get('/import/products/custom',  [App\Http\Controllers\Admin\AdminController::class, 'ebayUpload'])->name('ebayUpload');
     Route::get('/import/fitments/',  [App\Http\Controllers\Admin\AdminController::class, 'importFitments'])->name('importFitments');
-    Route::get('/categories',  [App\Http\Controllers\Admin\CategoriesController::class, 'createCategoriesFromJson'])->name('categoriesList');
     Route::get('/products',  [App\Http\Controllers\Admin\ProductsController::class, 'index'])->name('products.list');
     Route::get('/ebay/listings',  [App\Http\Controllers\Admin\AdminController::class, 'ebayListings'])->name('ebay.listings');
     Route::get('/ebay/listings/update',  [App\Http\Controllers\Admin\AdminController::class, 'updateListingId'])->name('updateListingId');
+    Route::get('/import/categories',  [App\Http\Controllers\Admin\AdminController::class, 'categoriesImport'])->name('categoriesImport');
 
     // Settings shop
     Route::get('/settings/',  [App\Http\Controllers\Admin\AdminController::class, 'settings'])->name('settings');
@@ -56,6 +57,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::get('/ebay/revise',  [App\Http\Controllers\Admin\EbayController::class, 'reviseFixedPriceItem']);
     Route::get('/ebay/update_price',  [App\Http\Controllers\Admin\EbayController::class, 'updatePriceItem']);
     Route::post('/ebay/remove-listing/{id}',  [App\Http\Controllers\Admin\EbayController::class, 'removeListing']);
+    Route::post('/categories/import',  [App\Http\Controllers\Admin\CategoriesController::class, 'categoriesImport']);
 
 
     Route::get('/ebay/template/{slug}', [App\Http\Controllers\Admin\AdminController::class, 'showTemplate']);
@@ -68,5 +70,8 @@ Route::get('/create-payment-intent', function (Request $request) {
     $payment = User::find(1)->payWith(
         10000, ['card']
     );
-    return $payment->client_secret;
+    return $payment;
+});
+Route::get('/test', function (Request $request) {
+    return Order::with('products')->paginate(10);
 });

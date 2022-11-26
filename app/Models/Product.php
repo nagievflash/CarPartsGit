@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static firstOrNew(array $array)
  * @method static updateOrCreate(array $array, array $array1)
  * @method static hasFitments()
+ * @method static join(string $string, string $string1, string $string2, string $string3)
  * @property string $sku
  * @property string $title
  * @property string $partslink
@@ -43,8 +44,12 @@ class Product extends Model
      * @var array
      */
     protected $casts = [
-        'images' => 'array'
+        'images' => 'array',
+        'shipping' => 'float',
+        'handling' => 'float'
     ];
+
+    protected $appends = ['shipping', 'handling'];
 
     /**
      * @return string
@@ -54,12 +59,44 @@ class Product extends Model
         return $this->getTitle();
     }
 
+    public function getHandlingAttribute(): string
+    {
+        if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
+            return (float) Warehouse::where('sku', $this->sku)->first()->handling + Warehouse::where('sku', $this->sku)->first()->handling / 4;
+        }
+        else return 0;
+    }
+
+    public function getShippingAttribute(): string
+    {
+        if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
+            return (float) Warehouse::where('sku', $this->sku)->first()->shipping + Warehouse::where('sku', $this->sku)->first()->shipping / 4;
+        }
+        else return 0;
+    }
+
+    public function setPriceAttribute($value)
+    {
+        if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
+            return Warehouse::where('sku', $this->sku)->first()->price + Warehouse::where('sku', $this->sku)->first()->price / 4;
+        }
+        else return 0;
+    }
+
+    public function setQtyAttribute($value)
+    {
+        if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
+            return Warehouse::where('sku', $this->sku)->first()->qty;
+        }
+        else return 0;
+    }
+
     /**
      * Get the VEHICLE COMPATIBILITY FITMENT
      */
     public function fitments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Compatibility::class, 'sku', 'sku');
+        return $this->hasMany(Fitment::class, 'sku', 'sku');
     }
 
 
@@ -123,6 +160,7 @@ class Product extends Model
     {
         return $query->where('qty', '>', 0);
     }
+
 
 
 }
