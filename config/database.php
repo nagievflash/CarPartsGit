@@ -127,6 +127,7 @@ return [
                     'laravel'), '_').'_database_'),
         ],
         'default' => [
+            'scheme' => env('REDIS_SCHEME', 'tcp'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', 'bARFVkN9t'),
             'port' => env('REDIS_PORT', 6379),
