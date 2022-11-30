@@ -22,6 +22,7 @@
                 <div class="card-body">
                     <a href="{{Route('settings.shop')}}" class="btn btn-xl btn-light-primary font-bold m-3">Shop settings</a>
                     <a href="{{Route('settings.suppliers')}}" class="btn btn-xl btn-light-secondary font-bold m-3">Suppliers settings</a>
+                    <a href="{{Route('settings.taxes')}}" class="btn btn-xl btn-light-success font-bold m-3">Tax settings</a>
                 </div>
             </div>
 

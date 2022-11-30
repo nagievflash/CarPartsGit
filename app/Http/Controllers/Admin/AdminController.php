@@ -7,6 +7,7 @@ use App\Models\Attribute;
 use App\Models\EbayListing;
 use App\Models\Fitment;
 use App\Models\Shop;
+use App\Models\Tax;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -124,4 +125,5 @@ class AdminController extends Controller
     {
         return view('admin.category-import');
     }
+
 }

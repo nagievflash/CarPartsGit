@@ -47,6 +47,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::put('/settings/shop/{slug}/update',  [App\Http\Controllers\Admin\ShopController::class, 'update']);
     Route::post('/settings/suppliers/lkq/update',  [App\Http\Controllers\Admin\SuppliersController::class, 'updateLKQ']);
     Route::delete('/settings/shop/{slug}/delete',  [App\Http\Controllers\Admin\ShopController::class, 'destroy']);
+    Route::get('/settings/taxes',  [App\Http\Controllers\Admin\TaxesController::class, 'index'])->name('settings.taxes');
 
 
     Route::post('/import',  [App\Http\Controllers\Admin\RequestController::class, 'importProductsBasics']);
@@ -58,6 +59,8 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::get('/ebay/update_price',  [App\Http\Controllers\Admin\EbayController::class, 'updatePriceItem']);
     Route::post('/ebay/remove-listing/{id}',  [App\Http\Controllers\Admin\EbayController::class, 'removeListing']);
     Route::post('/categories/import',  [App\Http\Controllers\Admin\CategoriesController::class, 'categoriesImport']);
+    Route::post('/taxes/remove/{id}',  [App\Http\Controllers\Admin\TaxesController::class, 'remove']);
+    Route::post('/taxes/store',  [App\Http\Controllers\Admin\TaxesController::class, 'store']);
 
 
     Route::get('/ebay/template/{slug}', [App\Http\Controllers\Admin\AdminController::class, 'showTemplate']);

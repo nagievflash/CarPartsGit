@@ -8,6 +8,7 @@ use App\Models\Compatibility;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\State;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\Year;
@@ -179,15 +180,9 @@ Route::post('/auth/login', [AuthController::class, 'loginUser']);
 Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::class, 'getSetupIntent']);
 Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 'postPaymentMethods']);
 
-Route::get('/create-payment-intent', function (Request $request) {
-    $request->user()->createSetupIntent();
-    $payment = $request->user()->payWith(
-        10000, ['card', 'paypal']
-    );
-    return $payment->client_secret;
-
-})->middleware('auth:sanctum');
-
+Route::get('/states', function (Request $request) {
+    return State::all();
+});
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
@@ -226,6 +221,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         );
 
         $address = Address::firstOrCreate([
+            'country'   => $data["userdata"]["country"],
+            'state'     => $data["userdata"]["state"],
             'address'   => $data["userdata"]["address"],
             'address2'  => $data["userdata"]["address2"],
             'city'      => $data["userdata"]["city"],
@@ -251,8 +248,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::get('/orders/get/{id}', function (Request $request) {
         $user = $request->user();
-        $order = Order::where('user_id', $user->id)->firstOrFail();
-
         return Order::where('user_id', $user->id)->where('id', $request->id)->with('products')->with('addresses')->firstOrFail()->toJson(JSON_PRETTY_PRINT);
     });
 
@@ -260,4 +255,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $user = $request->user();
         return User::where('id', $user->id)->first()->addresses()->get();
     });
+
+
 });

@@ -10,7 +10,7 @@
         <!-- Styles -->
         @include('layouts.partials.styles')
         <style>
-            .remove-listing {
+            .remove-listing, .cursor-pointer {
                 cursor:pointer;
             }
         </style>
