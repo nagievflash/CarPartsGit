@@ -114,13 +114,22 @@ Route::get('/categories/{year}/{make}/{model}/{submodel?}', function ($year, $ma
 
 Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($year, $make, $model, $submodel, $category) {
     if ($submodel != 0) {
-        return Product::whereHas('fitments', function ($query) use ($category, $submodel, $year, $make, $model) {
+/*        return Product::whereHas('fitments', function ($query) use ($category, $submodel, $year, $make, $model) {
             return $query->where('year', '=', $year)
                 ->where('make_name', $make)
                 ->where('model_name', $model)
                 ->where('submodel_name', $submodel)
                 ->where('part_name', $category);
-        })->isAvailable()->paginate(16);
+        })->isAvailable()->paginate(16);*/
+        return Product::hasFitments()
+            ->join('fitments', 'products.sku', '=', 'fitments.sku')
+            ->where('year', '=', $year)
+            ->where('make_name', $make)
+            ->where('model_name', $model)
+            ->where('submodel_name', $submodel)
+            ->where('part_name', $category)
+            //->isAvailable()
+            ->paginate(16);
     }
     else {
         return Product::whereHas('fitments', function ($query) use ($category, $year, $make, $model) {
