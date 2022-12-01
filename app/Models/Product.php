@@ -150,17 +150,14 @@ class Product extends Model
         return $title;
     }
 
-    public function scopeHasFitments($query)
-    {
-        return $query->has('fitments');
-    }
-
-
     public function scopeIsAvailable($query)
     {
         return $query->where('qty', '>', 0);
     }
 
-
+    public function scopeHasFitments($query)
+    {
+        return $query->where('fitments', '=', 1);
+    }
 
 }
