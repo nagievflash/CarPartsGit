@@ -265,5 +265,21 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         return User::where('id', $user->id)->first()->addresses()->get();
     });
 
+    Route::delete('/profile/addresses/delete/{id}', function (Request $request) {
+        $user = $request->user();
+        $id = $request->id;
+        $address = $user->addresses()->findOrFail($id);
+        $address->delete();
+        return 'success deleted';
+    });
+
+    Route::put('/profile/addresses/update/{id}', function (Request $request) {
+        $user = $request->user();
+        $id = $request->id;
+        $data = $request->data;
+        $address = $user->addresses()->findOrFail($id);
+        $address->update($data);
+        return $address->toJson(JSON_PRETTY_PRINT);
+    });
 
 });
