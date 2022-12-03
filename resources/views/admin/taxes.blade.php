@@ -129,20 +129,6 @@
                             location.reload()
                         });
                     }
-                    $('.edit-tax').click(function(e){
-                        let result = prompt('Edit state', $(this).fi);
-                        if (result) {
-                            $.ajax({
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                type: "POST",
-                                url: $(this).data('href'),
-                            })
-                                .done(function() {
-                                    location.reload()
-                                });
-                        }
                 })
             })
         </script>
