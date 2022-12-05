@@ -25,7 +25,7 @@ class Tax extends Model
      * @var array
      */
     protected $casts = [
-        'stare' => 'string',
+        'state' => 'string',
         'rate'  => 'float'
     ];
 }

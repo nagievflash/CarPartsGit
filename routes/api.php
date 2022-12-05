@@ -283,3 +283,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
 });
+
+Route::put('/feedback', function (Request $request) {
+    $email = $request->email;
+    $message = $request->message;
+    $to = [
+        [
+            'email' => $email,
+            'name' => $message,
+        ]
+    ];
+    \Mail::to($to)->send(new \App\Mail\Hello);
+});
