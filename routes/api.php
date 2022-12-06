@@ -202,9 +202,9 @@ Route::post('/profile/reset', function (Request $request) {
         : back()->withErrors(['email' => __($status)]);
 })->middleware('guest')->name('password.email');
 
-Route::get('/reset-password/{token}', function ($token) {
-    return view('auth.reset-password', ['token' => $token]);
-})->middleware('guest')->name('password.reset');
+//Route::get('/reset-password/{token}', function ($token) {
+//    return view('auth.reset-password', ['token' => $token]);
+//})->middleware('guest')->name('password.reset');
 
 Route::post('/reset-password', function (Request $request) {
     $request->validate([
@@ -244,14 +244,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         return $request->user();
     });
 
-    Route::put('/profile/update/{id}', function (Request $request) {
+    Route::put('/profile/update', function (Request $request) {
+
+        $request->validate([
+            'name'      => 'required',
+            'lastname'  => 'required',
+            'phone'     => 'required',
+            'email'     => 'required|unique:users,email',
+        ]);
+
         try {
             $user = $request->user();
             $user->name  = $request->name;
             $user->lastname  = $request->lastname;
             $user->email = $request->email;
             $user->phone = $request->phone;
-            $user->profile_photo_path  = $request->profile_photo_path;
+           // $user->profile_photo_path  = $request->profile_photo_path;
             $user->update();
 
             return $request->user();
