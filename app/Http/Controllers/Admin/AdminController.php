@@ -126,4 +126,15 @@ class AdminController extends Controller
         return view('admin.category-import');
     }
 
+
+    /**
+     * LKQ Package Import page
+     * @param Request $request
+     * @return Factory|View|Application
+     */
+    public function importLKQPackages(Request $request): Factory|View|Application
+    {
+        return view('admin.LKQImport');
+    }
+
 }

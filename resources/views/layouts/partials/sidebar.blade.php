@@ -57,6 +57,12 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
+                    <a href="{{Route('lkq_packages')}}" class='sidebar-link'>
+                        <i class="bi bi-gear"></i>
+                        <span>LKQ Packages Import</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a href="{{Route('ebayUpload')}}" class='sidebar-link'>
                         <i class="bi bi-cloud-arrow-up"></i>
                         <span>Upload Ebay</span>

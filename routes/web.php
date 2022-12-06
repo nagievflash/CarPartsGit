@@ -36,6 +36,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::get('/ebay/listings',  [App\Http\Controllers\Admin\AdminController::class, 'ebayListings'])->name('ebay.listings');
     Route::get('/ebay/listings/update',  [App\Http\Controllers\Admin\AdminController::class, 'updateListingId'])->name('updateListingId');
     Route::get('/import/categories',  [App\Http\Controllers\Admin\AdminController::class, 'categoriesImport'])->name('categoriesImport');
+    Route::get('/import/lkq_packages',  [App\Http\Controllers\Admin\AdminController::class, 'importLKQPackages'])->name('lkq_packages');
 
     // Settings shop
     Route::get('/settings/',  [App\Http\Controllers\Admin\AdminController::class, 'settings'])->name('settings');
@@ -54,6 +55,8 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::post('/import/updateEbayListingId',  [App\Http\Controllers\Admin\RequestController::class, 'updateEbayListingId']);
     Route::post('/import/fitments',  [App\Http\Controllers\Admin\RequestController::class, 'importFitments']);
     Route::post('/import/products/custom',  [App\Http\Controllers\Admin\RequestController::class, 'importProductsCustom']);
+    Route::post('/import/lkq_packages',  [App\Http\Controllers\Admin\RequestController::class, 'importLKQPackages']);
+
     Route::post('/ebay/upload',  [App\Http\Controllers\Admin\EbayController::class, 'addFixedPriceItem']);
     Route::get('/ebay/revise',  [App\Http\Controllers\Admin\EbayController::class, 'reviseFixedPriceItem']);
     Route::get('/ebay/update_price',  [App\Http\Controllers\Admin\EbayController::class, 'updatePriceItem']);

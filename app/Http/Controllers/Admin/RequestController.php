@@ -7,6 +7,7 @@ use App\Imports\CustomProductsImport;
 use App\Imports\FitmentImport;
 use App\Imports\InventoryImport;
 use App\Imports\InventoryImportJC;
+use App\Imports\LKQPackageImport;
 use App\Imports\UpdateEbayListingIDImport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -77,6 +78,19 @@ class RequestController extends Controller
         $shop = $request->input('shop');
         //Storage::disk('local')->putFileAs('/files/', $file, 'fitments.csv');
         Excel::import(new UpdateEbayListingIDImport($shop), $file);
+        return redirect()->back()->with('success', 'The Job started successfully!');
+    }
+
+    /**
+     * Import LKQ Package File
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function importLKQPackages(Request $request): RedirectResponse
+    {
+        $file = $request->file('csv-import');
+        Storage::disk('local')->putFileAs('/files/', $file, 'lkq_packages.csv');
+        Excel::queueImport(new LKQPackageImport(), storage_path().'/app/files/lkq_packages.csv');
         return redirect()->back()->with('success', 'The Job started successfully!');
     }
 }
