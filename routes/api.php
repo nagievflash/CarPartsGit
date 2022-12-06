@@ -191,15 +191,18 @@ Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
 
 Route::post('/profile/reset', function (Request $request) {
+
     $request->validate(['email' => 'required|email']);
 
-    $status = Password::sendResetLink(
-        $request->only('email')
-    );
+    try {
+          Password::sendResetLink(
+            $request->only('email')
+        );
+        return response()->json(['message' => 'successfully!'], 200);
+    }catch (Exception $e){
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
 
-    return $status === Password::RESET_LINK_SENT
-        ? back()->with(['status' => __($status)])
-        : back()->withErrors(['email' => __($status)]);
 })->middleware('guest')->name('password.email');
 
 //Route::get('/reset-password/{token}', function ($token) {
@@ -207,29 +210,33 @@ Route::post('/profile/reset', function (Request $request) {
 //})->middleware('guest')->name('password.reset');
 
 Route::post('/reset-password', function (Request $request) {
+
     $request->validate([
         'token' => 'required',
         'email' => 'required|email',
         'password' => 'required|min:8|confirmed',
     ]);
 
-    $status = Password::reset(
-        $request->only('email', 'password', 'password_confirmation', 'token'),
-        function ($user, $password) {
-            $user->forceFill([
-                'password' => Hash::make($password)
-            ])->setRememberToken(Str::random(60));
+    try {
+          Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
 
-            $user->save();
+                $user->save();
 
-            event(new PasswordReset($user));
-        }
-    );
+                event(new PasswordReset($user));
+            }
+        );
 
-    return $status === Password::PASSWORD_RESET
-        ? redirect()->route('login')->with('status', __($status))
-        : back()->withErrors(['email' => [__($status)]]);
-})->middleware('guest')->name('password.update');
+        return response()->json(['message' => 'successfully!'], 200);
+    }catch (Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
+
+});
 
 Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::class, 'getSetupIntent']);
 Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 'postPaymentMethods']);
@@ -262,7 +269,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
            // $user->profile_photo_path  = $request->profile_photo_path;
             $user->update();
 
-            return $request->user();
+            return response()->json($request->user(), 200);
+
         }catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
