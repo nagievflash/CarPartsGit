@@ -262,12 +262,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         try {
             $user = $request->user();
-            $user->name  = $request->name;
-            $user->lastname  = $request->lastname;
-            $user->email = $request->email;
-            $user->phone = $request->phone;
-           // $user->profile_photo_path  = $request->profile_photo_path;
-            $user->update();
+
+            $user->update([
+                'name'     => $request->name,
+                'lastname' => $request->lastname,
+                'email'    => $request->email,
+                'phone'    => $request->phone,
+                //'profile_photo_path' => $request->profile_photo_path,
+            ]);
 
             return response()->json($request->user(), 200);
 
