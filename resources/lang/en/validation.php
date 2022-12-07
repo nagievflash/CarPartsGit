@@ -14,6 +14,7 @@ return [
     */
 
     'accepted' => 'The :attribute must be accepted.',
+    'phone' => 'Incorrect code.',
     'active_url' => 'The :attribute is not a valid URL.',
     'after' => 'The :attribute must be a date after :date.',
     'after_or_equal' => 'The :attribute must be a date after or equal to :date.',
@@ -43,7 +44,7 @@ return [
     'ends_with' => 'The :attribute must end with one of the following: :values.',
     'exists' => 'The selected :attribute is invalid.',
     'file' => 'The :attribute must be a file.',
-    'filled' => 'The :attribute field must have a value.',
+    'filled' => 'The :attribute cannot be empty.',
     'gt' => [
         'numeric' => 'The :attribute must be greater than :value.',
         'file' => 'The :attribute must be greater than :value kilobytes.',

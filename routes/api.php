@@ -190,6 +190,21 @@ Route::get('/oauth2/authorize', function (Request $request) {
 Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
 
+Route::post('/profile/validate', function (Request $request) {
+
+    if ($request->has('email')) {
+        $request->validate([
+            'email' => 'filled|regex:/(.+)@(.+)\.(.+)/i|unique:users,email',
+        ]);
+    }
+
+    if ($request->has('phone')) {
+        $request->validate([
+            'phone' => 'filled|phone|unique:users,phone|size:12',
+        ]);
+    }
+});
+
 Route::post('/profile/reset', function (Request $request) {
 
     $request->validate(['email' => 'required|email']);
