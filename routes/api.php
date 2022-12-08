@@ -2,8 +2,12 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\CheckoutController;
+use App\Mail\ResetPassword;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Carbon;
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Models\Address;
 use App\Models\Category;
@@ -211,9 +215,18 @@ Route::post('/profile/reset', function (Request $request) {
     $request->validate(['email' => 'required|email']);
 
     try {
-          Password::sendResetLink(
-            $request->only('email')
-        );
+        $user = User::where('email', $request->only('email'))->first();
+        if ($user) {
+            //so we can have dependency
+            $password_broker = app(PasswordBroker::class);
+            //create reset password token
+            $token = $password_broker->createToken($user);
+
+            DB::table('password_resets')->insert(['email' => $user->email, 'token' => $token, 'created_at' => new Carbon]);
+
+            Mail::to($user->email)->send(new ResetPassword($token,$user->email));
+
+        }
         return response()->json(['message' => 'successfully!'], 200);
     }catch (Exception $e){
         return response()->json(['message' => $e->getMessage()], 422);
