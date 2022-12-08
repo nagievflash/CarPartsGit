@@ -293,5 +293,5 @@ Route::put('/feedback', function (Request $request) {
             'name' => $message,
         ]
     ];
-    \Mail::to($to)->send(new \App\Mail\Hello);
+    // \Mail::to($to)->send(new \App\Mail\Hello);
 });

@@ -66,6 +66,8 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::post('/taxes/store',  [App\Http\Controllers\Admin\TaxesController::class, 'store']);
 
 
+    Route::post('/inventory/start_inventory',  [App\Http\Controllers\Admin\RequestController::class, 'startInventory']);
+
     Route::get('/ebay/template/{slug}', [App\Http\Controllers\Admin\AdminController::class, 'showTemplate']);
     Route::get('/ebay/listings/{ebay_id}',  [App\Http\Controllers\Admin\ListingsController::class, 'show'])->name('ebay.listing');
 });

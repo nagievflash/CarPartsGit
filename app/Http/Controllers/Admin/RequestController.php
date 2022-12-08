@@ -11,6 +11,7 @@ use App\Imports\LKQPackageImport;
 use App\Imports\UpdateEbayListingIDImport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -92,5 +93,21 @@ class RequestController extends Controller
         Storage::disk('local')->putFileAs('/files/', $file, 'lkq_packages.csv');
         Excel::queueImport(new LKQPackageImport(), storage_path().'/app/files/lkq_packages.csv');
         return redirect()->back()->with('success', 'The Job started successfully!');
+    }
+
+    /**
+     * Start Inventory from CRM request
+     * @return RedirectResponse
+     */
+    public function startInventory(): RedirectResponse
+    {
+        Artisan::call('update:inventory', [
+            'supplier' => 'pf'
+        ]);
+        Artisan::call('update:inventory', [
+            'supplier' => 'lkq'
+        ]);
+
+        return redirect()->back()->with('success', 'The Inventory Update Job started successfully!');
     }
 }
