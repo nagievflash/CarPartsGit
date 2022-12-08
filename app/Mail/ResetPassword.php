@@ -40,7 +40,7 @@ class ResetPassword extends Mailable
     public function build(): static
     {
         return $this
-            ->from($address = 'marketing@autoelements.com', $name = 'AutoElements')
+            ->from($address = 'info@autoelements.com', $name = 'AutoElements')
             ->subject('Reset Password')
             ->view('mail.reset_password',['url' => $this->resetUrl()]);
     }

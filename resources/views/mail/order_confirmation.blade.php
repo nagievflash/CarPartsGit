@@ -73,7 +73,7 @@
                                                 <td class="es-m-p0r" valign="top" align="center" style="padding:0;Margin:0;width:560px">
                                                     <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                         <tr>
-                                                            <td align="center" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px;font-size:0px"><a target="_blank" href="https://autoelements.com" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#666666;font-size:14px"><img src="images/ae_1ro.png" alt="Autoelements.com" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" title="Autoelements.com" width="100" height="59"></a></td>
+                                                            <td align="center" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px;font-size:0px"><a target="_blank" href="https://autoelements.com" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#666666;font-size:14px"><img src="{{asset('images/mail/ae_1ro.png')}}" alt="Autoelements.com" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" title="Autoelements.com" width="100" height="59"></a></td>
                                                         </tr>
                                                     </table></td>
                                             </tr>
@@ -113,7 +113,7 @@
                                                 <td align="center" valign="top" style="padding:0;Margin:0;width:560px">
                                                     <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                         <tr>
-                                                            <td align="center" style="padding:0;Margin:0;padding-top:20px;padding-bottom:25px;font-size:0px"><img src="images/84141618400759579.png" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="100" height="98"></td>
+                                                            <td align="center" style="padding:0;Margin:0;padding-top:20px;padding-bottom:25px;font-size:0px"><img src="{{asset('images/mail/84141618400759579.png')}}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="100" height="98"></td>
                                                         </tr>
                                                         <tr>
                                                             <td align="center" class="es-m-txt-c" style="padding:0;Margin:0;padding-bottom:10px"><h1 style="Margin:0;line-height:46px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:46px;font-style:normal;font-weight:bold;color:#333333">Order confirmation</h1></td>
@@ -141,7 +141,7 @@
                                                             <td class="es-m-p0r" align="center" style="padding:0;Margin:0;width:70px">
                                                                 <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                                     <tr>
-                                                                        <td align="center" style="padding:0;Margin:0;font-size:0px"><img class="adapt-img" src="images/RC76010012PQ_1" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="70" height="21"></td>
+                                                                        <td align="center" style="padding:0;Margin:0;font-size:0px"><img class="adapt-img" src="{{asset('images/mail/RC76010012PQ_1')}}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="70" height="21"></td>
                                                                     </tr>
                                                                 </table></td>
                                                         </tr>
@@ -195,7 +195,7 @@
                                                             <td class="es-m-p0r" align="center" style="padding:0;Margin:0;width:70px">
                                                                 <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                                     <tr>
-                                                                        <td align="center" style="padding:0;Margin:0;font-size:0px"><img class="adapt-img" src="images/RC76010012PQ_1" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="70" height="21"></td>
+                                                                        <td align="center" style="padding:0;Margin:0;font-size:0px"><img class="adapt-img" src="{{asset('images/mail/RC76010012PQ_1')}}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="70" height="21"></td>
                                                                     </tr>
                                                                 </table></td>
                                                         </tr>
@@ -304,10 +304,10 @@
                                                             <td align="center" style="padding:0;Margin:0;padding-top:15px;padding-bottom:15px;font-size:0">
                                                                 <table cellpadding="0" cellspacing="0" class="es-table-not-adapt es-social" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                                     <tr>
-                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Facebook" src="images/facebook-logo-black.png" alt="Fb" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
-                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Twitter" src="images/twitter-logo-black.png" alt="Tw" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
-                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Instagram" src="images/instagram-logo-black.png" alt="Inst" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
-                                                                        <td align="center" valign="top" style="padding:0;Margin:0"><img title="Youtube" src="images/youtube-logo-black.png" alt="Yt" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
+                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Facebook" src="{{asset('images/mail/facebook-logo-black.png')}}" alt="Fb" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
+                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Twitter" src="{{asset('images/mail/twitter-logo-black.png')}}" alt="Tw" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
+                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Instagram" src="{{asset('images/mail/instagram-logo-black.png')}}" alt="Inst" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
+                                                                        <td align="center" valign="top" style="padding:0;Margin:0"><img title="Youtube" src="{{asset('images/mail/youtube-logo-black.png')}}" alt="Yt" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
                                                                     </tr>
                                                                 </table></td>
                                                         </tr>
