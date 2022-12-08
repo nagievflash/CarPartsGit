@@ -93,9 +93,20 @@ class EbayController extends Controller
 
     }
 
-    public function removeListing($id) {
+    public function removeListing($id): string
+    {
         EbayListing::where('id', $id)->delete();
         return 'Success deleted';
+    }
 
+    /**
+     * Update listing's price
+     * @param $id
+     * @return string
+     */
+    public function updateListing($id): string
+    {
+        EbayListing::where('id', $id)->firstOrFail()->updatePrice();
+        return 'Success updated';
     }
 }

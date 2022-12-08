@@ -276,4 +276,17 @@ class EbayListing extends Model
         }
         return $result;
     }
+
+    public function updatePrice() {
+        $listingInfo = $this->getPriceGraph(true);
+        $listingPrice = DB::table('listing_price')->where('listing_id', $this->id);
+        $nums = $listingInfo[0]['nums'];
+        if ($nums == 0) $nums = 1;
+        if ($listingPrice->exists()) {
+            $listingPrice->update(['price' => $listingInfo['price'], 'price_old' => $listingPrice->first()->price, 'quantity' => $listingInfo[0]['qty'] / $nums]);
+        }
+        else {
+            DB::table('listing_price')->insert(['listing_id' => $this->id, 'price' => $listingInfo['price'], 'quantity' => $listingInfo[0]['qty'] / $nums]);
+        }
+    }
 }

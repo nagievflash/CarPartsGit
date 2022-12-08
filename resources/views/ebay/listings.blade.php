@@ -80,8 +80,9 @@
                                     <a href="https://www.ebay.com/itm/{{$listing->ebay_id}}" class="text-success" target="_blank">See listing</a>
                                 </td>
                                 <td>
-                                    <a href="/admin/ebay/update_price?ebay_id={{$listing->ebay_id}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-arrow-repeat"></i></a>
-                                    <a href="/admin/ebay/listings/{{$listing->ebay_id}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-box-arrow-up-right"></i></a>
+                                    <a href="/admin/ebay/update_price?ebay_id={{$listing->ebay_id}}" class="text-success h4 p-1" title="Revise Item at Ebay"><i class="bi bi-cloud-upload"></i></a>
+                                    <a data-href="/admin/ebay/update-listing/{{$listing->id}}" class="text-info cursor-pointer h4 p-1 update-listing" title="Update Listing Price"><i class="bi bi-arrow-repeat"></i></a>
+                                    <a href="/admin/ebay/listings/{{$listing->ebay_id}}" class="text-dark h4 p-1" title="Revise Item at Ebay"><i class="bi bi-box-arrow-up-right"></i></a>
                                     <a data-href="/admin/ebay/remove-listing/{{$listing->id}}" class="text-danger h4 p-1 remove-listing" title="Remove Listing from CRM"><i class="bi bi-trash"></i></a>
                                 </td>
                             </tr>
@@ -114,6 +115,19 @@
                             location.reload()
                         });
                     }
+                })
+
+                $('.update-listing').click(function(e){
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: "POST",
+                        url: $(this).data('href'),
+                    })
+                    .done(function() {
+                        location.reload()
+                    });
                 })
             })
         </script>
