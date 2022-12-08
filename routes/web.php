@@ -67,6 +67,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
 
 
     Route::post('/inventory/start_inventory',  [App\Http\Controllers\Admin\RequestController::class, 'startInventory']);
+    Route::post('/inventory/update_ebay_listings',  [App\Http\Controllers\Admin\RequestController::class, 'updateEbayListings']);
 
     Route::get('/ebay/template/{slug}', [App\Http\Controllers\Admin\AdminController::class, 'showTemplate']);
     Route::get('/ebay/listings/{ebay_id}',  [App\Http\Controllers\Admin\ListingsController::class, 'show'])->name('ebay.listing');

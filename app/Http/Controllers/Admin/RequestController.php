@@ -110,4 +110,14 @@ class RequestController extends Controller
 
         return redirect()->back()->with('success', 'The Inventory Update Job started successfully!');
     }
+    /**
+     * Start Updating Ebay Listings from CRM request
+     * @return RedirectResponse
+     */
+    public function updateEbayListings(): RedirectResponse
+    {
+        Artisan::call('update:pricing');
+
+        return redirect()->back()->with('success', 'Update ebay listings job started successfully!');
+    }
 }
