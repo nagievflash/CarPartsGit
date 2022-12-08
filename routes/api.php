@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\State;
 use App\Models\User;
+use App\Models\Rates;
 use App\Models\Warehouse;
 use App\Models\Year;
 use Illuminate\Http\Request;
@@ -261,6 +262,21 @@ Route::get('/states', function (Request $request) {
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+
+    Route::post('/products/rate', function (Request $request) {
+        try {
+            (new Rates)->create(
+                [
+                    'rate_type' => 'App\Models\Product',
+                    'rate_id'   => $request->get("id"),
+                    'value'     => $request->get("value"),
+                ]
+            );
+            return response()->json(['message' => 'Your score has been counted!!'], 200);
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    });
 
     Route::get('/profile', function (Request $request) {
         return $request->user();

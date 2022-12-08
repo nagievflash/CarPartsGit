@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * @method static paginate(int $int)
@@ -148,6 +148,11 @@ class Product extends Model
         }
 
         return $title;
+    }
+
+    public function rate(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Rates::class, 'rate');
     }
 
     public function scopeIsAvailable($query)
