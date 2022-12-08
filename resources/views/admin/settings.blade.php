@@ -23,17 +23,6 @@
                     <a href="{{Route('settings.shop')}}" class="btn btn-xl btn-light-primary font-bold m-3">Shop settings</a>
                     <a href="{{Route('settings.suppliers')}}" class="btn btn-xl btn-light-secondary font-bold m-3">Suppliers settings</a>
                     <a href="{{Route('settings.taxes')}}" class="btn btn-xl btn-light-success font-bold m-3">Tax settings</a>
-                    <hr />
-
-                    <form action="/admin/inventory/start_inventory" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-xl btn-primary font-bold m-3">Update PF / LKQ inventory</button>
-                    </form>
-
-                    <form action="/admin/inventory/update_ebay_listings" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-xl btn-success font-bold m-3">Send inventory to Ebay</button>
-                    </form>
                 </div>
             </div>
 
