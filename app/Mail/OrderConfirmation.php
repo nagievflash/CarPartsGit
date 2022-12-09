@@ -28,7 +28,7 @@ class OrderConfirmation extends Mailable
     public function build()
     {
         return $this
-            ->from($address = 'info@autoelements.com', $name = 'AutoElements')
+            ->from($address = env('MAIL_USERNAME'), $name = env('APP_NAME'))
             ->subject('Order Confirmation')
             ->view('mail.order_confirmation',[]);
     }
