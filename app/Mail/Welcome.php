@@ -28,7 +28,7 @@ class Welcome extends Mailable
     public function build()
     {
         return $this
-            ->from($address = 'info@autoelements.com', $name = 'AutoElements')
+            ->from($address = env('MAIL_USERNAME'), $name = env('APP_NAME'))
             ->subject('Welcome')
             ->view('mail.welcome',[]);
     }

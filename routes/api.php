@@ -205,7 +205,7 @@ Route::post('/profile/validate', function (Request $request) {
 
     if ($request->has('phone')) {
         $request->validate([
-            'phone' => 'filled|phone|unique:users,phone|size:12',
+            'phone' => 'filled|phone|unique:users,phone|size:11',
         ]);
     }
 });
