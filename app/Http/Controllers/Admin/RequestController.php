@@ -120,4 +120,13 @@ class RequestController extends Controller
 
         return redirect()->back()->with('success', 'Update ebay listings job started successfully!');
     }
+
+    public function importInventoryJC(Request $request): RedirectResponse
+    {
+        $file = $request->file('csv-import');
+        Storage::disk('local')->putFileAs('/files/', $file, 'inventoryJC.csv');
+        Excel::queueImport(new InventoryImportJC, storage_path().'/app/files/inventoryJC.csv');
+
+        return redirect()->back()->with('success', 'The Job started successfully!');
+    }
 }

@@ -22,7 +22,7 @@
                 <h4 class="card-title">File import form</h4>
             </div>
             <div class="card-body">
-                <form action="/admin/import" method="POST" enctype="multipart/form-data">
+                <form action="/admin/import/jc" method="POST" enctype="multipart/form-data">
                     @csrf
                     <x-maz-input :id="'csv-import'"
                                  :name="'csv-import'"

@@ -51,7 +51,8 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::get('/settings/taxes',  [App\Http\Controllers\Admin\TaxesController::class, 'index'])->name('settings.taxes');
 
 
-    Route::post('/import',  [App\Http\Controllers\Admin\RequestController::class, 'importProductsBasics']);
+    // Route::post('/import',  [App\Http\Controllers\Admin\RequestController::class, 'importProductsBasics']);
+    Route::post('/import/jc',  [App\Http\Controllers\Admin\RequestController::class, 'importInventoryJC']);
     Route::post('/import/updateEbayListingId',  [App\Http\Controllers\Admin\RequestController::class, 'updateEbayListingId']);
     Route::post('/import/fitments',  [App\Http\Controllers\Admin\RequestController::class, 'importFitments']);
     Route::post('/import/products/custom',  [App\Http\Controllers\Admin\RequestController::class, 'importProductsCustom']);
