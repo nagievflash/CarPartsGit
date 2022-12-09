@@ -2,6 +2,13 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\CheckoutController;
+use App\Mail\ResetPassword;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Carbon;
+use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use App\Models\Address;
 use App\Models\Category;
 use App\Models\Compatibility;
@@ -10,6 +17,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\State;
 use App\Models\User;
+use App\Models\Rates;
 use App\Models\Warehouse;
 use App\Models\Year;
 use Illuminate\Http\Request;
@@ -17,6 +25,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Password;
 
 /*
 |--------------------------------------------------------------------------
@@ -186,6 +195,78 @@ Route::get('/oauth2/authorize', function (Request $request) {
 Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'loginUser']);
 
+Route::post('/profile/validate', function (Request $request) {
+
+    if ($request->has('email')) {
+        $request->validate([
+            'email' => 'filled|regex:/(.+)@(.+)\.(.+)/i|unique:users,email',
+        ]);
+    }
+
+    if ($request->has('phone')) {
+        $request->validate([
+            'phone' => 'filled|phone|unique:users,phone|size:12',
+        ]);
+    }
+});
+
+Route::post('/profile/reset', function (Request $request) {
+
+    $request->validate(['email' => 'required|email']);
+
+    try {
+        $user = User::where('email', $request->only('email'))->first();
+        if ($user) {
+            //so we can have dependency
+            $password_broker = app(PasswordBroker::class);
+            //create reset password token
+            $token = $password_broker->createToken($user);
+
+            DB::table('password_resets')->insert(['email' => $user->email, 'token' => $token, 'created_at' => new Carbon]);
+
+            Mail::to($user->email)->send(new ResetPassword($token,$user->email));
+
+        }
+        return response()->json(['message' => 'successfully!'], 200);
+    }catch (Exception $e){
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
+
+})->middleware('guest')->name('password.email');
+
+//Route::get('/reset-password/{token}', function ($token) {
+//    return view('auth.reset-password', ['token' => $token]);
+//})->middleware('guest')->name('password.reset');
+
+Route::post('/reset-password', function (Request $request) {
+
+    $request->validate([
+        'token' => 'required',
+        'email' => 'required|email',
+        'password' => 'required|min:8|confirmed',
+    ]);
+
+    try {
+          Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        return response()->json(['message' => 'successfully!'], 200);
+    }catch (Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
+
+});
+
 Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::class, 'getSetupIntent']);
 Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 'postPaymentMethods']);
 
@@ -195,8 +276,50 @@ Route::get('/states', function (Request $request) {
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
+    Route::post('/products/rate', function (Request $request) {
+        try {
+            (new Rates)->create(
+                [
+                    'rate_type' => 'App\Models\Product',
+                    'rate_id'   => $request->get("id"),
+                    'value'     => $request->get("value"),
+                ]
+            );
+            return response()->json(['message' => 'Your score has been counted!!'], 200);
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    });
+
     Route::get('/profile', function (Request $request) {
         return $request->user();
+    });
+
+    Route::put('/profile/update', function (Request $request) {
+
+        $request->validate([
+            'name'      => 'required',
+            'lastname'  => 'required',
+            'phone'     => 'required',
+            'email'     => 'required|unique:users,email',
+        ]);
+
+        try {
+            $user = $request->user();
+
+            $user->update([
+                'name'     => $request->name,
+                'lastname' => $request->lastname,
+                'email'    => $request->email,
+                'phone'    => $request->phone,
+                //'profile_photo_path' => $request->profile_photo_path,
+            ]);
+
+            return response()->json($request->user(), 200);
+
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
     });
 
     Route::get('/checkout/intent', [CheckoutController::class, 'intent']);
