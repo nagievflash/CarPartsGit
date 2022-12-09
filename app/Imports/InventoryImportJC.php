@@ -45,7 +45,7 @@ class InventoryImportJC implements ToModel, WithHeadingRow, WithChunkReading, Wi
     {
         if ($row['pfg_sku'] != '#Н/Д' && $row['quantity'] != '#Н/Д' && $row['jc_total_cost'] != '#Н/Д') {
             Warehouse::updateOrCreate(
-                ['pfg_sku' => $row['sku'], 'supplier_id' => 3],
+                ['sku' => $row['pfg_sku'], 'supplier_id' => 3],
                 ['price' => (float)str_replace(',','.', $row["jc_total_cost"]), 'qty' => $row["quantity"], 'partslink' => $row['parts_num']]
             );
         }
