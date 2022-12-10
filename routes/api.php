@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Password;
+use App\Mail\Feedback;
 
 /*
 |--------------------------------------------------------------------------
@@ -226,8 +227,10 @@ Route::post('/profile/reset', function (Request $request) {
 
             Mail::to($user->email)->send(new ResetPassword($token,$user->email));
 
+            return response()->json(['message' => 'successfully!'], 200);
+        }else{
+            return response()->json(['message' => 'User with this email does not exist!'], 422);
         }
-        return response()->json(['message' => 'successfully!'], 200);
     }catch (Exception $e){
         return response()->json(['message' => $e->getMessage()], 422);
     }
@@ -408,13 +411,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 Route::put('/feedback', function (Request $request) {
-    $email = $request->email;
-    $message = $request->message;
-    $to = [
-        [
-            'email' => $email,
-            'name' => $message,
-        ]
-    ];
-    // \Mail::to($to)->send(new \App\Mail\Hello);
+    try {
+        $email = $request->email;
+        $message = $request->message;
+
+        Mail::to($email)->send(new Feedback($message));
+
+        return response()->json(['message' => 'Application successfully sent!'], 200);
+    }catch (\Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
 });
