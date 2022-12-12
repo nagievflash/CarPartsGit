@@ -348,9 +348,19 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         }
         $total = $total + $shipping + $handling;
         $total = $total + $total / 4;
-        $payment = $user->payWith(
+/*        $payment = $user->payWith(
             number_format((float)$total, 2, '.', '') * 100, ['card']
+        );*/
+        $stripe = new \Stripe\StripeClient(
+            getenv('STRIPE_SECRET')
         );
+        $payment =  $stripe->paymentIntents->create([
+            'amount' => number_format((float)$total, 2, '.', '') * 100,
+            'currency' => 'usd',
+            'automatic_payment_methods' => [
+                'enabled' => 'true',
+            ],
+        ]);
 
         $address = Address::firstOrCreate([
             'country'   => $data["userdata"]["country"],

@@ -2,6 +2,7 @@
 
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Vtiful\Kernel\Excel;
 
@@ -78,10 +79,16 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
 
 Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->post('/getSuggestedCategories',  [App\Http\Controllers\Admin\EbayController::class, 'getSuggestedCategories'])->name('getSuggestedCategories');
 Route::get('/create-payment-intent', function (Request $request) {
-    $payment = User::find(1)->payWith(
-        10000, ['card']
+    $stripe = new \Stripe\StripeClient(
+        getenv('STRIPE_SECRET')
     );
-    return $payment;
+    return $stripe->paymentIntents->create([
+        'amount' => 2000,
+        'currency' => 'usd',
+        'automatic_payment_methods' => [
+            'enabled' => 'true',
+        ],
+    ]);
 });
 Route::get('/test', function (Request $request) {
     return Order::with('products')->paginate(10);
