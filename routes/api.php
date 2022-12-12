@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\CheckoutController;
+use App\Mail\OrderConfirmation;
 use App\Mail\ResetPassword;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Carbon;
@@ -399,6 +400,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $order->stripe_id = $payment->id;
         $order->addresses()->attach($address->id);
         $order->save();
+
+        Mail::to($user->email)->send(new OrderConfirmation($order));
 
         return $order->id;
     });

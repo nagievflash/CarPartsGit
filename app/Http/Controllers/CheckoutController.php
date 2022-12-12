@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Backlog;
 use Illuminate\Http\Request;
-use App\Mail\OrderConfirmation;
-use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller {
 
@@ -48,8 +46,6 @@ class CheckoutController extends Controller {
             if ($payment->status === 'succeeded') {
                 Backlog::createBacklog('payment messages', 'success payed ' . $paymentMethod);
             }
-
-            Mail::to($user->email)->send(new OrderConfirmation($payment));
 
             return response()->json(
                 ['status' => 'success', 'data' => ['payment' => $payment]]
