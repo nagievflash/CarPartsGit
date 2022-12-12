@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\CheckoutController;
+use App\Mail\OrderConfirmation;
 use App\Mail\ResetPassword;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Carbon;
@@ -26,6 +27,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Password;
+use App\Mail\Feedback;
+use App\Models\Tickets;
+use Illuminate\Support\Facades\Storage;
+use App\Mail\Ticket;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,13 +47,18 @@ use Illuminate\Support\Facades\Password;
 
 Route::get('/products', function (Request $request) {
     if ($request->has('search')) {
-        $products =  Product::where("sku", $request->get("search"))
-            ->orWhere("partslink", 'like',  '%'.$request->get("search").'%')
-            ->orWhere("oem_number", 'like',  '%'.$request->get("search").'%')
-            ->hasFitments()->isAvailable()->paginate(16);
+        $products = Product::where("sku", $request->get("search"))
+            ->orWhere("partslink", 'like', '%'.$request->get("search").'%')
+            ->orWhere("oem_number", 'like', '%'.$request->get("search").'%')
+            ->hasFitments()->isAvailable();
     }
-    else $products = Product::hasFitments()->isAvailable()->paginate(16);
-    return $products;
+    else $products = Product::hasFitments()->isAvailable();
+
+    $paginate = $request->has('paginate') ? (int)$request->get("paginate") : 16;
+    $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'price';
+    $orderBy = $request->has('orderBy') && in_array(strtolower($request->get('orderBy')),['desc','asc']) ? $request->get('orderBy') : 'asc';
+
+    return $products->orderBy($sort, $orderBy)->paginate($paginate);
 });
 
 Route::get('/fitments', function (Request $request) {
@@ -226,8 +237,10 @@ Route::post('/profile/reset', function (Request $request) {
 
             Mail::to($user->email)->send(new ResetPassword($token,$user->email));
 
+            return response()->json(['message' => 'successfully!'], 200);
+        }else{
+            return response()->json(['message' => 'User with this email does not exist!'], 422);
         }
-        return response()->json(['message' => 'successfully!'], 200);
     }catch (Exception $e){
         return response()->json(['message' => $e->getMessage()], 422);
     }
@@ -274,6 +287,25 @@ Route::get('/states', function (Request $request) {
     return State::all();
 });
 
+
+Route::post('/email/verification-notification', function (Request $request) {
+    try {
+        $request->user()->sendEmailVerificationNotification();
+        return response()->json(['message' => 'Confirmation link sent to email'], 200);
+    }catch (\Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
+})->middleware(['auth:sanctum', 'throttle:6,1'])->name('verification.send');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    try {
+        $request->fulfill();
+        return response()->json(['message' => 'Email successfully verified'], 200);
+    }catch (\Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
+})->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post('/products/rate', function (Request $request) {
@@ -301,7 +333,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             'name'      => 'required',
             'lastname'  => 'required',
             'phone'     => 'required',
-            'email'     => 'required|unique:users,email',
         ]);
 
         try {
@@ -380,6 +411,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $order->addresses()->attach($address->id);
         $order->save();
 
+        Mail::to($user->email)->send(new OrderConfirmation($order));
+
         return $order->id;
     });
 
@@ -415,16 +448,78 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         return $address->toJson(JSON_PRETTY_PRINT);
     });
 
+    Route::post('/profile/addresses/create', function (Request $request) {
+        try {
+            $user = $request->user();
+            $data = $request->data;
+
+            $address = Address::firstOrCreate([
+                'country'   => $data["userdata"]["country"],
+                'state'     => $data["userdata"]["state"],
+                'address'   => $data["userdata"]["address"],
+                'address2'  => $data["userdata"]["address2"],
+                'city'      => $data["userdata"]["city"],
+                'zipcode'   => $data["userdata"]["zipcode"],
+            ]);
+
+            $user->addresses()->attach($address->id);
+            $user->save();
+
+            return $address->toJson(JSON_PRETTY_PRINT);
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    });
+
 });
 
 Route::put('/feedback', function (Request $request) {
-    $email = $request->email;
-    $message = $request->message;
-    $to = [
-        [
-            'email' => $email,
-            'name' => $message,
-        ]
-    ];
-    // \Mail::to($to)->send(new \App\Mail\Hello);
+    try {
+        $email = $request->email;
+        $message = $request->message;
+
+        Mail::to($email)->send(new Feedback($message));
+
+        return response()->json(['message' => 'Application successfully sent!'], 200);
+    }catch (\Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
+});
+
+Route::post('/setTicket', function (Request $request) {
+
+    $request->validate([
+        'name'      => 'required',
+        'phone'     => 'required',
+    ]);
+
+    try {
+        $data['email']    = $request->email;
+        $data['name']     = $request->name;
+        $data['phone']    = $request->phone;
+        $data['messages'] = $request->message;
+        $data['path']     = '';
+        $utm = '';
+        if(!empty($request->utm) && is_array($request->utm)){
+            foreach ($request->utm as $key => $value){
+                $utm .= $key . ': ' . $value . ';';
+            }
+        }
+        $data['utm'] = $utm;
+        if(!empty($request->file())){
+            $data['path'] = 'https://' . $_SERVER['HTTP_HOST'] . '/' . Storage::putFile('tickets/' . 'ticket_file_' . $data['email'] . rand(0,1000), $request->file('file'));
+        }
+        $ticket = (new Tickets());
+        $ticket->fill($data);
+        $ticket->save();
+
+        $data['id'] = $ticket->id;
+        $data['created_at'] = $ticket->created_at;
+
+        Mail::to( env('MAIL_USERNAME'))->send(new Ticket($data));
+
+        return response()->json(['message' => 'Application successfully sent!'], 200);
+    }catch (\Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
 });

@@ -5,9 +5,8 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Order;
 
-class OrderConfirmation extends Mailable
+class Ticket extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -17,11 +16,11 @@ class OrderConfirmation extends Mailable
      * @return void
      */
 
-    public $order;
+    public array $data;
 
-    public function __construct($order)
+    public function __construct($data)
     {
-        $this->order = $order;
+        $this->data = $data;
     }
 
     /**
@@ -33,7 +32,7 @@ class OrderConfirmation extends Mailable
     {
         return $this
             ->from($address = env('MAIL_USERNAME'), $name = env('APP_NAME'))
-            ->subject('Order Confirmation')
-            ->view('mail.order_confirmation', $this->order);
+            ->subject('Welcome')
+            ->view('mail.ticket',$this->data);
     }
 }
