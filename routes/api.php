@@ -378,7 +378,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         }
         $total = $total + $shipping + $handling;
         $total = $total + $total / 4;
-/*        $payment = $user->payWith(
+        /*        $payment = $user->payWith(
             number_format((float)$total, 2, '.', '') * 100, ['card']
         );*/
         $stripe = new \Stripe\StripeClient(
@@ -410,7 +410,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $order->addresses()->attach($address->id);
         $order->save();
 
-        Mail::to($user->email)->send(new OrderConfirmation($order));
+        // Mail::to($user->email)->send(new OrderConfirmation($order));
 
         return $order->id;
     });
