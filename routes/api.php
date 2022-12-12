@@ -454,12 +454,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             $data = $request->data;
 
             $address = Address::firstOrCreate([
-                'country'   => $data["userdata"]["country"],
-                'state'     => $data["userdata"]["state"],
-                'address'   => $data["userdata"]["address"],
-                'address2'  => $data["userdata"]["address2"],
-                'city'      => $data["userdata"]["city"],
-                'zipcode'   => $data["userdata"]["zipcode"],
+                'country'   => $data["country"],
+                'state'     => $data["state"],
+                'address'   => $data["address"],
+                'address2'  => $data["address2"],
+                'city'      => $data["city"],
+                'zip'       => $data["zip"],
             ]);
 
             $user->addresses()->attach($address->id);
