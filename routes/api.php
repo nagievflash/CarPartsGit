@@ -341,7 +341,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             $user->update([
                 'name'     => $request->name,
                 'lastname' => $request->lastname,
-                'email'    => $request->email,
                 'phone'    => $request->phone,
                 //'profile_photo_path' => $request->profile_photo_path,
             ]);
