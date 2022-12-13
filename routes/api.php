@@ -467,12 +467,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             $data = $request->data;
 
             $address = Address::firstOrCreate([
-                'country'   => $data["country"],
-                'state'     => $data["state"],
-                'address'   => $data["address"],
-                'address2'  => $data["address2"],
-                'city'      => $data["city"],
-                'zipcode'   => $data["zip"],
+                'country'   => $request->country ?? '',
+                'state'     => $request->state ?? '',
+                'address'   => $request->address ?? '',
+                'address2'  => $request->address2 ?? '',
+                'city'      => $request->city ?? '',
+                'zipcode'   => $request->zipcode ?? '',
             ]);
 
             $user->addresses()->attach($address->id);
