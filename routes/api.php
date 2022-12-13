@@ -410,7 +410,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $order->addresses()->attach($address->id);
         $order->save();
 
-        // Mail::to($user->email)->send(new OrderConfirmation($order));
+        Mail::to($user->email)->send(new OrderConfirmation($order->id));
 
         return $order->id;
     });
