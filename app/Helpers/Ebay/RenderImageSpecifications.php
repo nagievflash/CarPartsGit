@@ -5,6 +5,7 @@ namespace App\Helpers\Ebay;
 use Intervention\Image\Facades\Image;
 use XMLWriter;
 use Exception;
+use App\Jobs\RenderProductImagesJob;
 
 trait RenderImageSpecifications
 {
@@ -15,15 +16,19 @@ trait RenderImageSpecifications
      * @param $type
      * @return string
      */
-    public function renderImageSpecifications($imageUrl, $type): string
+    public function renderImageSpecifications($imageUrl, $type,$product_id): string
     {
         $contents = file_get_contents($imageUrl);
         $url = 'images/ebay/'. substr($imageUrl, strrpos($imageUrl, '/') + 1) . '_' . $type . '.jpg';
+        $imageName = substr($imageUrl, strrpos($imageUrl, '/') + 1) . '_' . $type;
         file_put_contents(public_path($url), $contents);
 
         $img = Image::make(public_path($url));
         $watermark = Image::make(public_path('images/bg/watermark_'.$type.'.png'));
         $canvas = Image::canvas(1200, 1200);
+
+        $job = new RenderProductImagesJob($url, $imageName,$type,$product_id);
+        dispatch($job);
 
         $img->resize(1200, 1200, function($constraint)
         {

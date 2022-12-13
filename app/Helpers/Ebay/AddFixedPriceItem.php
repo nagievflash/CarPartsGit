@@ -71,7 +71,7 @@ trait AddFixedPriceItem
                 }
             }
 
-            $images[0] = $this->renderImageSpecifications($images[0], $this->shop->slug);
+            $images[0] = $this->renderImageSpecifications($images[0], $this->shop->slug,$product->id);
 
             $product->images = implode(',', $images);
             $product->save();

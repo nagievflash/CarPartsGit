@@ -356,6 +356,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/checkout/pay', [CheckoutController::class, 'pay']);
 
     Route::post('/orders/add', function (Request $request) {
+
         $data = $request->all();
         $user = $request->user();
 
