@@ -165,8 +165,14 @@ Route::get('/categories-list/', function () {
     return Category::all();
 });
 
-Route::get('/categories/{title}', function ($title) {
-    $title = urldecode($title);
+Route::get('/categories/{title}', function (Request $request) {
+    $title = explode('/',$request->path());
+    $title = array_pop($title);
+
+    $paginate = $request->has('paginate') ? (int)$request->get("paginate") : 16;
+    $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'price';
+    $orderBy = $request->has('orderBy') && in_array(strtolower($request->get('orderBy')),['desc','asc']) ? $request->get('orderBy') : 'asc';
+
     return Product::select('products.id as id','sku', 'title', 'partslink', 'oem_number', 'price', 'qty', 'images','mcat_name','mscat_name', 'categories.part_name as part_name')
         ->join('categories', 'products.title', '=', 'categories.part_name')
         ->where(function($query) use ($title)
@@ -176,7 +182,7 @@ Route::get('/categories/{title}', function ($title) {
                 ->orWhere('categories.part_name', '=', $title);
         })
         ->hasFitments()
-        ->paginate(16);
+        ->orderBy($sort, $orderBy)->paginate($paginate);
 });
 
 
@@ -356,6 +362,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/checkout/pay', [CheckoutController::class, 'pay']);
 
     Route::post('/orders/add', function (Request $request) {
+
         $data = $request->all();
         $user = $request->user();
 
@@ -410,7 +417,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $order->addresses()->attach($address->id);
         $order->save();
 
-        // Mail::to($user->email)->send(new OrderConfirmation($order));
+        Mail::to($user->email)->send(new OrderConfirmation($order->id));
 
         return $order->id;
     });
@@ -443,7 +450,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $id = $request->id;
         $data = $request->data;
         $address = $user->addresses()->findOrFail($id);
-        $address->update($data);
+        $address->update([
+            'address1' => $request->address1 ?? '',
+            'address2' => $request->address2 ?? '',
+            'city'     => $request->city ?? '',
+            'state'    => $request->state ?? '',
+            'zip'      => $request->zip ?? '',
+            'country'  => $request->country ?? '',
+        ]);
         return $address->toJson(JSON_PRETTY_PRINT);
     });
 

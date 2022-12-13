@@ -155,6 +155,11 @@ class Product extends Model
         return $this->morphMany(Rates::class, 'rate');
     }
 
+    public function images(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Images::class, 'item');
+    }
+
     public function scopeIsAvailable($query)
     {
         return $query->where('qty', '>', 0);

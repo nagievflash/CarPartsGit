@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Rates extends Model
 {
     protected $fillable = [
-        'rate',
+        'value',
         'rate_type',
         'rate_id'
     ];
