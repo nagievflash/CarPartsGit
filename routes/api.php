@@ -472,7 +472,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 'address'   => $data["address"],
                 'address2'  => $data["address2"],
                 'city'      => $data["city"],
-                'zip'       => $data["zip"],
+                'zipcode'   => $data["zip"],
             ]);
 
             $user->addresses()->attach($address->id);
