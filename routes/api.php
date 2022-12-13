@@ -448,7 +448,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/profile/addresses/update/{id}', function (Request $request) {
         $user = $request->user();
         $id = $request->id;
-        $data = $request->data;
         $address = $user->addresses()->findOrFail($id);
         $address->update([
             'address' => $request->address ?? '',
@@ -464,7 +463,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/profile/addresses/create', function (Request $request) {
         try {
             $user = $request->user();
-            $data = $request->data;
 
             $address = Address::firstOrCreate([
                 'country'   => $request->country ?? '',
