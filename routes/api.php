@@ -451,11 +451,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $data = $request->data;
         $address = $user->addresses()->findOrFail($id);
         $address->update([
-            'address1' => $request->address1 ?? '',
+            'address' => $request->address ?? '',
             'address2' => $request->address2 ?? '',
             'city'     => $request->city ?? '',
             'state'    => $request->state ?? '',
-            'zip'      => $request->zip ?? '',
+            'zipcode'  => $request->zipcode ?? '',
             'country'  => $request->country ?? '',
         ]);
         return $address->toJson(JSON_PRETTY_PRINT);
