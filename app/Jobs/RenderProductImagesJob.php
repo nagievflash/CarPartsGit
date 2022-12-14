@@ -39,7 +39,7 @@ class RenderProductImagesJob implements ShouldQueue
      */
     public function handle()
     {
-        $sku = Product::where('id',$this->product_id)->pluck()->fitst();
+        $sku = Product::where('id',$this->product_id)->pluck('sku')->first();
 
         for ($i = 1; $i < 8; $i++) {
             $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . $sku . '_' . $i;
@@ -65,39 +65,51 @@ class RenderProductImagesJob implements ShouldQueue
         }
 
         if(!empty($images)){
-            foreach ($images as $url){
+            foreach ($images as $index => $url){
                 if(!empty(config('sizes')['product'])) {
-                    $id = null;
                     $sort_order = 0;
                     foreach (config('sizes')['product'] as $key => $size) {
 
                         $image = file_get_contents($url);
 
-                        $resize = Image::make(public_path($image));
-                        $resize->fit($size['w'], $size['h']);
-                        $path = '/images/products/' . $sku . '/' . $sku . '_resize_w-' . $size['w'] . '_h-' . $size['h'];
-                        $resize->save(Storage::path($path));
-                        $status = Storage::exists($path);
+                        $dir = 'images\products\\' . $sku;
 
-                        if ($status) {
-                            $sort_order = is_null($id) ? $sort_order : $sort_order + 1;
-                            (new Images())->updateOrCreate(['id' => $id],
-                                [
-                                    'item_type'  => 'App\Models\Product',
-                                    'item_id'    => $this->product_id,
-                                     $key        => $path,
-                                    'url'        => $url,
-                                    'sort_order' => $sort_order
-                                ]
-                            );
-
-                            $id = (new Images)->id;
+                        if (!is_dir(storage_path('app/' . $dir))) {
+                            mkdir(storage_path('app/' . $dir), 0777, true);
                         }
 
-                        Backlog::createBacklog('ImageResize', 'resize image  ' . $sku . ' width - ' . $size['w'] . ' height - ' . $size['h'] . ' status - ' . $status);
+                        $filename = $sku . '_' . $index . '_' . $key . '_resize_w_' . $size['w'] . '_h_' . $size['h'] . '.jpg';
+                        $path = $dir .  '\\' . $filename;
+
+                        if (!file_exists(storage_path('app\\' . $path))) {
+                            $resize = Image::make($image);
+                            $resize->fit($size['w'], $size['h']);
+
+                            $resize->save(Storage::path($path));
+                            $status = Storage::exists($path);
+
+                            if ($status) {
+                                (new Images())->updateOrCreate([['item_id',1],['url',$url]],
+                                    [
+                                        'item_type'  => 'App\Models\Product',
+                                        'item_id'    => $this->product_id,
+                                         $key         => $path,
+                                        'url'        => $url,
+                                        'sort_order' => $sort_order
+                                    ]
+                                );
+                                $sort_order++;
+                            }
+
+                            Backlog::createBacklog('ImageResize', 'resize image  ' . $sku . ' width - ' . $size['w'] . ' height - ' . $size['h'] . ' status - successfully');
+                        }else{
+                            Backlog::createBacklog('ImageResize', 'resize image  ' . $sku . ' width - ' . $size['w'] . ' height - ' . $size['h'] . ' status - already exists');
+                        }
                     }
                 }
             }
+        }else{
+            Backlog::createBacklog('ImageResize', 'failed to parse any images');
         }
     }
 }
