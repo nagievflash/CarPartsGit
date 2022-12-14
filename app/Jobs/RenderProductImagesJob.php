@@ -65,9 +65,9 @@ class RenderProductImagesJob implements ShouldQueue
         }
 
         if(!empty($images)){
+            $sort_order = 0;
             foreach ($images as $index => $url){
                 if(!empty(config('sizes')['product'])) {
-                    $sort_order = 0;
                     foreach (config('sizes')['product'] as $key => $size) {
 
                         $image = file_get_contents($url);
@@ -93,12 +93,11 @@ class RenderProductImagesJob implements ShouldQueue
                                     [
                                         'item_type'  => 'App\Models\Product',
                                         'item_id'    => $this->product_id,
-                                         $key         => $path,
+                                         $key        => $path,
                                         'url'        => $url,
                                         'sort_order' => $sort_order
                                     ]
                                 );
-                                $sort_order++;
                             }
 
                             Backlog::createBacklog('ImageResize', 'resize image  ' . $sku . ' width - ' . $size['w'] . ' height - ' . $size['h'] . ' status - successfully');
@@ -107,6 +106,7 @@ class RenderProductImagesJob implements ShouldQueue
                         }
                     }
                 }
+                $sort_order++;
             }
         }else{
             Backlog::createBacklog('ImageResize', 'failed to parse any images');
