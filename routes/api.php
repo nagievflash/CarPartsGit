@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Mail\OrderConfirmation;
@@ -288,6 +289,7 @@ Route::post('/create-new-password', function (Request $request) {
 })->name('create.new-password');
 
 Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::class, 'getSetupIntent']);
+
 Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 'postPaymentMethods']);
 
 Route::get('/states', function (Request $request) {
@@ -334,52 +336,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         return $request->user();
     });
 
-    Route::put('/profile/update', function (Request $request) {
+    Route::put('/profile/update',[UserController::class, 'profileUpdate']);
 
-        $request->validate([
-            'name'      => 'required',
-            'lastname'  => 'required',
-            'phone'     => 'required',
-        ]);
-
-        try {
-            $user = $request->user();
-
-            $user->update([
-                'name'     => $request->name,
-                'lastname' => $request->lastname,
-                'phone'    => $request->phone,
-                //'profile_photo_path' => $request->profile_photo_path,
-            ]);
-
-            return response()->json($request->user(), 200);
-
-        }catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
-    });
-
-    Route::put('/profile/update/password', function (Request $request) {
-
-        $request->validate([
-            'old_password'  => 'current_password',
-            'new_password'  => 'required',
-        ]);
-
-        try {
-            $user = $request->user();
-            $password = Hash::make($request->new_password);
-
-            $user->update([
-                'password'     => $password,
-            ]);
-
-            return response()->json($request->user(), 200);
-
-        }catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
-    });
+    Route::put('/profile/update/password', [UserController::class, 'updatePassword']);
 
     Route::get('/checkout/intent', [CheckoutController::class, 'intent']);
     Route::post('/checkout/pay', [CheckoutController::class, 'pay']);
