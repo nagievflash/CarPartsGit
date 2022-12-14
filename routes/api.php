@@ -358,6 +358,28 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         }
     });
 
+    Route::put('/profile/update/password', function (Request $request) {
+
+        $request->validate([
+            'old_password'  => 'current_password',
+            'new_password'  => 'required',
+        ]);
+
+        try {
+            $user = $request->user();
+            $password = Hash::make($request->new_password);
+
+            $user->update([
+                'password'     => $password,
+            ]);
+
+            return response()->json($request->user(), 200);
+
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    });
+
     Route::get('/checkout/intent', [CheckoutController::class, 'intent']);
     Route::post('/checkout/pay', [CheckoutController::class, 'pay']);
 
