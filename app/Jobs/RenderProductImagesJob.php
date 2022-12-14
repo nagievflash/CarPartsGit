@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Models\Images;
+use App\Models\Product;
 
 
 class RenderProductImagesJob implements ShouldQueue
@@ -24,16 +25,10 @@ class RenderProductImagesJob implements ShouldQueue
      * @return void
      */
 
-    public string $url;
-    public string $name;
-    public string $type;
     public int $product_id;
 
-    public function __construct($url,$name,$type,$product_id)
+    public function __construct($product_id)
     {
-        $this->url  = $url;
-        $this->name = $name;
-        $this->type = $type;
         $this->product_id = $product_id;
     }
 
@@ -44,39 +39,72 @@ class RenderProductImagesJob implements ShouldQueue
      */
     public function handle()
     {
-        if(!empty(config('sizes')['product'])) {
-            $id = null;
-            $sort_order = 0;
-            foreach (config('sizes')['product'] as $key => $size) {
-                $resize = Image::make(public_path($this->url));
-                $resize->fit($size['w'], $size['h']);
-                $path = '/images/products/' . $this->type . '/' . $this->name . '_resize_w-' . $size['w'] . '_h-' . $size['h'];
-                $resize->save(Storage::path($path));
-                $status = Storage::exists($path);
+        $sku = Product::where('id',$this->product_id)->pluck()->fitst();
 
-                if ($status) {
-                    if(is_null($id)){
-                        (new Images)->create(
-                            [
-                                'item_type' => 'App\Models\Product',
-                                'item_id'   => $this->product_id,
-                                 $key => $path,
-                                'sort_order' => $sort_order
-                            ]
-                        );
-                        $id = (new Images)->id;
-                    }else{
-                        $sort_order++;
-                        (new Images())->updateOrCreate(['id' => $id],
-                            [
-                              $key => $path,
-                              'sort_order' => $sort_order
-                            ]
-                        );
+        for ($i = 1; $i < 8; $i++) {
+            $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . $sku . '_' . $i;
+            $ch = curl_init($file);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
+            curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            if ($httpCode == 200) {
+                $images[] = $file;
+            } else {
+                $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . explode('-', $sku)[0] . '_' . $i;
+                $ch = curl_init($file);
+                curl_setopt($ch, CURLOPT_NOBODY, true);
+                curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                if ($httpCode == 200) {
+                    $images[] = $file;
+                }
+                else break;
+            }
+        }
+
+        if(!empty($images)){
+            foreach ($images as $url){
+                if(!empty(config('sizes')['product'])) {
+                    $id = null;
+                    $sort_order = 0;
+                    foreach (config('sizes')['product'] as $key => $size) {
+
+                        $image = file_get_contents($url);
+
+                        $resize = Image::make(public_path($image));
+                        $resize->fit($size['w'], $size['h']);
+                        $path = '/images/products/' . $sku . '_resize_w-' . $size['w'] . '_h-' . $size['h'];
+                        $resize->save(Storage::path($path));
+                        $status = Storage::exists($path);
+
+                        if ($status) {
+                            if(is_null($id)){
+                                (new Images)->create(
+                                    [
+                                        'item_type'  => 'App\Models\Product',
+                                        'item_id'    => $this->product_id,
+                                         $key        => $path,
+                                         'url'       => $url,
+                                        'sort_order' => $sort_order
+                                    ]
+                                );
+                                $id = (new Images)->id;
+                            }else{
+                                $sort_order++;
+                                (new Images())->updateOrCreate(['id' => $id],
+                                    [
+                                        $key => $path,
+                                        'sort_order' => $sort_order
+                                    ]
+                                );
+                            }
+                        }
+
+                        Backlog::createBacklog('ImageResize', 'resize image  ' . $sku . ' width - ' . $size['w'] . ' height - ' . $size['h'] . ' status - ' . $status);
                     }
                 }
-
-                Backlog::createBacklog('ImageResize', 'resize image  ' . $this->url . ' width - ' . $size['w'] . ' height - ' . $size['h'] . ' status - ' . $status);
             }
         }
     }
