@@ -74,8 +74,8 @@ class RenderProductImagesJob implements ShouldQueue
 
                         $dir = 'images\products\\' . $sku;
 
-                        if (!is_dir(storage_path('app/' . $dir))) {
-                            mkdir(storage_path('app/' . $dir), 0777, true);
+                        if (!is_dir(storage_path('app\\' . $dir))) {
+                            mkdir(storage_path('app\\' . $dir), 0777, true);
                         }
 
                         $filename = $sku . '_' . $index . '_' . $key . '_resize_w_' . $size['w'] . '_h_' . $size['h'] . '.jpg';
@@ -89,7 +89,7 @@ class RenderProductImagesJob implements ShouldQueue
                             $status = Storage::exists($path);
 
                             if ($status) {
-                                (new Images())->updateOrCreate([['item_id',1],['url',$url]],
+                                (new Images())->updateOrCreate([['item_id',$this->product_id],['url',$url]],
                                     [
                                         'item_type'  => 'App\Models\Product',
                                         'item_id'    => $this->product_id,
