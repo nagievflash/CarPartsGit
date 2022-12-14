@@ -32,6 +32,7 @@ use App\Models\Tickets;
 use Illuminate\Support\Facades\Storage;
 use App\Mail\Ticket;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Mail\ThanksForJoining;
 
 /*
 |--------------------------------------------------------------------------
@@ -306,6 +307,9 @@ Route::post('/email/verification-notification', function (Request $request) {
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     try {
         $request->fulfill();
+        $user = $request->user();
+        Mail::to($user->email)->send(new ThanksForJoining());
+
         return response()->json(['message' => 'Email successfully verified'], 200);
     }catch (\Exception $e) {
         return response()->json(['message' => $e->getMessage()], 422);
