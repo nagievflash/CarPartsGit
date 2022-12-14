@@ -405,8 +405,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             $handling += $item['quantity'] * $product->handling;
             $qty += $item["quantity"];
         }
+        $subtotal = $total;
         $total = $total + $shipping + $handling;
-        $total = $total + $total / 4;
         /*        $payment = $user->payWith(
             number_format((float)$total, 2, '.', '') * 100, ['card']
         );*/
@@ -433,7 +433,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $user->addresses()->syncWithoutDetaching($address->id);
 
         $order->total_quantity = $qty;
-        $order->total = $total;
+        $order->total = $subtotal;
+        $order->shipping = $shipping;
+        $order->handling = $handling;
         $order->stripe_secret = $payment->client_secret;
         $order->stripe_id = $payment->id;
         $order->addresses()->attach($address->id);
