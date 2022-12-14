@@ -75,31 +75,23 @@ class RenderProductImagesJob implements ShouldQueue
 
                         $resize = Image::make(public_path($image));
                         $resize->fit($size['w'], $size['h']);
-                        $path = '/images/products/' . $sku . '_resize_w-' . $size['w'] . '_h-' . $size['h'];
+                        $path = '/images/products/' . $sku . '/' . $sku . '_resize_w-' . $size['w'] . '_h-' . $size['h'];
                         $resize->save(Storage::path($path));
                         $status = Storage::exists($path);
 
                         if ($status) {
-                            if(is_null($id)){
-                                (new Images)->create(
-                                    [
-                                        'item_type'  => 'App\Models\Product',
-                                        'item_id'    => $this->product_id,
-                                         $key        => $path,
-                                         'url'       => $url,
-                                        'sort_order' => $sort_order
-                                    ]
-                                );
-                                $id = (new Images)->id;
-                            }else{
-                                $sort_order++;
-                                (new Images())->updateOrCreate(['id' => $id],
-                                    [
-                                        $key => $path,
-                                        'sort_order' => $sort_order
-                                    ]
-                                );
-                            }
+                            $sort_order = is_null($id) ? $sort_order : $sort_order + 1;
+                            (new Images())->updateOrCreate(['id' => $id],
+                                [
+                                    'item_type'  => 'App\Models\Product',
+                                    'item_id'    => $this->product_id,
+                                     $key        => $path,
+                                    'url'        => $url,
+                                    'sort_order' => $sort_order
+                                ]
+                            );
+
+                            $id = (new Images)->id;
                         }
 
                         Backlog::createBacklog('ImageResize', 'resize image  ' . $sku . ' width - ' . $size['w'] . ' height - ' . $size['h'] . ' status - ' . $status);
