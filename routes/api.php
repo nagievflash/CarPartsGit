@@ -409,8 +409,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             $handling += $item['quantity'] * $product->handling;
             $qty += $item["quantity"];
         }
+        $subtotal = $total;
         $total = $total + $shipping + $handling;
-        $total = $total + $total / 4;
         /*        $payment = $user->payWith(
             number_format((float)$total, 2, '.', '') * 100, ['card']
         );*/
@@ -437,7 +437,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         $user->addresses()->syncWithoutDetaching($address->id);
 
         $order->total_quantity = $qty;
-        $order->total = $total;
+        $order->total = $subtotal;
+        $order->shipping = $shipping;
+        $order->handling = $handling;
         $order->stripe_secret = $payment->client_secret;
         $order->stripe_id = $payment->id;
         $order->addresses()->attach($address->id);
@@ -474,14 +476,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/profile/addresses/update/{id}', function (Request $request) {
         $user = $request->user();
         $id = $request->id;
-        $data = $request->data;
         $address = $user->addresses()->findOrFail($id);
         $address->update([
-            'address1' => $request->address1 ?? '',
+            'address' => $request->address ?? '',
             'address2' => $request->address2 ?? '',
             'city'     => $request->city ?? '',
             'state'    => $request->state ?? '',
-            'zip'      => $request->zip ?? '',
+            'zipcode'  => $request->zipcode ?? '',
             'country'  => $request->country ?? '',
         ]);
         return $address->toJson(JSON_PRETTY_PRINT);
@@ -490,15 +491,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/profile/addresses/create', function (Request $request) {
         try {
             $user = $request->user();
-            $data = $request->data;
 
             $address = Address::firstOrCreate([
-                'country'   => $data["country"],
-                'state'     => $data["state"],
-                'address'   => $data["address"],
-                'address2'  => $data["address2"],
-                'city'      => $data["city"],
-                'zip'       => $data["zip"],
+                'country'   => $request->country ?? '',
+                'state'     => $request->state ?? '',
+                'address'   => $request->address ?? '',
+                'address2'  => $request->address2 ?? '',
+                'city'      => $request->city ?? '',
+                'zipcode'   => $request->zipcode ?? '',
             ]);
 
             $user->addresses()->attach($address->id);
