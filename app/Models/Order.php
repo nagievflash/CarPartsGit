@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method create(array $array)
  * @method static firstOrFail($id)
  * @method static where(string $string, $id)
+ * @method static findOrFail($id)
  * @property mixed $id
  */
 class Order extends Model
