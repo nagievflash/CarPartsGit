@@ -255,9 +255,9 @@ Route::post('/profile/reset', function (Request $request) {
 
 //Route::get('/reset-password/{token}', function ($token) {
 //    return view('auth.reset-password', ['token' => $token]);
-//})->middleware('guest')->name('password.reset');
+//})->middleware('guest');
 
-Route::post('/reset-password', function (Request $request) {
+Route::post('/create-new-password', function (Request $request) {
 
     $request->validate([
         'token' => 'required',
@@ -284,7 +284,7 @@ Route::post('/reset-password', function (Request $request) {
         return response()->json(['message' => $e->getMessage()], 422);
     }
 
-});
+})->name('create.new-password');
 
 Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::class, 'getSetupIntent']);
 Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 'postPaymentMethods']);
@@ -349,6 +349,28 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 'lastname' => $request->lastname,
                 'phone'    => $request->phone,
                 //'profile_photo_path' => $request->profile_photo_path,
+            ]);
+
+            return response()->json($request->user(), 200);
+
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    });
+
+    Route::put('/profile/update/password', function (Request $request) {
+
+        $request->validate([
+            'old_password'  => 'current_password',
+            'new_password'  => 'required',
+        ]);
+
+        try {
+            $user = $request->user();
+            $password = Hash::make($request->new_password);
+
+            $user->update([
+                'password'     => $password,
             ]);
 
             return response()->json($request->user(), 200);
