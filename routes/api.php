@@ -255,9 +255,9 @@ Route::post('/profile/reset', function (Request $request) {
 
 //Route::get('/reset-password/{token}', function ($token) {
 //    return view('auth.reset-password', ['token' => $token]);
-//})->middleware('guest')->name('password.reset');
+//})->middleware('guest');
 
-Route::post('/reset-password', function (Request $request) {
+Route::post('/create-new-password', function (Request $request) {
 
     $request->validate([
         'token' => 'required',
@@ -284,7 +284,7 @@ Route::post('/reset-password', function (Request $request) {
         return response()->json(['message' => $e->getMessage()], 422);
     }
 
-});
+})->name('create.new-password');
 
 Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::class, 'getSetupIntent']);
 Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 'postPaymentMethods']);
