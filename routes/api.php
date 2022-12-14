@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Mail\Ticket;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Mail\ThanksForJoining;
+use App\Models\PendingReceipt;
 
 /*
 |--------------------------------------------------------------------------
@@ -317,6 +318,22 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 })->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+
+//    Route::post('/subscribe-product', function (Request $request) {
+//        $user = $request->user();
+//
+//        if(!PendingReceipt::where([['email',$user->email] , ['id',$request->product_id]])->exists()){
+//            PendingReceipt::insert(
+//                [
+//                    'email' => $user->email,
+//                    'product_id' => $request->product_id
+//                ]
+//            );
+//            return response()->json(['message' => 'You have successfully subscribed to the product update'], 200);
+//        }else{
+//            return response()->json(['message' => 'You are already subscribed to updates for this product'], 422);
+//        }
+//    });
 
     Route::post('/products/rate', function (Request $request) {
         try {
