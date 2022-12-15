@@ -46,6 +46,7 @@ class Setting extends Model
         }
         return Cache::get('access_token');
     }
+
     public static function setAccessToken($token) {
         (new Setting)->updateOrCreate([
             'key'   => 'ebay_refresh_token',

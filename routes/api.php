@@ -168,9 +168,7 @@ Route::get('/categories-list/', function () {
 });
 
 Route::get('/categories/{title}', function (Request $request) {
-    $title = explode('/',$request->path());
-    $title = array_pop($title);
-
+    $title = $request->title;
     $paginate = $request->has('paginate') ? (int)$request->get("paginate") : 16;
     $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'price';
     $orderBy = $request->has('orderBy') && in_array(strtolower($request->get('orderBy')),['desc','asc']) ? $request->get('orderBy') : 'asc';

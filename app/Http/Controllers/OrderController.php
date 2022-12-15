@@ -67,6 +67,19 @@ class OrderController extends Controller {
             'automatic_payment_methods' => [
                 'enabled' => 'true',
             ],
+            'metadata' => [
+                "order_id" => $order->id
+            ],
+            'shipping' => [
+                'address' => [
+                    'country'       => $data["userdata"]["country"],
+                    'state'         => $data["userdata"]["state"],
+                    'line1'         => $data["userdata"]["address"],
+                    'line2'         => $data["userdata"]["address2"],
+                    'city'          => $data["userdata"]["city"],
+                    'postal_code'   => $data["userdata"]["zipcode"],
+                ]
+            ]
         ]);
 
         $address = Address::firstOrCreate([
