@@ -1,8 +1,10 @@
 <?php
 
+use App\Mail\OrderConfirmation;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Vtiful\Kernel\Excel;
 
@@ -79,10 +81,21 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
 
 Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->post('/getSuggestedCategories',  [App\Http\Controllers\Admin\EbayController::class, 'getSuggestedCategories'])->name('getSuggestedCategories');
 Route::get('/create-payment-intent', function (Request $request) {
-    $stripe = new \Stripe\StripeClient(
-        getenv('STRIPE_SECRET')
-    );
-    return $stripe->taxRates->all();
+    $orders = Order::where('user_id', 1)->where('status', 'created');
+    if ($orders->exists()) {
+        foreach ($orders->get() as $order) {
+            $stripe = new \Stripe\StripeClient(
+                getenv('STRIPE_SECRET')
+            );
+            $intent = $stripe->paymentIntents->retrieve($order->stripe_id);
+            if ($intent->amount == $intent->amount_received) {
+                $order->status = 'processing';
+                $order->save();
+                Mail::to('nagiev.axioma@gmail.com')->send(new OrderConfirmation($order->id));
+            }
+        }
+    }
+    else return $orders->get();
 });
 Route::get('/test', function (Request $request) {
     return Order::with('products')->paginate(10);
