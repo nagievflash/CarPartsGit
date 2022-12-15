@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\OrderController;
 use App\Mail\OrderConfirmation;
 use App\Mail\ResetPassword;
 use Illuminate\Auth\Events\PasswordReset;
@@ -168,9 +170,7 @@ Route::get('/categories-list/', function () {
 });
 
 Route::get('/categories/{title}', function (Request $request) {
-    $title = explode('/',$request->path());
-    $title = array_pop($title);
-
+    $title = $request->title;
     $paginate = $request->has('paginate') ? (int)$request->get("paginate") : 16;
     $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'price';
     $orderBy = $request->has('orderBy') && in_array(strtolower($request->get('orderBy')),['desc','asc']) ? $request->get('orderBy') : 'asc';
@@ -289,6 +289,7 @@ Route::post('/create-new-password', function (Request $request) {
 })->name('create.new-password');
 
 Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::class, 'getSetupIntent']);
+
 Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 'postPaymentMethods']);
 
 Route::get('/states', function (Request $request) {
@@ -354,128 +355,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         return $request->user();
     });
 
-    Route::put('/profile/update', function (Request $request) {
+    Route::put('/profile/update',[UserController::class, 'profileUpdate']);
 
-        $request->validate([
-            'name'      => 'required',
-            'lastname'  => 'required',
-            'phone'     => 'required',
-        ]);
-
-        try {
-            $user = $request->user();
-
-            $user->update([
-                'name'     => $request->name,
-                'lastname' => $request->lastname,
-                'phone'    => $request->phone,
-                //'profile_photo_path' => $request->profile_photo_path,
-            ]);
-
-            return response()->json($request->user(), 200);
-
-        }catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
-    });
-
-    Route::put('/profile/update/password', function (Request $request) {
-
-        $request->validate([
-            'old_password'  => 'current_password',
-            'new_password'  => 'required',
-        ]);
-
-        try {
-            $user = $request->user();
-            $password = Hash::make($request->new_password);
-
-            $user->update([
-                'password'     => $password,
-            ]);
-
-            return response()->json($request->user(), 200);
-
-        }catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
-    });
+    Route::put('/profile/update/password', [UserController::class, 'updatePassword']);
 
     Route::get('/checkout/intent', [CheckoutController::class, 'intent']);
     Route::post('/checkout/pay', [CheckoutController::class, 'pay']);
 
-    Route::post('/orders/add', function (Request $request) {
+    Route::post('/orders/add', [OrderController::class, 'store']);
 
-        $data = $request->all();
-        $user = $request->user();
+    Route::get('/orders/get', [OrderController::class, 'index']);
 
-        $order = Order::create([
-            'user_id'       => $user->id,
-            'status'        => 'created'
-        ]);
-
-        $total = 0;
-        $qty = 0;
-        $shipping = 0;
-        $handling = 0;
-        foreach ($data["items"] as $item) {
-            $product = Warehouse::where('sku', $item["sku"])->where('supplier_id', 1)->first();
-            $order->products()->attach($item["sku"],  ['qty' => $item["quantity"], 'price' => $product->price, 'total' => $product->price * $item["quantity"]]);
-            $total += $item['quantity'] * $product->price;
-            $shipping += $item['quantity'] * $product->shipping;
-            $handling += $item['quantity'] * $product->handling;
-            $qty += $item["quantity"];
-        }
-        $subtotal = $total;
-        $total = $total + $shipping + $handling;
-        /*        $payment = $user->payWith(
-            number_format((float)$total, 2, '.', '') * 100, ['card']
-        );*/
-        $stripe = new \Stripe\StripeClient(
-            getenv('STRIPE_SECRET')
-        );
-        $payment =  $stripe->paymentIntents->create([
-            'amount' => number_format((float)$total, 2, '.', '') * 100,
-            'currency' => 'usd',
-            'automatic_payment_methods' => [
-                'enabled' => 'true',
-            ],
-        ]);
-
-        $address = Address::firstOrCreate([
-            'country'   => $data["userdata"]["country"],
-            'state'     => $data["userdata"]["state"],
-            'address'   => $data["userdata"]["address"],
-            'address2'  => $data["userdata"]["address2"],
-            'city'      => $data["userdata"]["city"],
-            'zipcode'   => $data["userdata"]["zipcode"],
-        ]);
-
-        $user->addresses()->syncWithoutDetaching($address->id);
-
-        $order->total_quantity = $qty;
-        $order->total = $subtotal;
-        $order->shipping = $shipping;
-        $order->handling = $handling;
-        $order->stripe_secret = $payment->client_secret;
-        $order->stripe_id = $payment->id;
-        $order->addresses()->attach($address->id);
-        $order->save();
-
-        Mail::to($user->email)->send(new OrderConfirmation($order->id));
-
-        return $order->id;
-    });
-
-    Route::get('/orders/get', function (Request $request) {
-        $user = $request->user();
-        return Order::where('user_id', $user->id)->with('products')->with('addresses')->orderBy('id', 'DESC')->paginate(10);
-    });
-
-    Route::get('/orders/get/{id}', function (Request $request) {
-        $user = $request->user();
-        return Order::where('user_id', $user->id)->where('id', $request->id)->with('products')->with('addresses')->firstOrFail()->toJson(JSON_PRETTY_PRINT);
-    });
+    Route::get('/orders/get/{id}', [OrderController::class, 'show']);
 
     Route::get('/profile/addresses', function (Request $request) {
         $user = $request->user();

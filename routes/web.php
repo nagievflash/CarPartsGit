@@ -82,13 +82,7 @@ Route::get('/create-payment-intent', function (Request $request) {
     $stripe = new \Stripe\StripeClient(
         getenv('STRIPE_SECRET')
     );
-    return $stripe->paymentIntents->create([
-        'amount' => 2000,
-        'currency' => 'usd',
-        'automatic_payment_methods' => [
-            'enabled' => 'true',
-        ],
-    ]);
+    return $stripe->taxRates->all();
 });
 Route::get('/test', function (Request $request) {
     return Order::with('products')->paginate(10);
