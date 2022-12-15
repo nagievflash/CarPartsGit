@@ -169,22 +169,20 @@ Route::get('/categories-list/', function () {
     return Category::all();
 });
 
-Route::get('/categories/{title}', function (Request $request) {
-    $title = $request->title;
+Route::get('/categories/{slug}', function (Request $request) {
+    $slug = $request->slug;
     $paginate = $request->has('paginate') ? (int)$request->get("paginate") : 16;
     $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'price';
     $orderBy = $request->has('orderBy') && in_array(strtolower($request->get('orderBy')),['desc','asc']) ? $request->get('orderBy') : 'asc';
-
+    $category = Category::where('categories.mcat_slug', '=', $slug)
+        ->orWhere('categories.mscat_slug', '=', $slug)
+        ->orWhere('categories.slug', '=', $slug)->first();
     return Product::select('products.id as id','sku', 'title', 'partslink', 'oem_number', 'price', 'qty', 'images','mcat_name','mscat_name', 'categories.part_name as part_name')
         ->join('categories', 'products.title', '=', 'categories.part_name')
-        ->where(function($query) use ($title)
-        {
-            $query->where('categories.mcat_name', '=', $title)
-                ->orWhere('categories.mscat_name', '=', $title)
-                ->orWhere('categories.part_name', '=', $title);
-        })
+        ->where('')
         ->hasFitments()
-        ->orderBy($sort, $orderBy)->paginate($paginate);
+        ->orderBy($sort, $orderBy)
+        ->paginate($paginate);
 });
 
 

@@ -55,9 +55,7 @@ class OrderController extends Controller {
         }
         $subtotal = $total;
         $total = $total + $shipping + $handling;
-        /*        $payment = $user->payWith(
-            number_format((float)$total, 2, '.', '') * 100, ['card']
-        );*/
+
         $stripe = new \Stripe\StripeClient(
             getenv('STRIPE_SECRET')
         );
@@ -78,7 +76,9 @@ class OrderController extends Controller {
                     'line2'         => $data["userdata"]["address2"],
                     'city'          => $data["userdata"]["city"],
                     'postal_code'   => $data["userdata"]["zipcode"],
-                ]
+                ],
+                'name'  => $user->name,
+                'phone' => $user->phone
             ]
         ]);
 
