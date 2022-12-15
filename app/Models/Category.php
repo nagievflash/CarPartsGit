@@ -17,6 +17,9 @@ class Category extends Model
     protected $fillable = [
         'mcat_name',
         'mscat_name',
-        'part_name'
+        'part_name',
+        'mcat_slug',
+        'mscat_slug',
+        'slug'
     ];
 }

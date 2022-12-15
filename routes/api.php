@@ -137,32 +137,48 @@ Route::get('/categories/{year}/{make}/{model}/{submodel?}', function ($year, $ma
 
 
 Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($year, $make, $model, $submodel, $category) {
+    $slug = strtolower($category);
+
+    $category = Category::where('categories.mcat_slug', '=', $slug)
+        ->orWhere('categories.mscat_slug', '=', $slug)
+        ->orWhere('categories.slug', '=', $slug)
+        ->first();
+
+    $cat_name = '';
+    if ($category->mcat_slug == $slug) {
+        $cat_name = $category->mcat_name;
+    }
+    elseif ($category->mscat_slug == $slug) {
+        $cat_name = $category->mscat_name;
+    }
+    elseif ($category->slug == $slug) {
+        $cat_name = $category->part_name;
+    }
+
     if ($submodel != 0) {
-/*        return Product::whereHas('fitments', function ($query) use ($category, $submodel, $year, $make, $model) {
-            return $query->where('year', '=', $year)
-                ->where('make_name', $make)
-                ->where('model_name', $model)
-                ->where('submodel_name', $submodel)
-                ->where('part_name', $category);
-        })->isAvailable()->paginate(16);*/
-        return Product::hasFitments()
+        $products = Product::hasFitments()
             ->join('fitments', 'products.sku', '=', 'fitments.sku')
             ->where('year', '=', $year)
             ->where('make_name', $make)
             ->where('model_name', $model)
             ->where('submodel_name', $submodel)
-            ->where('part_name', $category)
+            ->where('part_name', $category->part_name)
             //->isAvailable()
             ->paginate(16);
     }
     else {
-        return Product::whereHas('fitments', function ($query) use ($category, $year, $make, $model) {
-            return $query->where('year', '=', $year)
-                ->where('make_name', $make)
-                ->where('model_name', $model)
-                ->where('part_name', $category);
-        })->isAvailable()->paginate(16);
+        $products = Product::hasFitments()
+            ->join('fitments', 'products.sku', '=', 'fitments.sku')
+            ->where('year', '=', $year)
+            ->where('make_name', $make)
+            ->where('model_name', $model)
+            ->where('part_name', $category->part_name)
+            ->paginate(16);
     }
+    return collect(array(
+        'title' => $cat_name,
+        'products' => $products
+    ));
 });
 
 Route::get('/categories-list/', function () {
@@ -170,19 +186,37 @@ Route::get('/categories-list/', function () {
 });
 
 Route::get('/categories/{slug}', function (Request $request) {
-    $slug = $request->slug;
+    $slug = strtolower($request->slug);
+
     $paginate = $request->has('paginate') ? (int)$request->get("paginate") : 16;
     $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'price';
     $orderBy = $request->has('orderBy') && in_array(strtolower($request->get('orderBy')),['desc','asc']) ? $request->get('orderBy') : 'asc';
     $category = Category::where('categories.mcat_slug', '=', $slug)
         ->orWhere('categories.mscat_slug', '=', $slug)
         ->orWhere('categories.slug', '=', $slug)->first();
-    return Product::select('products.id as id','sku', 'title', 'partslink', 'oem_number', 'price', 'qty', 'images','mcat_name','mscat_name', 'categories.part_name as part_name')
+
+    $products =  Product::select('products.id as id','sku', 'title', 'partslink', 'oem_number', 'price', 'qty', 'images','mcat_name','mscat_name', 'categories.part_name as part_name', 'slug','mcat_slug', 'mscat_slug')
         ->join('categories', 'products.title', '=', 'categories.part_name')
-        ->where('')
+        ->where('slug', $slug)
+        ->orWhere('mscat_slug', $slug)
+        ->orWhere('mcat_slug', $slug)
         ->hasFitments()
         ->orderBy($sort, $orderBy)
         ->paginate($paginate);
+    $cat_name = '';
+    if ($category->mcat_slug == $slug) {
+        $cat_name = $category->mcat_name;
+    }
+    elseif ($category->mscat_slug == $slug) {
+        $cat_name = $category->mscat_name;
+    }
+    elseif ($category->slug == $slug) {
+        $cat_name = $category->part_name;
+    }
+    return collect(array(
+        'title' => $cat_name,
+        'products' => $products
+    ));
 });
 
 
@@ -291,7 +325,7 @@ Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::clas
 Route::post('/user/payments',  [App\Http\Controllers\Api\UserController::class, 'postPaymentMethods']);
 
 Route::get('/states', function (Request $request) {
-    return State::all();
+    return State::join('taxes', 'states.abbreviation', '=', 'taxes.state')->get();
 });
 
 
