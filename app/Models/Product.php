@@ -91,6 +91,14 @@ class Product extends Model
         else return 0;
     }
 
+    public function setImagesAttribute($value)
+    {
+        if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
+            return Images::where('sku', $this->sku)->get();
+        }
+        else return 0;
+    }
+
     /**
      * Get the VEHICLE COMPATIBILITY FITMENT
      */

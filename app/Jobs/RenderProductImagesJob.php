@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Backlog;
+use App\Models\Warehouse;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +13,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Models\Images;
-use App\Models\Product;
 
 
 class RenderProductImagesJob implements ShouldQueue
@@ -39,8 +39,8 @@ class RenderProductImagesJob implements ShouldQueue
      */
     public function handle()
     {
-        $sku = Product::where('id',$this->product_id)->pluck('sku')->first();
-
+        $sku = Warehouse::where('id',$this->product_id)->pluck('sku')->first();
+        $images = [];
         for ($i = 1; $i < 8; $i++) {
             $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . $sku . '_' . $i;
             $ch = curl_init($file);
@@ -91,8 +91,9 @@ class RenderProductImagesJob implements ShouldQueue
                             if ($status) {
                                 (new Images())->updateOrCreate([['item_id',$this->product_id],['url',$url]],
                                     [
-                                        'item_type'  => 'App\Models\Product',
+                                        'item_type'  => 'App\Models\Warehouse',
                                         'item_id'    => $this->product_id,
+                                        'sku'        => $sku,
                                          $key        => $path,
                                         'url'        => $url,
                                         'sort_order' => $sort_order
