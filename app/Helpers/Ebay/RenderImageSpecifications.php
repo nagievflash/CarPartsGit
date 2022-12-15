@@ -16,7 +16,7 @@ trait RenderImageSpecifications
      * @param $type
      * @return string
      */
-    public function renderImageSpecifications($imageUrl, $type,$product_id): string
+    public function renderImageSpecifications($imageUrl, $type): string
     {
         $contents = file_get_contents($imageUrl);
         $url = 'images/ebay/'. substr($imageUrl, strrpos($imageUrl, '/') + 1) . '_' . $type . '.jpg';
@@ -26,9 +26,6 @@ trait RenderImageSpecifications
         $img = Image::make(public_path($url));
         $watermark = Image::make(public_path('images/bg/watermark_'.$type.'.png'));
         $canvas = Image::canvas(1200, 1200);
-
-        $job = new RenderProductImagesJob($url, $imageName,$type,$product_id);
-        dispatch($job);
 
         $img->resize(1200, 1200, function($constraint)
         {
