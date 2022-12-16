@@ -7,7 +7,9 @@ use App\Imports\InventoryImportLKQ;
 use App\Imports\InventoryImportPF;
 use App\Jobs\UpdateListingsPricesJob;
 use App\Models\EbayListing;
+use App\Models\Product;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use ZipArchive;
@@ -66,7 +68,7 @@ class UpdateInventory extends Command
                 ]);
             }
             $newest = $fileData->sortByDesc('date')->first();
-
+            DB::table('products')->update(['available' => 0]);
             Excel::queueImport(new InventoryImportPF, storage_path().'/app/'.$newest['file'])->allOnQueue('pf');
             return 'The Job started successfully!';
         }

@@ -52,9 +52,10 @@ use App\Models\PendingReceipt;
 Route::get('/products', function (Request $request) {
     if ($request->has('search')) {
         $products = Product::where("sku", $request->get("search"))
-            ->orWhere("partslink", 'like', '%'.$request->get("search").'%')
-            ->orWhere("oem_number", 'like', '%'.$request->get("search").'%')
-            ->hasFitments()->isAvailable();
+            ->orWhere("partslink", 'like', '%' . $request->get("search").'%')
+            ->orWhere("oem_number", 'like', '%' . $request->get("search").'%')
+            ->hasFitments()
+            ->isAvailable();
     }
     else $products = Product::hasFitments()->isAvailable();
 

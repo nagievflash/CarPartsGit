@@ -44,19 +44,9 @@ class InventoryImportLKQ implements ToModel, WithHeadingRow, WithChunkReading, W
      */
     public function model(array $row)
     {
-
         Warehouse::updateOrCreate(
             ['partslink' => $row['partnumber'], 'supplier_id' => 2],
             ['price' => $row["customerprice"], 'qty' => $row["quantityavailable"], 'partslink' => $row['partnumber']]
-        );
-        Product::firstOrCreate(
-            [
-                'sku' => $row['partnumber']
-            ],
-            [
-                'images' => $row['imagepath'],
-                'title'  => $row['webdescription1']
-            ]
         );
     }
 
