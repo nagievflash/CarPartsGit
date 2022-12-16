@@ -6,6 +6,8 @@ use App\Mail\OrderConfirmation;
 use App\Models\Address;
 use App\Models\Backlog;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\Tax;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -14,15 +16,26 @@ class OrderController extends Controller {
 
     public function index(Request $request) {
         $user = $request->user();
-        return Order::where('user_id', $user->id)
-            ->with('products')
-            ->with('addresses'
-            )->orderBy('id', 'DESC')
-            ->paginate(10);
+        $orders = Order::where('user_id', $user->id)->where('status', 'created');
+        if ($orders->exists()) {
+            foreach ($orders->get() as $order) {
+                $this->checkStripeOrderStatus($order, $request);
+            }
+            return Order::where('user_id', $user->id)
+                ->with('products')
+                ->with('addresses'
+                )->orderBy('id', 'DESC')
+                ->paginate(10);
+        }
+        else return $orders->get();
     }
 
     public function show(Request $request) {
         $user = $request->user();
+        $order = Order::where('user_id', $user->id)->where('id', $request->id)->firstOrFail();
+        if ($order->status == 'created' ) {
+            $this->checkStripeOrderStatus($order, $request);
+        }
         return Order::where('user_id', $user->id)
             ->where('id', $request->id)
             ->with('products')
@@ -46,18 +59,17 @@ class OrderController extends Controller {
         $shipping = 0;
         $handling = 0;
         foreach ($data["items"] as $item) {
-            $product = Warehouse::where('sku', $item["sku"])->where('supplier_id', 1)->first();
-            $order->products()->attach($item["sku"],  ['qty' => $item["quantity"], 'price' => ($product->price + $product->price / 4) , 'total' => ($product->price + $product->price / 4) * $item["quantity"]]);
-            $total += $item['quantity'] * ($product->price + $product->price / 4);
-            $shipping += $item['quantity'] * ($product->shipping + $product->shipping / 4);
-            $handling += $item['quantity'] * ($product->handling + $product->handling / 4);
+            $product = Product::where('sku', $item["sku"])->first();
+            $order->products()->attach($item["sku"],  ['qty' => $item["quantity"], 'price' => $product->price , 'total' => $product->price * $item["quantity"]]);
+            $total += $item['quantity'] * $product->price;
+            $shipping += $item['quantity'] * $product->shipping;
+            $handling += $item['quantity'] * $product->handling;
             $qty += $item["quantity"];
         }
         $subtotal = $total;
         $total = $total + $shipping + $handling;
-        /*        $payment = $user->payWith(
-            number_format((float)$total, 2, '.', '') * 100, ['card']
-        );*/
+        $tax = $total * Tax::where('state', $data["userdata"]["state"])->first()->rate / 100;
+        $total += $tax;
         $stripe = new \Stripe\StripeClient(
             getenv('STRIPE_SECRET')
         );
@@ -68,7 +80,10 @@ class OrderController extends Controller {
                 'enabled' => 'true',
             ],
             'metadata' => [
-                "order_id" => $order->id
+                "order_id" => $order->id,
+                'shipping'  => $shipping,
+                'handling'  => $handling,
+                'tax'       => $tax
             ],
             'shipping' => [
                 'address' => [
@@ -78,7 +93,9 @@ class OrderController extends Controller {
                     'line2'         => $data["userdata"]["address2"],
                     'city'          => $data["userdata"]["city"],
                     'postal_code'   => $data["userdata"]["zipcode"],
-                ]
+                ],
+                'name'  => $user->name,
+                'phone' => $user->phone
             ]
         ]);
 
@@ -94,7 +111,8 @@ class OrderController extends Controller {
         $user->addresses()->syncWithoutDetaching($address->id);
 
         $order->total_quantity = $qty;
-        $order->total = $subtotal;
+        $order->total = $total;
+        $order->tax = $tax;
         $order->shipping = $shipping;
         $order->handling = $handling;
         $order->stripe_secret = $payment->client_secret;
@@ -102,8 +120,20 @@ class OrderController extends Controller {
         $order->addresses()->attach($address->id);
         $order->save();
 
-        Mail::to($user->email)->send(new OrderConfirmation($order->id));
-
         return $order->id;
+    }
+
+    public function checkStripeOrderStatus(Order $order, Request $request) {
+        $stripe = new \Stripe\StripeClient(
+            getenv('STRIPE_SECRET')
+        );
+        $intent = $stripe->paymentIntents->retrieve($order->stripe_id);
+        if ($intent->amount == $intent->amount_received) {
+            $order->status = 'processing';
+            $order->save();
+            $user = $request->user();
+            Mail::to($user->email)->send(new OrderConfirmation($order->id));
+        }
+
     }
 }
