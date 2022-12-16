@@ -190,7 +190,7 @@ Route::get('/categories/{slug}', function (Request $request) {
     $slug = strtolower($request->slug);
 
     $paginate = $request->has('paginate') ? (int)$request->get("paginate") : 16;
-    $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'price';
+    $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'id';
     $orderBy = $request->has('orderBy') && in_array(strtolower($request->get('orderBy')),['desc','asc']) ? $request->get('orderBy') : 'asc';
     $category = Category::where('categories.mcat_slug', '=', $slug)
         ->orWhere('categories.mscat_slug', '=', $slug)
