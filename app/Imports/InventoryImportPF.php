@@ -7,6 +7,7 @@ use App\Jobs\UpdateInventoryPricingJob;
 use App\Models\Backlog;
 use App\Models\EbayListing;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\Warehouse;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
@@ -48,8 +49,17 @@ class InventoryImportPF implements ToModel, WithHeadingRow, WithChunkReading, Wi
         $qty = $row['stock_total'];
 
         Warehouse::updateOrCreate(
-            ['sku' => $row['sku'], 'supplier_id' => 1],
-            ['price' => $price, 'qty' => $qty, 'shipping' => (float)$row['shipping_cost'], 'handling' => (float)$row['handling_cost'], 'partslink' => $row['partslink'], 'category' => $row['part_name']]
+            [
+                'sku' => $row['sku'],
+                'supplier_id' => 1],
+            [
+                'price' => $price,
+                'qty' => $qty,
+                'shipping' => (float)$row['shipping_cost'],
+                'handling' => (float)$row['handling_cost'],
+                'partslink' => $row['partslink'],
+                'category' => $row['part_name']
+            ]
         );
         Product::updateOrCreate(
             [
@@ -57,7 +67,7 @@ class InventoryImportPF implements ToModel, WithHeadingRow, WithChunkReading, Wi
             ],
             [
                 'title'      => $row['part_name'],
-                'price'      => $price,
+                'price'      => $price + $price * .25,
                 'qty'        => $qty,
                 'partslink'  => $row['partslink'],
                 'oem_number' => $row['oem_number'],

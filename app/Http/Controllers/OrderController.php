@@ -99,6 +99,11 @@ class OrderController extends Controller {
             ]
         ]);
 
+        $user->name = $data["userdata"]["firstname"];
+        $user->lastname = $data["userdata"]["lastname"];
+        $user->phone = $data["userdata"]["phone"];
+        $user->save();
+
         $address = Address::firstOrCreate([
             'country'   => $data["userdata"]["country"],
             'state'     => $data["userdata"]["state"],
