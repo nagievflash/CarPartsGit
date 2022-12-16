@@ -164,7 +164,7 @@ Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($yea
             ->where('model_name', $model)
             ->where('submodel_name', $submodel)
             ->where('part_name', $category->part_name)
-            //->isAvailable()
+            ->isAvailable()
             ->paginate(16);
     }
     else {
@@ -174,6 +174,7 @@ Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($yea
             ->where('make_name', $make)
             ->where('model_name', $model)
             ->where('part_name', $category->part_name)
+            ->isAvailable()
             ->paginate(16);
     }
     return collect(array(
@@ -202,6 +203,7 @@ Route::get('/categories/{slug}', function (Request $request) {
         ->orWhere('mscat_slug', $slug)
         ->orWhere('mcat_slug', $slug)
         ->hasFitments()
+        ->isAvailable()
         ->orderBy($sort, $orderBy)
         ->paginate($paginate);
     $cat_name = '';
