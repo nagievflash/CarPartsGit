@@ -7,8 +7,10 @@ use App\Jobs\UpdateInventoryPricingJob;
 use App\Models\Backlog;
 use App\Models\EbayListing;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\Warehouse;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
@@ -47,18 +49,29 @@ class InventoryImportPF implements ToModel, WithHeadingRow, WithChunkReading, Wi
         $qty = $row['stock_total'];
 
         Warehouse::updateOrCreate(
-            ['sku' => $row['sku'], 'supplier_id' => 1],
-            ['price' => $price, 'qty' => $qty, 'shipping' => (float)$row['shipping_cost'], 'handling' => (float)$row['handling_cost'], 'partslink' => $row['partslink'], 'category' => $row['part_name']]
+            [
+                'sku' => $row['sku'],
+                'supplier_id' => 1],
+            [
+                'price' => $price,
+                'qty' => $qty,
+                'shipping' => (float)$row['shipping_cost'],
+                'handling' => (float)$row['handling_cost'],
+                'partslink' => $row['partslink'],
+                'category' => $row['part_name']
+            ]
         );
         Product::updateOrCreate(
             [
-                'sku' => $row['sku']
+                'sku'        => $row['sku']
             ],
             [
-                'price' => $price,
-                'qty'   => $qty,
-                'partslink' => $row['partslink'],
+                'title'      => $row['part_name'],
+                'price'      => $price + $price * .25,
+                'qty'        => $qty,
+                'partslink'  => $row['partslink'],
                 'oem_number' => $row['oem_number'],
+                'available'  => 1
             ]
         );
     }
@@ -75,6 +88,7 @@ class InventoryImportPF implements ToModel, WithHeadingRow, WithChunkReading, Wi
 
     public static function afterImport(AfterImport $event)
     {
+        DB::table('products')->where('available', 0)->delete();
         Backlog::createBacklog('importInventory', 'Supplier PF inventory csv file imported successful');
     }
 }

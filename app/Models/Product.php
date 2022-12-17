@@ -44,9 +44,11 @@ class Product extends Model
      * @var array
      */
     protected $casts = [
-        'images' => 'array',
-        'shipping' => 'float',
-        'handling' => 'float'
+        'images'    => 'array',
+        'shipping'  => 'float',
+        'handling'  => 'float',
+        'qty'       => 'integer',
+        'price'     => 'float'
     ];
 
     protected $appends = ['shipping', 'handling'];
@@ -71,22 +73,6 @@ class Product extends Model
     {
         if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
             return (float) Warehouse::where('sku', $this->sku)->first()->shipping + Warehouse::where('sku', $this->sku)->first()->shipping / 4;
-        }
-        else return 0;
-    }
-
-    public function setPriceAttribute($value)
-    {
-        if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
-            return Warehouse::where('sku', $this->sku)->first()->price + Warehouse::where('sku', $this->sku)->first()->price / 4;
-        }
-        else return 0;
-    }
-
-    public function setQtyAttribute($value)
-    {
-        if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
-            return Warehouse::where('sku', $this->sku)->first()->qty;
         }
         else return 0;
     }

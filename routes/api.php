@@ -52,9 +52,10 @@ use App\Models\PendingReceipt;
 Route::get('/products', function (Request $request) {
     if ($request->has('search')) {
         $products = Product::where("sku", $request->get("search"))
-            ->orWhere("partslink", 'like', '%'.$request->get("search").'%')
-            ->orWhere("oem_number", 'like', '%'.$request->get("search").'%')
-            ->hasFitments()->isAvailable();
+            ->orWhere("partslink", 'like', '%' . $request->get("search").'%')
+            ->orWhere("oem_number", 'like', '%' . $request->get("search").'%')
+            ->hasFitments()
+            ->isAvailable();
     }
     else $products = Product::hasFitments()->isAvailable();
 
@@ -163,7 +164,7 @@ Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($yea
             ->where('model_name', $model)
             ->where('submodel_name', $submodel)
             ->where('part_name', $category->part_name)
-            //->isAvailable()
+            ->isAvailable()
             ->paginate(16);
     }
     else {
@@ -173,6 +174,7 @@ Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($yea
             ->where('make_name', $make)
             ->where('model_name', $model)
             ->where('part_name', $category->part_name)
+            ->isAvailable()
             ->paginate(16);
     }
     return collect(array(
@@ -189,7 +191,7 @@ Route::get('/categories/{slug}', function (Request $request) {
     $slug = strtolower($request->slug);
 
     $paginate = $request->has('paginate') ? (int)$request->get("paginate") : 16;
-    $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'price';
+    $sort = $request->has('sort') && in_array($request->get('sort'),['price','created_at']) ? $request->get('sort') : 'id';
     $orderBy = $request->has('orderBy') && in_array(strtolower($request->get('orderBy')),['desc','asc']) ? $request->get('orderBy') : 'asc';
     $category = Category::where('categories.mcat_slug', '=', $slug)
         ->orWhere('categories.mscat_slug', '=', $slug)
@@ -201,6 +203,7 @@ Route::get('/categories/{slug}', function (Request $request) {
         ->orWhere('mscat_slug', $slug)
         ->orWhere('mcat_slug', $slug)
         ->hasFitments()
+        ->isAvailable()
         ->orderBy($sort, $orderBy)
         ->paginate($paginate);
     $cat_name = '';
