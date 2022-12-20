@@ -45,6 +45,12 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
+                    <a href="{{Route('orders.list')}}" class='sidebar-link'>
+                        <i class="bi bi-box"></i>
+                        <span>Orders</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a href="{{Route('ebay.listings')}}" class='sidebar-link'>
                         <i class="bi bi-shop"></i>
                         <span>Ebay Listings</span>

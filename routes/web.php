@@ -32,6 +32,13 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
         return view('admin.dashboard');
     })->name('dashboard');
 
+    //Orders
+    Route::get('/orders',  [App\Http\Controllers\Admin\OrdersController::class, 'index'])->name('orders.list');
+    Route::put('/orders',  [App\Http\Controllers\Admin\OrdersController::class, 'edit']);
+    Route::delete('/orders',  [App\Http\Controllers\Admin\OrdersController::class, 'destroy']);
+
+    //Products
+
     Route::get('/import',  [App\Http\Controllers\Admin\AdminController::class, 'importProductsFromCSV'])->name('import');
     Route::get('/import/products/custom',  [App\Http\Controllers\Admin\AdminController::class, 'ebayUpload'])->name('ebayUpload');
     Route::get('/import/fitments/',  [App\Http\Controllers\Admin\AdminController::class, 'importFitments'])->name('importFitments');
