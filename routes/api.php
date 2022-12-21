@@ -49,6 +49,7 @@ use App\Models\PendingReceipt;
 */
 
 
+
 Route::get('/products', function (Request $request) {
     if ($request->has('search')) {
         $products = Product::where("sku", $request->get("search"))
@@ -294,17 +295,50 @@ Route::post('/profile/reset', function (Request $request) {
 //    return view('auth.reset-password', ['token' => $token]);
 //})->middleware('guest');
 
+Route::get('/create-new-password', function (Request $request) {
+    //
+});
+
 Route::post('/create-new-password', function (Request $request) {
 
     $request->validate([
-        'token' => 'required',
-        'email' => 'required|email',
-        'password' => 'required|min:8|confirmed',
+        'token'    => 'required',
+        'email'    => 'required|email',
+        'password' => 'required|min:6',
     ]);
 
     try {
           Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
+            $request->only('email', 'password', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        return response()->json(['message' => 'successfully!'], 200);
+    }catch (Exception $e) {
+        return response()->json(['message' => $e->getMessage()], 422);
+    }
+
+});
+
+Route::get('/create-new-password', function (Request $request) {
+
+    $request->validate([
+        'token'    => 'required',
+        'email'    => 'required|email',
+        'password' => 'required|min:6',
+    ]);
+
+    try {
+        Password::reset(
+            $request->only('email', 'password', 'token'),
             function ($user, $password) {
                 $user->forceFill([
                     'password' => Hash::make($password)
@@ -331,8 +365,7 @@ Route::get('/states', function (Request $request) {
     return State::join('taxes', 'states.abbreviation', '=', 'taxes.state')->get();
 });
 
-
-Route::post('/email/verification-notification', function (Request $request) {
+Route::get('/email/verify', function (Request $request) {
     try {
         $request->user()->sendEmailVerificationNotification();
         return response()->json(['message' => 'Confirmation link sent to email'], 200);

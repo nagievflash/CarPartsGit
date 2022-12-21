@@ -74,15 +74,28 @@ class UsersController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        $user = User::where('id', $id);
+
+        if($user->get()->pluck('phone')->first() !== $request->phone){
+            $request->validate([
+                'phone'     => 'required|phone|unique:users,phone|size:11',
+            ]);
+        }
+        if($user->get()->pluck('email')->first() !== $request->email){
+            $request->validate([
+                'email'     => 'required|regex:/(.+)@(.+)\.(.+)/i|unique:users,email',
+            ]);
+        }
+
         $request->validate([
             'name'      => 'required',
-            'phone'     => 'required|phone|unique:users,phone|size:11',
             'lastname'  => 'required',
-            'email'     => 'required|regex:/(.+)@(.+)\.(.+)/i|unique:users,email',
         ]);
 
+
+
         try {
-            User::where('id', $id)->update([
+            $user->update([
                 'name'     => $request->name,
                 'phone'    => $request->phone,
                 'lastname' => $request->lastname,
