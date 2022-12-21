@@ -378,7 +378,7 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
     try {
         $request->fulfill();
         $user = $request->user();
-        Mail::to($user->email)->send(new ThanksForJoining());
+        Mail::to($user->email)->send(new ThanksForJoining($user->toArray()));
 
         return response()->json(['message' => 'Email successfully verified'], 200);
     }catch (\Exception $e) {

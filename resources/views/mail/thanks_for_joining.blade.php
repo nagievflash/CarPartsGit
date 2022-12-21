@@ -113,70 +113,13 @@
                                                 <td align="center" valign="top" style="padding:0;Margin:0;width:560px">
                                                     <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                         <tr>
-                                                            <td align="center" style="padding:0;Margin:0;padding-top:20px;padding-bottom:25px;font-size:0px"><img src="{{asset('images/96671618383886503.png')}}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="100" height="98"></td>
+                                                            <td align="center" style="padding:0;Margin:0;padding-top:20px;padding-bottom:25px;font-size:0px"><img src="{{asset('images/mail/84141618400759579.png')}}" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="100" height="98"></td>
                                                         </tr>
                                                         <tr>
                                                             <td align="center" class="es-m-txt-c" style="padding:0;Margin:0;padding-bottom:10px"><h1 style="Margin:0;line-height:46px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:46px;font-style:normal;font-weight:bold;color:#333333">Thanks for joining us!</h1></td>
                                                         </tr>
                                                         <tr>
-                                                            <td align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Hello, *|FNAME|*! Thanks for joining us! You are now on our mailing list. This means you'll be the first&nbsp;to hear about our fresh&nbsp;car parts and offers!</p></td>
-                                                        </tr>
-                                                    </table></td>
-                                            </tr>
-                                        </table></td>
-                                </tr>
-                                <tr>
-                                    <td class="esdev-adapt-off" align="left" style="padding:20px;Margin:0">
-                                        <table cellpadding="0" cellspacing="0" class="esdev-mso-table" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;width:560px">
-                                            <tr>
-                                                <td class="esdev-mso-td" valign="top" style="padding:0;Margin:0">
-                                                    <table cellpadding="0" cellspacing="0" class="es-left" align="left" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
-                                                        <tr class="es-mobile-hidden">
-                                                            <td align="left" style="padding:0;Margin:0;width:146px">
-                                                                <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                                                                    <tr>
-                                                                        <td align="center" height="40" style="padding:0;Margin:0"></td>
-                                                                    </tr>
-                                                                </table></td>
-                                                        </tr>
-                                                    </table></td>
-                                                <td class="esdev-mso-td" valign="top" style="padding:0;Margin:0">
-                                                    <table cellpadding="0" cellspacing="0" class="es-left" align="left" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
-                                                        <tr>
-                                                            <td align="left" style="padding:0;Margin:0;width:121px">
-                                                                <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#cccccc" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:separate;border-spacing:0px;background-color:#cccccc;border-radius:10px 0px 0px 10px" role="presentation">
-                                                                    <tr>
-                                                                        <td align="right" style="padding:0;Margin:0;padding-top:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#000000;font-size:14px">Login:</p></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td align="right" style="padding:0;Margin:0;padding-bottom:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#000000;font-size:14px">Password:</p></td>
-                                                                    </tr>
-                                                                </table></td>
-                                                        </tr>
-                                                    </table></td>
-                                                <td class="esdev-mso-td" valign="top" style="padding:0;Margin:0">
-                                                    <table cellpadding="0" cellspacing="0" class="es-left" align="left" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
-                                                        <tr>
-                                                            <td align="left" style="padding:0;Margin:0;width:155px">
-                                                                <table cellpadding="0" cellspacing="0" width="100%" bgcolor="#cccccc" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:separate;border-spacing:0px;background-color:#cccccc;border-radius:0px 10px 10px 0px" role="presentation">
-                                                                    <tr>
-                                                                        <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-left:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#000000;font-size:14px"><strong>USER-1000</strong></p></td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td align="left" style="padding:0;Margin:0;padding-bottom:10px;padding-left:10px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#000000;font-size:14px"><strong>FYTerg243okr</strong></p></td>
-                                                                    </tr>
-                                                                </table></td>
-                                                        </tr>
-                                                    </table></td>
-                                                <td class="esdev-mso-td" valign="top" style="padding:0;Margin:0">
-                                                    <table cellpadding="0" cellspacing="0" class="es-right" align="right" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
-                                                        <tr class="es-mobile-hidden">
-                                                            <td align="left" style="padding:0;Margin:0;width:138px">
-                                                                <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                                                                    <tr>
-                                                                        <td align="center" height="40" style="padding:0;Margin:0"></td>
-                                                                    </tr>
-                                                                </table></td>
+                                                            <td align="left" style="padding:0;Margin:0;padding-top:20px;padding-bottom:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#333333;font-size:14px">Hello, {{$name}}! Thanks for joining us! You are now on our mailing list. This means you'll be the first&nbsp;to hear about our fresh&nbsp;car parts and offers!</p></td>
                                                         </tr>
                                                     </table></td>
                                             </tr>
@@ -202,7 +145,7 @@
                                                                         <w:anchorlock></w:anchorlock>
                                                                         <center style='color:#ffffff; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:17px; font-weight:400; line-height:17px;  mso-text-raise:1px'>SHOP NOW</center>
                                                                     </v:roundrect></a>
-                                                                <![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border" style="border-style:solid;border-color:#2CB543;background:#ff1e00;border-width:0px;display:inline-block;border-radius:0px;width:auto;mso-hide:all"><a href="" class="es-button es-button-1" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:20px;border-style:solid;border-color:#ff1e00;border-width:10px 30px;display:inline-block;background:#ff1e00;border-radius:0px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center">SHOP NOW</a></span><!--<![endif]--></td>
+                                                                <![endif]--><!--[if !mso]><!-- --><span class="msohide es-button-border" style="border-style:solid;border-color:#2CB543;background:#ff1e00;border-width:0px;display:inline-block;border-radius:0px;width:auto;mso-hide:all"><a href="{{env('APP_URL')}}" class="es-button es-button-1" target="_blank" style="mso-style-priority:100 !important;text-decoration:none;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;color:#FFFFFF;font-size:20px;border-style:solid;border-color:#ff1e00;border-width:10px 30px;display:inline-block;background:#ff1e00;border-radius:0px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:normal;font-style:normal;line-height:24px;width:auto;text-align:center">SHOP NOW</a></span><!--<![endif]--></td>
                                                         </tr>
                                                         <tr>
                                                             <td align="left" style="Margin:0;padding-bottom:10px;padding-top:20px;padding-left:20px;padding-right:20px"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px">Got a question? Email us at <a target="_blank" href="mailto:info@autoelements.com" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px">info@autoelements.com</a>&nbsp;or give us <br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px">a call at&nbsp;<a target="_blank" href="tel:+18006030942" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px">+1 (800) 603-09-42</a>.</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px"><br>Thanks,</p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px">The Auto Elements&nbsp;Team!</p></td>
@@ -211,10 +154,10 @@
                                                             <td align="center" style="padding:0;Margin:0;padding-top:15px;padding-bottom:15px;font-size:0">
                                                                 <table cellpadding="0" cellspacing="0" class="es-table-not-adapt es-social" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                                                                     <tr>
-                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Facebook" src="{{asset('images/facebook-logo-black.png')}}" alt="Fb" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
-                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Twitter" src="{{asset('images/twitter-logo-black.png')}}" alt="Tw" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
-                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Instagram" src="{{asset('images/instagram-logo-black.png')}}" alt="Inst" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
-                                                                        <td align="center" valign="top" style="padding:0;Margin:0"><img title="Youtube" src="{{asset('images/youtube-logo-black.png')}}" alt="Yt" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
+                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Facebook" src="{{asset('images/mail/facebook-logo-black.png')}}" alt="Fb" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
+                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Twitter" src="{{asset('images/mail/twitter-logo-black.png')}}" alt="Tw" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
+                                                                        <td align="center" valign="top" style="padding:0;Margin:0;padding-right:40px"><img title="Instagram" src="{{asset('images/mail/instagram-logo-black.png')}}" alt="Inst" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
+                                                                        <td align="center" valign="top" style="padding:0;Margin:0"><img title="Youtube" src="{{asset('images/mail/youtube-logo-black.png')}}" alt="Yt" width="32" height="32" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic"></td>
                                                                     </tr>
                                                                 </table></td>
                                                         </tr>

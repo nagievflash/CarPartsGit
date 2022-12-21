@@ -10,14 +10,16 @@ class ThanksForJoining extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public array $data;
+
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($data)
     {
-        //
+        $this->data = $data;
     }
 
     /**
@@ -30,6 +32,6 @@ class ThanksForJoining extends Mailable
         return $this
             ->from($address = env('MAIL_USERNAME'), $name = env('APP_NAME'))
             ->subject('Thanks For Joining')
-            ->view('mail.thanks_for_joining',[]);
+            ->view('mail.thanks_for_joining',$this->data);
     }
 }
