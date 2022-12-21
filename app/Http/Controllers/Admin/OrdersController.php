@@ -53,7 +53,7 @@ class OrdersController extends Controller
      */
     public function show(string $id): Factory|View|Application
     {
-        $order = Order::findOrFail('id', $id);
+        $order = Order::where('id', $id)->get()->first();
         return view('admin.order')->with('order', $order);
     }
 
@@ -88,12 +88,12 @@ class OrdersController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Request $request
      */
-    public function destroy(int $id)
+    public function destroy(Request $request)
     {
         try {
-            Order::where('id', $id)->delete();
+            Order::where('id', (int)$request->id)->delete();
             Mail::to(auth()->user()->email)->send(new Cancellations());
             return response()->json(['message' => 'Order successfully deleted!'], 200);
         }catch (Exception $e){

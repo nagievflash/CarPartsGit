@@ -39,6 +39,12 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
+                    <a href="{{Route('users.list')}}" class='sidebar-link'>
+                        <i class="bi bi-box"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a href="{{Route('products.list')}}" class='sidebar-link'>
                         <i class="bi bi-box"></i>
                         <span>Products</span>
