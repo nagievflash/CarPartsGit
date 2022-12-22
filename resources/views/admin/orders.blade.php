@@ -23,11 +23,23 @@
                 <div class="card-body">
                     <div id="alert" class="alert" role="alert"></div>
                     <div class="col-md-6 mb-1">
-                        <form action="/admin/orders" method="GET" class="input-group mb-3 align-items-center">
+                        <div class="input-group mb-3 align-items-center">
                             @csrf
-                            <input type="text" class="form-control" placeholder="Search by order id" aria-label="Search by order id" name="search" value="{{ app('request')->input('search') }}">
-                            <button class="btn btn-outline-secondary" type="submit">Search</button>
-                        </form>
+                            <select id="key" style="margin-right: 3%" class="form-select">
+                                <option @php if(!empty($_GET) && array_key_exists('shipping',$_GET)) echo 'selected' @endphp value="shipping" selected>Shipping</option>
+                                <option @php if(!empty($_GET) && array_key_exists('discount',$_GET)) echo 'selected' @endphp value="discount">Discount</option>
+                                <option @php if(!empty($_GET) && array_key_exists('total',$_GET)) echo 'selected' @endphp value="total">Total</option>
+                                <option @php if(!empty($_GET) && array_key_exists('total_quantity',$_GET)) echo 'selected' @endphp value="total_quantity">Total_quantity</option>
+                                <option @php if(!empty($_GET) && array_key_exists('tax',$_GET)) echo 'selected' @endphp value="tax">Tax</option>
+                                <option @php if(!empty($_GET) && array_key_exists('status',$_GET)) echo 'selected' @endphp value="status">Status</option>
+                            </select>
+                            <select id="sort" style="margin-right: 3%" class="form-select">
+                                <option @php if(!empty($_GET) && in_array('asc',$_GET)) echo 'selected' @endphp value="asc" selected>Ascending</option>
+                                <option @php if(!empty($_GET) && in_array('desc',$_GET)) echo 'selected' @endphp value="desc">Descending</option>
+                            </select>
+                            <input id="value" type="text" class="form-control" style="width: 150px" placeholder="Sort by selected attribute" aria-label="Sort by selected attribute" name="name" value="{{ app('request')->input('search') }}">
+                            <button class="btn submit btn-outline-secondary" type="submit">Search</button>
+                        </div>
                     </div>
                     <table class="table table-striped" id="table1">
                         <thead>
@@ -71,6 +83,12 @@
     <x-slot name="scripts">
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
         <script>
+            $(document).on('click', '.submit', function(e){
+                e.preventDefault();
+                var baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                var newUrl = baseUrl + '?sort=' + $("#sort").val() + '&' + $("#key").val() + '=' + $("#value").val();
+                location.href = newUrl
+            });
             $(document).on('click', '.order_delete', function(e){
                 $.ajax({
                     url: '{{Route('order.delete')}}',

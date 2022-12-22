@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin\Filter\Query\UserFilter;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -20,9 +21,9 @@ class UsersController extends Controller
      * @param Request $request
      * @return Application|Factory|View
      */
-    public function index(Request $request): View|Factory|Application
+    public function index(UserFilter $filter): View|Factory|Application
     {
-        $users = User::orderBy('id', 'asc')->paginate(8);
+        $users = User::filter($filter)->orderBy('id', 'asc')->paginate(8);
         return view('admin.users')->with('users', $users);
     }
 
