@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Admin\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 class Product extends Model
 {
     use HasFactory;
+    use Filterable;
 
     /**
      * The attributes that are mass assignable.

@@ -21,6 +21,22 @@
             <div class="card">
                 <div class="card-body">
                     <div id="alert" class="alert" role="alert"></div>
+                    <div class="col-md-6 mb-1">
+                        <div class="input-group mb-3 align-items-center">
+                            @csrf
+                            <select id="key" style="margin-right: 3%" class="form-select">
+                                <option @php if(!empty($_GET) && array_key_exists('id',$_GET)) echo 'selected' @endphp value="id" selected>Id</option>
+                                <option @php if(!empty($_GET) && array_key_exists('type',$_GET)) echo 'selected' @endphp value="type">Type</option>
+                                <option @php if(!empty($_GET) && array_key_exists('value',$_GET)) echo 'selected' @endphp value="value">Value</option>
+                            </select>
+                            <select id="sort" style="margin-right: 3%" class="form-select">
+                                <option @php if(!empty($_GET) && in_array('asc',$_GET)) echo 'selected' @endphp value="asc" selected>Ascending</option>
+                                <option @php if(!empty($_GET) && in_array('desc',$_GET)) echo 'selected' @endphp value="desc">Descending</option>
+                            </select>
+                            <input id="value" type="text" class="form-control" style="width: 150px" placeholder="Sort by selected attribute" aria-label="Sort by selected attribute" name="name" value="{{ app('request')->input('search') }}">
+                            <button class="btn submit btn-outline-secondary" type="submit">Search</button>
+                        </div>
+                    </div>
                     <table class="table table-striped" id="table1">
                         <thead>
                         <tr>
@@ -55,6 +71,12 @@
     <x-slot name="scripts">
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
         <script>
+            $(document).on('click', '.submit', function(e){
+                e.preventDefault();
+                var baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                var newUrl = baseUrl + '?sort=' + $("#sort").val() + '&' + $("#key").val() + '=' + $("#value").val();
+                location.href = newUrl
+            });
             $(document).on('click', '.backlog_delete', function(e){
                 $.ajax({
                     url: '{{Route('backlog.delete')}}',
