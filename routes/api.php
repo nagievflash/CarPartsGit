@@ -48,8 +48,6 @@ use App\Models\PendingReceipt;
 |
 */
 
-
-
 Route::get('/products', function (Request $request) {
     if ($request->has('search')) {
         $products = Product::where("sku", $request->get("search"))
@@ -481,6 +479,21 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             $user->save();
 
             return $address->toJson(JSON_PRETTY_PRINT);
+        }catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    });
+
+    Route::post('/update-subscription', function (Request $request) {
+        try {
+            $user = $request->user();
+
+            PendingReceipt::create(
+                [
+                    'product_id' => $request->get("product_id"),
+                    'email'      => $user->email,
+                ]);
+            return response()->json(['message' => 'You have successfully subscribed to updates!'], 200);
         }catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }

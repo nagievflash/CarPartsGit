@@ -22,7 +22,7 @@ class UsersController extends Controller
      */
     public function index(Request $request): View|Factory|Application
     {
-        $users = User::all();
+        $users = User::orderBy('id', 'asc')->paginate(8);
         return view('admin.users')->with('users', $users);
     }
 

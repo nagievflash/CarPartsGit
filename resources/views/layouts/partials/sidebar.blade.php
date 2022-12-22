@@ -99,6 +99,12 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
+                    <a href="{{Route('backlogs.list')}}" class='sidebar-link'>
+                        <i class="bi bi-gear"></i>
+                        <span>Backlogs</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a href="/horizon" class='sidebar-link' target="_blank">
                         <i class="bi bi-card-checklist"></i>
                         <span class="text-danger">Horizon</span>

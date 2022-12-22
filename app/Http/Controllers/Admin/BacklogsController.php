@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Models\Backlog;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\Cancellations;
 use Exception;
+use Illuminate\Support\Facades\Hash;
 
-class OrdersController extends Controller
+class BacklogsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -22,8 +22,8 @@ class OrdersController extends Controller
      */
     public function index(Request $request): View|Factory|Application
     {
-        $orders = Order::orderBy('id', 'asc')->paginate(8);
-        return view('admin.orders')->with('products', $orders);
+        $backlogs = Backlog::orderBy('id', 'asc')->paginate(8);
+        return view('admin.backlogs')->with('backlogs', $backlogs);
     }
 
     /**
@@ -49,12 +49,10 @@ class OrdersController extends Controller
      * Display the specified resource.
      *
      * @param int $id
-     * @return Factory|View|Application
      */
-    public function show(string $id): Factory|View|Application
+    public function show(string $id)
     {
-        $order = Order::where('id', $id)->get()->first();
-        return view('admin.order')->with('order', $order);
+        //
     }
 
     /**
@@ -75,14 +73,7 @@ class OrdersController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        try {
-            Order::where('id', $id)->update([
-                'status' => $request->status
-            ]);
-            return response()->json(['message' => 'Order successfully modified'], 200);
-        }catch (Exception $e){
-            return response()->json(['message' => $e->getMessage()], 422);
-        }
+       //
     }
 
     /**
@@ -93,9 +84,8 @@ class OrdersController extends Controller
     public function destroy(Request $request)
     {
         try {
-            Order::where('id', (int)$request->id)->delete();
-            Mail::to(auth()->user()->email)->send(new Cancellations());
-            return response()->json(['message' => 'Order successfully deleted!'], 200);
+            Backlog::where('id', (int)$request->id)->delete();
+            return response()->json(['message' => 'Log successfully deleted!'], 200);
         }catch (Exception $e){
             return response()->json(['message' => $e->getMessage()], 422);
         }

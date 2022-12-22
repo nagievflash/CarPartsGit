@@ -32,6 +32,10 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
         return view('admin.dashboard');
     })->name('dashboard');
 
+    //Backlogs
+    Route::get('/backlogs',  [App\Http\Controllers\Admin\BacklogsController::class, 'index'])->name('backlogs.list');
+    Route::delete('/backlogs',  [App\Http\Controllers\Admin\BacklogsController::class, 'destroy'])->name('backlog.delete');
+
     //Orders
     Route::get('/orders',  [App\Http\Controllers\Admin\OrdersController::class, 'index'])->name('orders.list');
     Route::get('/orders/edit/{id}',  [App\Http\Controllers\Admin\OrdersController::class, 'edit'])->name('order.edit');

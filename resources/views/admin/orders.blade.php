@@ -59,6 +59,7 @@
                                     <td><button type="button" data-id="{{$order->id}}" class="btn btn-danger order_delete">Delete</button></td>
                                 </tr>
                             @endforeach
+                            {{ $orders->links() }}
                         @endif
                         </tbody>
                     </table>
