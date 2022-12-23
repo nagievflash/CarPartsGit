@@ -22,7 +22,7 @@ class OrdersController extends Controller
      */
     public function index(Request $request): View|Factory|Application
     {
-        $orders = Order::orderBy('id', 'asc')->paginate(8);
+        $orders = Order::orderBy('id', 'desc')->paginate(8);
         return view('admin.orders')->with('products', $orders);
     }
 

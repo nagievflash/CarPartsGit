@@ -22,7 +22,7 @@ class BacklogsController extends Controller
      */
     public function index(Request $request): View|Factory|Application
     {
-        $backlogs = Backlog::orderBy('id', 'asc')->paginate(8);
+        $backlogs = Backlog::orderBy('id', 'desc')->paginate(8);
         return view('admin.backlogs')->with('backlogs', $backlogs);
     }
 

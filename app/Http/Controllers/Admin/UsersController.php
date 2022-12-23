@@ -23,7 +23,7 @@ class UsersController extends Controller
      */
     public function index(UserFilter $filter): View|Factory|Application
     {
-        $users = User::filter($filter)->orderBy('id', 'asc')->paginate(8);
+        $users = User::filter($filter)->orderBy('id', 'desc')->paginate(8);
         return view('admin.users')->with('users', $users);
     }
 
