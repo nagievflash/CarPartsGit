@@ -57,9 +57,8 @@ trait ReviseFixedPriceItem
             }
             rsort($fitmentItems);
 
-            $priceWH = Warehouse::where('sku', $listing->product->sku)->where('supplier_id', 1)->first()->price;
+            $price = $listing->getPrice();
 
-            $price = $priceWH + $priceWH  * $this->shop->percent / 100;
             $stock = ($listing->product->qty - $this->shop->qty_reserve) > 0 ? $listing->product->qty - $this->shop->qty_reserve : 0;
             if ($stock > $this->shop->max_qty) $stock = $this->shop->max_qty;
 

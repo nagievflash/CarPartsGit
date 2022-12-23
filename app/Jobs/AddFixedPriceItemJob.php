@@ -7,12 +7,14 @@ use App\Models\Backlog;
 use App\Models\EbayListing;
 use App\Models\Product;
 use App\Models\Shop;
+use App\Models\Warehouse;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
 class AddFixedPriceItemJob implements ShouldQueue
@@ -51,8 +53,18 @@ class AddFixedPriceItemJob implements ShouldQueue
                 $ebaylisting = EbayListing::create([
                     'sku'       => $this->product->sku,
                     'ebay_id'   => $body->ItemID,
-                    'type'      => $this->shop
+                    'type'      => 'single',
+                    'shop'      => $this->shop,
                 ]);
+
+                DB::table('listing_partslink')->insert([
+                    'listing_id'    => $ebaylisting->id,
+                    'partslink'     => $this->product->sku,
+                    'quantity'      => 1,
+                ]);
+
+                $ebaylisting->updatePrice();
+
                 $ebayUploader->reviseFixedPriceItem($ebaylisting);
             }
         }
