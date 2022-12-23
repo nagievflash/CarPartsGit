@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Admin\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @method create(array $array)
@@ -38,5 +39,10 @@ class Order extends Model
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function paymentSystem():HasOne
+    {
+        return $this->hasOne(PaymentSystem::class,'id','payment_system_id');
     }
 }

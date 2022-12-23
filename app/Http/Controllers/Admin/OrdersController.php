@@ -77,7 +77,8 @@ class OrdersController extends Controller
     {
         try {
             Order::where('id', $id)->update([
-                'status' => $request->status
+                'status' => $request->status,
+                'note'   => $request->note,
             ]);
             return response()->json(['message' => 'Order successfully modified'], 200);
         }catch (Exception $e){
