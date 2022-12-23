@@ -49,6 +49,7 @@
                             <th>Total</th>
                             <th>Total_quantity</th>
                             <th>Tax</th>
+                            <th>Note</th>
                             <th>Created_at</th>
                             <th>Updated_at</th>
                             <th></th>
@@ -65,6 +66,7 @@
                                     <td>{{$order->total}}</td>
                                     <td>{{$order->total_quantity}}</td>
                                     <td>{{$ordert->tax}}</td>
+                                    <td>{{$ordert->note}}</td>
                                     <td>{{$order->created_at}}</td>
                                     <td>{{$order->updated_at}}</td>
                                     <td><a href="{{Route('order.edit',$order->id)}}" class='sidebar-link'><button type="button" class="btn btn-secondary order_edit">Edit</button></a></td>
