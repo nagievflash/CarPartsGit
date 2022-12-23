@@ -6,6 +6,7 @@ use App\Models\Attribute;
 use App\Models\Backlog;
 use App\Models\Compatibility;
 use App\Models\EbayListing;
+use App\Models\Warehouse;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Str;
@@ -56,7 +57,9 @@ trait ReviseFixedPriceItem
             }
             rsort($fitmentItems);
 
-            $price = $listing->product->price + $listing->product->price  * $this->shop->percent / 100;
+            $priceWH = Warehouse::where('sku', $listing->product->sku)->where('supplier_id', 1)->first()->price;
+
+            $price = $priceWH + $priceWH  * $this->shop->percent / 100;
             $stock = ($listing->product->qty - $this->shop->qty_reserve) > 0 ? $listing->product->qty - $this->shop->qty_reserve : 0;
             if ($stock > $this->shop->max_qty) $stock = $this->shop->max_qty;
 

@@ -5,6 +5,7 @@ namespace App\Helpers\Ebay;
 use App\Models\Attribute;
 use App\Models\Compatibility;
 use App\Models\Product;
+use App\Models\Warehouse;
 use GuzzleHttp\Promise\PromiseInterface;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Str;
@@ -84,8 +85,8 @@ trait AddFixedPriceItem
                 'positions'      => $positions,
                 'images'        => explode(',', $product->images)
             ])->render();
-
-            $price = $product->price + $product->price  * $this->shop->percent / 100;
+            $priceWH = Warehouse::where('sku', $product->sku)->where('supplier_id', 1)->first()->price;
+            $price =  $priceWH + $priceWH  * $this->shop->percent / 100;
             $stock = ($product->qty - $this->shop->qty_reserve) > 0 ? $product->qty - $this->shop->qty_reserve : 0;
             if ($stock > $this->shop->max_qty) $stock = $this->shop->max_qty;
 

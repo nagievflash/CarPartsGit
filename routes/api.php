@@ -123,7 +123,8 @@ Route::get('/categories/{year}/{make}/{model}/{submodel?}', function ($year, $ma
             ->where('model_name', $model)
             ->where('submodel_name', $submodel)
             ->orderBy('part_name')
-            ->distinct()->get();
+            ->distinct()
+            ->get();
     }
     else {
         return DB::table('filters')
@@ -132,7 +133,8 @@ Route::get('/categories/{year}/{make}/{model}/{submodel?}', function ($year, $ma
             ->where('make_name', $make)
             ->where('model_name', $model)
             ->orderBy('part_name')
-            ->distinct()->get();
+            ->distinct()
+            ->get();
     }
 });
 
