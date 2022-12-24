@@ -43,10 +43,10 @@ class UpdateListingsImport implements ToModel, WithHeadingRow, WithChunkReading,
      */
     public function model(array $row)
     {
-        if (isset($row['sku'])) $listing = EbayListing::where('sku', $row['sku']);
-        if (isset($row['listing_id'])) $listing = EbayListing::where('ebay_id', $row['listing_id']);
+        $listing = EbayListing::where('sku', $row['sku'])->firstOrFail();
+        //if (isset($row['listing_id'])) $listing = EbayListing::where('ebay_id', $row['listing_id']);
 
-        dispatch(new UpdateListingImagesJob($listing->first()));
+        dispatch(new UpdateListingImagesJob($listing));
     }
 
     public function chunkSize(): int
