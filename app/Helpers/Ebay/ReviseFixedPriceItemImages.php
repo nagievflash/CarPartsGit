@@ -39,7 +39,7 @@ trait ReviseFixedPriceItemImages
             if ($httpCode == 200) {
                 $images[] = $file;
             } else {
-                $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . explode('-', $product->sku)[0] . '_' . $i;
+                $file = 'https://res.cloudinary.com/us-auto-parts-network-inc/image/upload/images/' . explode('-', $listing->sku)[0] . '_' . $i;
                 $ch = curl_init($file);
                 curl_setopt($ch, CURLOPT_NOBODY, true);
                 curl_exec($ch);
