@@ -20,7 +20,6 @@ trait RenderImageSpecifications
     {
         $contents = file_get_contents($imageUrl);
         $url = 'images/ebay/'. substr($imageUrl, strrpos($imageUrl, '/') + 1) . '_' . $type . '.jpg';
-        $imageName = substr($imageUrl, strrpos($imageUrl, '/') + 1) . '_' . $type;
         file_put_contents(public_path($url), $contents);
 
         $img = Image::make(public_path($url));
