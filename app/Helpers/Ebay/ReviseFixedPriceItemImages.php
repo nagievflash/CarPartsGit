@@ -105,7 +105,7 @@ trait ReviseFixedPriceItemImages
         $xmlWriter->writeElement('GalleryType', 'Gallery');
         $xmlWriter->writeElement('PhotoDisplay', 'PicturePack');
 
-        foreach (explode(',', $product->images) as $image) {
+        foreach ($images as $image) {
             $xmlWriter->writeElement('PictureURL', $image); //NEED SOME URLS
         }
 
