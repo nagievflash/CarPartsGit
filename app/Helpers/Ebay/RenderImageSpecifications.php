@@ -21,9 +21,9 @@ trait RenderImageSpecifications
 
         $img = Image::make(public_path($url));
         $watermark = Image::make(public_path('images/bg/watermark_'.$type.'.png'));
-        $canvas = Image::canvas(1200, 1200);
+        $canvas = Image::canvas(1500, 1500);
 
-        $img->resize(1200, 1200, function($constraint)
+        $img->resize(1500, 1500, function($constraint)
         {
             $constraint->aspectRatio();
         });
