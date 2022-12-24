@@ -77,8 +77,8 @@ trait ReviseFixedPriceItemImages
             'title'         => $product->getTitle(),
             'fitments'      => $fitmentItems,
             'attributes'    => $attributes,
-            'positions'      => $positions,
-            'images'        => explode(',', $product->images)
+            'positions'     => $positions,
+            'images'        => $images
         ])->render();
 
         $stock = ($listing->getQuantity() - $this->shop->qty_reserve) > 0 ? $listing->getQuantity() - $this->shop->qty_reserve : 0;
