@@ -43,10 +43,11 @@ class UpdateListingsImport implements ToModel, WithHeadingRow, WithChunkReading,
      */
     public function model(array $row)
     {
-        $listing = EbayListing::where('sku', $row['sku'])->firstOrFail();
-        //if (isset($row['listing_id'])) $listing = EbayListing::where('ebay_id', $row['listing_id']);
-
-        dispatch(new UpdateListingImagesJob($listing));
+        $listing = EbayListing::where('sku', $row['sku']);
+        if ($listing->exists()) {
+            dispatch(new UpdateListingImagesJob($listing->first()));
+        }
+        else Backlog::createBacklog('error 404', $row['sku']);
     }
 
     public function chunkSize(): int
@@ -66,6 +67,5 @@ class UpdateListingsImport implements ToModel, WithHeadingRow, WithChunkReading,
 
     public static function afterImport(AfterImport $event)
     {
-        Backlog::createBacklog('importInventory', 'Supplier 1 inventory csv file imported successful');
     }
 }

@@ -37,6 +37,6 @@ class UpdateListingImagesJob implements ShouldQueue
     public function handle()
     {
         $ebayUploader = new EbayHelper(Shop::where('slug', $this->listing->type)->first());
-        $ebayUploader->reviseFixedPriceItem($this->listing);
+        $ebayUploader->reviseFixedPriceItemImages($this->listing);
     }
 }
