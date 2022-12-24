@@ -3,9 +3,6 @@
 namespace App\Helpers\Ebay;
 
 use Intervention\Image\Facades\Image;
-use XMLWriter;
-use Exception;
-use App\Jobs\RenderProductImagesJob;
 
 trait RenderImageSpecifications
 {
@@ -32,7 +29,7 @@ trait RenderImageSpecifications
         });
 
         if ($type == 'ebay4') $canvas->insert($img, 'center', 0, 100);
-        else $canvas->insert($img, 'center', 0, 0);
+        else $canvas->insert($img, 'center');
 
         $canvas->insert($watermark, 'center');
         $canvas->save(public_path($url));
