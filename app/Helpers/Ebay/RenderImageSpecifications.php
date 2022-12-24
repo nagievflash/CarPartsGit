@@ -22,7 +22,7 @@ trait RenderImageSpecifications
         $url = 'images/ebay/'. substr($imageUrl, strrpos($imageUrl, '/') + 1) . '_' . $type . '1.jpg';
         file_put_contents(public_path($url), $contents);
 
-        /*$img = Image::make(public_path($url));
+        $img = Image::make(public_path($url));
         $watermark = Image::make(public_path('images/bg/watermark_'.$type.'.png'));
         $canvas = Image::canvas(1200, 1200);
 
@@ -35,7 +35,7 @@ trait RenderImageSpecifications
         else $canvas->insert($img, 'center', 0, 0);
 
         $canvas->insert($watermark, 'center');
-        $canvas->save(public_path($url));*/
+        $canvas->save(public_path($url));
 
         return env('APP_URL') . '/' . $url;
     }
