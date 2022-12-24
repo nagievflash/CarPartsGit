@@ -10,6 +10,7 @@ use App\Helpers\Ebay\GetSuggestedCategories;
 use App\Helpers\Ebay\RenderImageSpecifications;
 use App\Helpers\Ebay\ReviseFixedPriceItem;
 use App\Helpers\Ebay\RemoveItemCompatibility;
+use App\Helpers\Ebay\ReviseFixedPriceItemImages;
 use App\Helpers\Ebay\UpdateInventoryPricing;
 use App\Helpers\Ebay\ReviseFixedPriceItemAllModels;
 use App\Models\Shop;
@@ -30,7 +31,8 @@ class EbayHelper {
         GetCompatibilityEnginesFromEbay,
         GetSuggestedCategories,
         GetItem,
-        ReviseFixedPriceItemAllModels;
+        ReviseFixedPriceItemAllModels,
+        ReviseFixedPriceItemImages;
 
     private string $url;
 

@@ -9,6 +9,7 @@ use App\Imports\InventoryImport;
 use App\Imports\InventoryImportJC;
 use App\Imports\LKQPackageImport;
 use App\Imports\UpdateEbayListingIDImport;
+use App\Imports\UpdateListingsImport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -126,6 +127,21 @@ class RequestController extends Controller
         $file = $request->file('csv-import');
         Storage::disk('local')->putFileAs('/files/', $file, 'inventoryJC.csv');
         Excel::queueImport(new InventoryImportJC, storage_path().'/app/files/inventoryJC.csv');
+
+        return redirect()->back()->with('success', 'The Job started successfully!');
+    }
+
+    /**
+     * Upload to Ebay with sku
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function importListings(Request $request): RedirectResponse
+    {
+        $file = $request->file('csv-import');
+
+        Storage::disk('local')->putFileAs('/files/', $file, 'listings.csv');
+        Excel::queueImport(new UpdateListingsImport, storage_path().'/app/files/listings.csv');
 
         return redirect()->back()->with('success', 'The Job started successfully!');
     }
