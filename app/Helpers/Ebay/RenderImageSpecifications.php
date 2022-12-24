@@ -16,7 +16,7 @@ trait RenderImageSpecifications
     public function renderImageSpecifications($imageUrl, $type): string
     {
         $contents = file_get_contents($imageUrl);
-        $url = 'images/ebay/'. substr($imageUrl, strrpos($imageUrl, '/') + 1) . '_' . $type . '.jpg';
+        $url = 'images/ebay/'. substr($imageUrl, strrpos($imageUrl, '/') + 1) . '_new_' . $type . '.jpg';
         file_put_contents(public_path($url), $contents);
 
         $img = Image::make(public_path($url));
