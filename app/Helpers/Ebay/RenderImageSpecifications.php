@@ -25,7 +25,7 @@ trait RenderImageSpecifications
 
         shell_exec('mogrify -write ' . public_path($url) . '  -resize ' . '1200' . 'x' . '1200' . ' -gravity center -extent ' . '1200' . 'x' . '1200' . ' -background none -quality 100 -strip -colorspace sRGB ' . public_path($url));
         shell_exec('optipng -o2 -strip all ' . public_path($url));
-        shell_exec('COMPOSITE=/usr/bin/composite $COMPOSITE -gravity SouthEast ' . public_path('images/bg/watermark_'.$type.'.png') . public_path($url) . public_path($url));
+        shell_exec('composite -compose bumpmap -gravity center ' . public_path('images/bg/watermark_'.$type.'.png')  . ' '  . public_path($url) . ' '  . public_path($url));
 
 //        $img = Image::make(public_path($url));
 //        $watermark = Image::make(public_path('images/bg/watermark_'.$type.'.png'));
