@@ -101,7 +101,7 @@ trait ReviseFixedPriceItemImages
         $xmlWriter->writeElement('Quantity', $stock);
         if ($stock != 0) $xmlWriter->writeElement('StartPrice', $price);
 
-        $xmlWriter->startElement('PictureDetails');
+        /*$xmlWriter->startElement('PictureDetails');
         $xmlWriter->writeElement('GalleryType', 'Gallery');
         $xmlWriter->writeElement('PhotoDisplay', 'PicturePack');
 
@@ -109,7 +109,7 @@ trait ReviseFixedPriceItemImages
             $xmlWriter->writeElement('PictureURL', $image); //NEED SOME URLS
         }
 
-        $xmlWriter->endElement();
+        $xmlWriter->endElement();*/
 
         $xmlWriter->startElement('Description');  // Need HTML Template
         $xmlWriter->text($template);
