@@ -87,9 +87,9 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
-                    <a href="{{Route('updateListingId')}}" class='sidebar-link'>
+                    <a href="{{Route('updateListings')}}" class='sidebar-link'>
                         <i class="bi bi-card-checklist"></i>
-                        <span>Update Listings IDs</span>
+                        <span>Update Listings</span>
                     </a>
                 </li>
                 <li class="sidebar-item">

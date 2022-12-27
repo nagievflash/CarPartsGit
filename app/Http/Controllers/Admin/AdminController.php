@@ -115,6 +115,15 @@ class AdminController extends Controller
         return view('admin.updateListingId');
     }
 
+    /**
+     * @param Request $request
+     * @return Factory|View|Application
+     */
+    public function updateListings(Request $request): Factory|View|Application
+    {
+        return view('admin.updateListings');
+    }
+
 
     /**
      * Category Imports Page
