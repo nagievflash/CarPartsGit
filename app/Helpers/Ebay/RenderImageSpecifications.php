@@ -3,10 +3,6 @@
 namespace App\Helpers\Ebay;
 
 use Imagick;
-use Intervention\Image\Facades\Image;
-use XMLWriter;
-use Exception;
-use App\Jobs\RenderProductImagesJob;
 
 trait RenderImageSpecifications
 {
@@ -16,6 +12,7 @@ trait RenderImageSpecifications
      * @param $imageUrl
      * @param $type
      * @return string
+     * @throws \ImagickException
      */
     public function renderImageSpecifications($imageUrl, $type): string
     {
@@ -33,13 +30,13 @@ trait RenderImageSpecifications
         $w = $im->getImageWidth();
         $h = $im->getImageHeight();
 
-        $off_top=0;
-        $off_left=0;
+        $off_top  = 0;
+        $off_left = 0;
 
-        if($w > $h){
-            $off_top = ((1200-$h)/2) * -1;
-        }else{
-            $off_left = ((1200-$w)/2) * -1;
+        if ($w > $h) {
+            $off_top  = ((1200 - $h) / 2) * -1;
+        } else{
+            $off_left = ((1200 - $w) / 2) * -1;
         }
 
         $im->extentImage(1200,1200, $off_left, $off_top);
@@ -53,16 +50,6 @@ trait RenderImageSpecifications
         $im->compositeImage($watermark, Imagick::COMPOSITE_OVER, $x, $y);
 
         $im->writeImage(public_path($url));
-
-        /*$img = Image::make(public_path($url));
-        $watermark = Image::make(public_path('images/bg/watermark_'.$type.'.png'));
-        $canvas = Image::canvas(1200, 1200);
-
-        if ($type == 'ebay4') $canvas->insert($img, 'center', 0, 100);
-        else $canvas->insert($img, 'center', 0, 0);
-
-        $canvas->insert($watermark, 'center');
-        $canvas->save(public_path($url));*/
 
         return env('APP_URL') . '/' . $url;
     }
