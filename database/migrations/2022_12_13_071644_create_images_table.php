@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('images', function (Blueprint $table) {
             $table->increments('id');
             $table->morphs('item');
+            $table->string('sku')->nullable();
             $table->string('url')->nullable();
             $table->string('small')->nullable();
             $table->string('medium')->nullable();

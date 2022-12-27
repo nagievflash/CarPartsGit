@@ -39,9 +39,21 @@
                     </a>
                 </li>
                 <li class="sidebar-item">
+                    <a href="{{Route('users.list')}}" class='sidebar-link'>
+                        <i class="bi bi-box"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
                     <a href="{{Route('products.list')}}" class='sidebar-link'>
                         <i class="bi bi-box"></i>
                         <span>Products</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{Route('orders.list')}}" class='sidebar-link'>
+                        <i class="bi bi-box"></i>
+                        <span>Orders</span>
                     </a>
                 </li>
                 <li class="sidebar-item">
@@ -84,6 +96,12 @@
                     <a href="{{Route('settings')}}" class='sidebar-link'>
                         <i class="bi bi-gear"></i>
                         <span>Settings</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a href="{{Route('backlogs.list')}}" class='sidebar-link'>
+                        <i class="bi bi-gear"></i>
+                        <span>Backlogs</span>
                     </a>
                 </li>
                 <li class="sidebar-item">

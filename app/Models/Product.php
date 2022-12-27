@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Admin\Filter\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Builder;
 class Product extends Model
 {
     use HasFactory;
+    use Filterable;
 
     /**
      * The attributes that are mass assignable.
@@ -73,6 +75,14 @@ class Product extends Model
     {
         if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
             return (float) Warehouse::where('sku', $this->sku)->first()->shipping + Warehouse::where('sku', $this->sku)->first()->shipping / 4;
+        }
+        else return 0;
+    }
+
+    public function setImagesAttribute($value)
+    {
+        if (Warehouse::where('sku', $this->sku)->where('supplier_id', 1)->exists()) {
+            return Images::where('sku', $this->sku)->get();
         }
         else return 0;
     }

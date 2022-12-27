@@ -32,6 +32,25 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
         return view('admin.dashboard');
     })->name('dashboard');
 
+    //Backlogs
+    Route::get('/backlogs',  [App\Http\Controllers\Admin\BacklogsController::class, 'index'])->name('backlogs.list');
+    Route::delete('/backlogs',  [App\Http\Controllers\Admin\BacklogsController::class, 'destroy'])->name('backlog.delete');
+
+    //Orders
+    Route::get('/orders',  [App\Http\Controllers\Admin\OrdersController::class, 'index'])->name('orders.list');
+    Route::get('/orders/edit/{id}',  [App\Http\Controllers\Admin\OrdersController::class, 'edit'])->name('order.edit');
+    Route::put('/orders/{id}',  [App\Http\Controllers\Admin\OrdersController::class, 'update'])->name('order.update');
+    Route::delete('/orders',  [App\Http\Controllers\Admin\OrdersController::class, 'destroy'])->name('order.delete');
+
+    //Users
+    Route::get('/users',  [App\Http\Controllers\Admin\UsersController::class, 'index'])->name('users.list');
+    Route::get('/users/edit/{id}',  [App\Http\Controllers\Admin\UsersController::class, 'edit'])->name('user.edit');
+    Route::put('/users/{id}',  [App\Http\Controllers\Admin\UsersController::class, 'update'])->name('user.update');
+    Route::post('/users/{id}',  [App\Http\Controllers\Admin\UsersController::class, 'updatePassword'])->name('user.password-update');
+    Route::delete('/users',  [App\Http\Controllers\Admin\UsersController::class, 'destroy'])->name('user.delete');
+
+    //Products
+
     Route::get('/import',  [App\Http\Controllers\Admin\AdminController::class, 'importProductsFromCSV'])->name('import');
     Route::get('/import/products/custom',  [App\Http\Controllers\Admin\AdminController::class, 'ebayUpload'])->name('ebayUpload');
     Route::get('/import/fitments/',  [App\Http\Controllers\Admin\AdminController::class, 'importFitments'])->name('importFitments');

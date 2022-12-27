@@ -11,6 +11,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Cashier\Billable;
 use function Illuminate\Events\queueable;
+use App\Models\Admin\Filter\Filterable;
 
 class User extends Authenticatable
 {
@@ -18,6 +19,7 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
     use Billable;
+    use Filterable;
 
     public function orders()
     {
@@ -79,6 +81,4 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'billing_address'   => 'array',
     ];
-
-
 }

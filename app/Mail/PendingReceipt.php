@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class Welcome extends Mailable
+class PendingReceipt extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -15,9 +15,12 @@ class Welcome extends Mailable
      *
      * @return void
      */
-    public function __construct()
+
+    public array $product;
+
+    public function __construct($product)
     {
-        //
+        $this->product = $product;
     }
 
     /**
@@ -29,7 +32,7 @@ class Welcome extends Mailable
     {
         return $this
             ->from($address = env('MAIL_USERNAME'), $name = env('APP_NAME'))
-            ->subject('Welcome')
-            ->view('mail.welcome',[]);
+            ->subject('PendingReceipt')
+            ->view('mail.pending_receipt',$this->product);
     }
 }

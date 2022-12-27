@@ -36,13 +36,24 @@
                             </ul>
                         </div>
                     @endif
-                    <div class="col-md-6 mb-1">
-                        <form action="/admin/products" method="GET" class="input-group mb-3 align-items-center">
-                            @csrf
-                            <input type="text" class="form-control" placeholder="Search by product sku or partslink" aria-label="Search by product sku or partslink" name="search" value="{{ app('request')->input('search') }}">
-                            <button class="btn btn-outline-secondary" type="submit">Search</button>
-                        </form>
-                    </div>
+                        <div class="col-md-6 mb-1">
+                            <div class="input-group mb-3 align-items-center">
+                                @csrf
+                                <select id="key" style="margin-right: 3%" class="form-select">
+                                    <option @php if(!empty($_GET) && array_key_exists('title',$_GET)) echo 'selected' @endphp value="title" selected>Title</option>
+                                    <option @php if(!empty($_GET) && array_key_exists('sku',$_GET)) echo 'selected' @endphp value="sku">Sku</option>
+                                    <option @php if(!empty($_GET) && array_key_exists('price',$_GET)) echo 'selected' @endphp value="price">Price</option>
+                                    <option @php if(!empty($_GET) && array_key_exists('qty',$_GET)) echo 'selected' @endphp value="qty">Qty</option>
+                                    <option @php if(!empty($_GET) && array_key_exists('status',$_GET)) echo 'selected' @endphp value="status">Status</option>
+                                </select>
+                                <select id="sort" style="margin-right: 3%" class="form-select">
+                                    <option @php if(!empty($_GET) && in_array('asc',$_GET)) echo 'selected' @endphp value="asc" selected>Ascending</option>
+                                    <option @php if(!empty($_GET) && in_array('desc',$_GET)) echo 'selected' @endphp value="desc">Descending</option>
+                                </select>
+                                <input id="value" type="text" class="form-control" style="width: 150px" placeholder="Sort by selected attribute" aria-label="Sort by selected attribute" name="name" value="{{ app('request')->input('search') }}">
+                                <button class="btn submit btn-outline-secondary" type="submit">Search</button>
+                            </div>
+                        </div>
                     <table class="table table-striped" id="table1">
                         <thead>
                         <tr>
@@ -107,9 +118,12 @@
     <x-slot name="scripts">
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
         <script>
-            $('document').ready(function(){
-
-            })
+            $(document).on('click', '.submit', function(e){
+                e.preventDefault();
+                var baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                var newUrl = baseUrl + '?sort=' + $("#sort").val() + '&' + $("#key").val() + '=' + $("#value").val();
+                location.href = newUrl
+            });
         </script>
     </x-slot>
 </x-app-layout>
