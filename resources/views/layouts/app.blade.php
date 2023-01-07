@@ -13,6 +13,9 @@
             .remove-listing, .cursor-pointer {
                 cursor:pointer;
             }
+            .table-crm td {
+                padding:10px 0;
+            }
         </style>
     </head>
     <body>
