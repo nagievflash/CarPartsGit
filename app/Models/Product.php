@@ -130,7 +130,7 @@ class Product extends Model
 
     public function getTitleShort(): string
     {
-        $fitment = Fitment::select('make_name', 'part_name', 'model_name', 'year')->where('sku', $this->sku)->get();
+        $fitment = Compatibility::select('make_name', 'part_name', 'model_name', 'year')->where('sku', $this->sku)->get();
         $title = '';
         if ($fitment->count() > 0) {
             $items = $fitment->where('model_name', $fitment->first()->model_name)->sortBy(['year', 'asc']);

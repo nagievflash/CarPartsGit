@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
  * @property mixed $ebay_id
  * @property mixed $sku
  * @property mixed $shop
+ * @property mixed $fixed
  * @method static create(array $array)
  * @method static where(string $string, mixed $input)
  * @method static first()

@@ -84,11 +84,13 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::get('/ebay/revise',  [App\Http\Controllers\Admin\EbayController::class, 'reviseFixedPriceItem']);
     Route::get('/ebay/update_price',  [App\Http\Controllers\Admin\EbayController::class, 'updatePriceItem']);
     Route::post('/ebay/remove-listing/{id}',  [App\Http\Controllers\Admin\EbayController::class, 'removeListing']);
-    Route::post('/ebay/remove-part/{id}',  [App\Http\Controllers\Admin\EbayController::class, 'removePart']);
     Route::post('/ebay/update-listing/{id}',  [App\Http\Controllers\Admin\EbayController::class, 'updateListing']);
     Route::post('/categories/import',  [App\Http\Controllers\Admin\CategoriesController::class, 'categoriesImport']);
     Route::post('/taxes/remove/{id}',  [App\Http\Controllers\Admin\TaxesController::class, 'remove']);
     Route::post('/taxes/store',  [App\Http\Controllers\Admin\TaxesController::class, 'store']);
+    Route::post('/update-listing/{id}',  [App\Http\Controllers\Admin\ListingsController::class, 'update']);
+    Route::post('/listings/parts/add',  [App\Http\Controllers\Admin\ListingsController::class, 'storePartslink']);
+    Route::post('/listings/parts/remove/{id}',  [App\Http\Controllers\Admin\ListingsController::class, 'removePartslink']);
 
 
     Route::post('/inventory/start_inventory',  [App\Http\Controllers\Admin\RequestController::class, 'startInventory']);

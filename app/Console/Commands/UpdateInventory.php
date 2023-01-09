@@ -87,5 +87,20 @@ class UpdateInventory extends Command
             Excel::queueImport(new InventoryImportLKQ, storage_path().'/app/files/lkq_inventory.csv')->allOnQueue('lkq');
             return 'The Job started successfully!';
         }
+
+        /*if ($this->argument('supplier') == 'sap') {
+            $disk = Storage::disk('lkq');
+            $inventoryFile = '';
+            foreach ($disk->files() as $file) {
+                if (pathinfo($file, PATHINFO_EXTENSION) == 'csv') {
+                    $inventoryFile = $file;
+                }
+            }
+            if ($inventoryFile != '') Storage::disk('local')->put('files/lkq_inventory.csv', $disk->get($inventoryFile));
+            else dd('file not found');
+
+            Excel::queueImport(new InventoryImportLKQ, storage_path().'/app/files/lkq_inventory.csv')->allOnQueue('lkq');
+            return 'The Job started successfully!';
+        }*/
     }
 }

@@ -48,7 +48,7 @@
                         <tr>
                             <th></th>
                             <th>Shop</th>
-                            <th>Type</th>
+                            <th style="width:180px;">Fixed</th>
                             <th>Ebay_id</th>
                             <th>Qty</th>
                             <th>Price</th>
@@ -58,7 +58,7 @@
                         </thead>
                         <tbody>
                         @foreach ($listings as $listing)
-                            <tr>
+                            <tr class="listing-item" data-href="/admin/update-listing/{{$listing->id}}">
 
                                 <td style="text-align: center;">
                                     <div class="form-check">
@@ -70,8 +70,10 @@
                                 <td>
                                     <span class="badge bg-success">{{$listing->shop}}</span>
                                 </td>
-                                <td>
-                                    {{$listing->type}}
+                                <td style="width:180px; padding-left:13px" align="center">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input cursor-pointer" type="checkbox" name="fixed" @if ($listing->fixed) checked @endif />
+                                    </div>
                                 </td>
                                 <td>{{$listing->ebay_id}}</td>
                                 <td>{{$listing->getQuantity()}}</td>
@@ -124,6 +126,23 @@
                         },
                         type: "POST",
                         url: $(this).data('href'),
+                    })
+                    .done(function() {
+                        location.reload()
+                    });
+                })
+
+                $('input[name="fixed"]').on('change', function(e){
+                    let qty = $(this).closest('input[name="listing_quantity"]').val()
+                    let price = $(this).closest('input[name="listing_price"]').val()
+                    let fixed = $(this).closest('input[name="fixed"]').prop('checked')
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        type: "POST",
+                        data: { qty : qty, price : price, fixed : fixed },
+                        url: $(this).closest('.listing-item').data('href'),
                     })
                     .done(function() {
                         location.reload()

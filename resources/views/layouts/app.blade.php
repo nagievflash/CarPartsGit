@@ -16,6 +16,9 @@
             .table-crm td {
                 padding:10px 0;
             }
+            .ml-5 {
+                margin-left:5px;
+            }
         </style>
     </head>
     <body>

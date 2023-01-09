@@ -165,7 +165,7 @@ Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($yea
             ->where('model_name', $model)
             ->where('submodel_name', $submodel)
             ->where('part_name', $category->part_name)
-            ->isAvailable()
+            // ->isAvailable()
             ->paginate(16);
     }
     else {
@@ -175,7 +175,7 @@ Route::get('/filter/{year}/{make}/{model}/{submodel}/{category}', function ($yea
             ->where('make_name', $make)
             ->where('model_name', $model)
             ->where('part_name', $category->part_name)
-            ->isAvailable()
+            // ->isAvailable()
             ->paginate(16);
     }
     return collect(array(

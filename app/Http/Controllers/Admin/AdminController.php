@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attribute;
+use App\Models\Compatibility;
 use App\Models\EbayListing;
 use App\Models\Fitment;
 use App\Models\Shop;
@@ -69,7 +70,7 @@ class AdminController extends Controller
     {
         $product = EbayListing::first()->product()->first();
 
-        $fitments = Fitment::where('sku', $product->sku)->get();
+        $fitments = Compatibility::where('sku', $product->sku)->get();
         $attributes = Attribute::where('sku', $product->sku)->get();
 
         $result = $fitments->groupBy(['submodel_name']);

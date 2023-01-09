@@ -100,12 +100,6 @@ class EbayController extends Controller
         return 'Success deleted';
     }
 
-    public function removePart($id): string
-    {
-        DB::table('listing_partslink')->where('id', $id)->delete();
-        return 'Success deleted';
-    }
-
 
     /**
      * Update listing's price

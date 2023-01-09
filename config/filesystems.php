@@ -81,6 +81,13 @@ return [
             'username' => env('FTP_USERNAME_PF'),
             'password' => env('FTP_PASSWORD_PF'),
         ],
+
+        'sap' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_HOST_SAP'),
+            'username' => env('FTP_USERNAME_SAP'),
+            'password' => env('FTP_PASSWORD_SAP'),
+        ],
     ],
 
     /*
