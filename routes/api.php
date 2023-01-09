@@ -348,7 +348,7 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
     }catch (\Exception $e) {
         return response()->json(['message' => $e->getMessage()], 422);
     }
-})->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+})->middleware(['auth:sanctum'])->name('verification.verify');
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
