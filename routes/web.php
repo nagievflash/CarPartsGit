@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Vtiful\Kernel\Excel;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Http\Request;
+use App\Models\Setting;
 
 /*
 |--------------------------------------------------------------------------
@@ -95,8 +98,24 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
 
     Route::get('/ebay/template/{slug}', [App\Http\Controllers\Admin\AdminController::class, 'showTemplate']);
     Route::get('/ebay/listings/{ebay_id}',  [App\Http\Controllers\Admin\ListingsController::class, 'show'])->name('ebay.listing');
+
+    Route::post('/maintenance', function (Request $request) {
+        $value = $request->maintenance === 'true' ? true : false;
+        Setting::updateOrCreate(['key'=>'maintenance'],['key'=>'maintenance','value' => $value]);
+        if($value) {
+            Artisan::call('down', [
+                '--secret' => 'autoelements',
+            ]);
+        }else{
+            Artisan::call('up');
+        }
+    })->name('maintenance');
+
 });
 
+Route::get('/create-new-password', function (Request $request) {
+    // Create new password
+})->name('create.new-password');
 
 Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->post('/getSuggestedCategories',  [App\Http\Controllers\Admin\EbayController::class, 'getSuggestedCategories'])->name('getSuggestedCategories');
 Route::get('/create-payment-intent', function (Request $request) {

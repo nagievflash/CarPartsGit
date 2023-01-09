@@ -36,6 +36,7 @@ use App\Mail\Ticket;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Mail\ThanksForJoining;
 use App\Models\PendingReceipt;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -291,14 +292,6 @@ Route::post('/profile/reset', function (Request $request) {
 
 })->middleware('guest')->name('password.email');
 
-//Route::get('/reset-password/{token}', function ($token) {
-//    return view('auth.reset-password', ['token' => $token]);
-//})->middleware('guest');
-
-Route::get('/create-new-password', function (Request $request) {
-    //
-});
-
 Route::post('/create-new-password', function (Request $request) {
 
     $request->validate([
@@ -327,35 +320,6 @@ Route::post('/create-new-password', function (Request $request) {
     }
 
 });
-
-Route::get('/create-new-password', function (Request $request) {
-
-    $request->validate([
-        'token'    => 'required',
-        'email'    => 'required|email',
-        'password' => 'required|min:6',
-    ]);
-
-    try {
-        Password::reset(
-            $request->only('email', 'password', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password)
-                ])->setRememberToken(Str::random(60));
-
-                $user->save();
-
-                event(new PasswordReset($user));
-            }
-        );
-
-        return response()->json(['message' => 'successfully!'], 200);
-    }catch (Exception $e) {
-        return response()->json(['message' => $e->getMessage()], 422);
-    }
-
-})->name('create.new-password');
 
 Route::get('/user/setup-intent',  [App\Http\Controllers\Api\UserController::class, 'getSetupIntent']);
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attribute;
 use App\Models\EbayListing;
 use App\Models\Fitment;
+use App\Models\Setting;
 use App\Models\Shop;
 use App\Models\Tax;
 use Illuminate\Contracts\Foundation\Application;
@@ -58,7 +59,10 @@ class AdminController extends Controller
     public function settings(Request $request): Factory|View|Application
     {
         $shops = Shop::get();
-        return view('admin.settings')->with('shops', $shops);
+        $settings = [
+            'maintenance' => Setting::where('key', 'maintenance')->pluck('value')->first(),
+        ];
+        return view('admin.settings')->with('shops', $shops)->with('settings', $settings);
     }
 
 
