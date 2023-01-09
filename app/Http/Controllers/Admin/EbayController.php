@@ -12,6 +12,7 @@ use App\Models\Shop;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 
 class EbayController extends Controller
@@ -98,6 +99,13 @@ class EbayController extends Controller
         EbayListing::where('id', $id)->delete();
         return 'Success deleted';
     }
+
+    public function removePart($id): string
+    {
+        DB::table('listing_partslink')->where('id', $id)->delete();
+        return 'Success deleted';
+    }
+
 
     /**
      * Update listing's price

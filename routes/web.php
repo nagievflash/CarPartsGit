@@ -87,6 +87,7 @@ Route::middleware(['auth:sanctum', 'verified'])->prefix('admin')->group(function
     Route::get('/ebay/revise',  [App\Http\Controllers\Admin\EbayController::class, 'reviseFixedPriceItem']);
     Route::get('/ebay/update_price',  [App\Http\Controllers\Admin\EbayController::class, 'updatePriceItem']);
     Route::post('/ebay/remove-listing/{id}',  [App\Http\Controllers\Admin\EbayController::class, 'removeListing']);
+    Route::post('/ebay/remove-part/{id}',  [App\Http\Controllers\Admin\EbayController::class, 'removePart']);
     Route::post('/ebay/update-listing/{id}',  [App\Http\Controllers\Admin\EbayController::class, 'updateListing']);
     Route::post('/categories/import',  [App\Http\Controllers\Admin\CategoriesController::class, 'categoriesImport']);
     Route::post('/taxes/remove/{id}',  [App\Http\Controllers\Admin\TaxesController::class, 'remove']);
