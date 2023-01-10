@@ -10,6 +10,8 @@ use Laravel\Sanctum\HasApiTokens;
 use Laravel\Cashier\Billable;
 use function Illuminate\Events\queueable;
 use App\Models\Admin\Filter\Filterable;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Support\Facades\URL;
 
 class User extends Authenticatable
 {

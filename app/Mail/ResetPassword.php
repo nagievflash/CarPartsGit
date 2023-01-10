@@ -26,10 +26,10 @@ class ResetPassword extends Mailable
 
     protected function resetUrl():string
     {
-        return url(route('create.new-password', [
+        return env('APP_URL') . route('create.new-password', [
             'token' => $this->token,
             'email' =>  $this->email,
-        ], false));
+        ], false);
     }
 
     /**

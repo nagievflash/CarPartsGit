@@ -13,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use App\Models\Images;
-
+use Imagick;
 
 class RenderProductImagesJob implements ShouldQueue
 {
@@ -82,10 +82,31 @@ class RenderProductImagesJob implements ShouldQueue
                         $path = $dir .  '\\' . $filename;
 
                         if (!file_exists(storage_path('app\\' . $path))) {
-                            $resize = Image::make($image);
-                            $resize->fit($size['w'], $size['h']);
 
-                            $resize->save(Storage::path($path));
+                            $contents = file_get_contents($url);
+                            file_put_contents(public_path($path), $contents);
+
+                            $im = new Imagick(public_path($path));
+
+                            $im->trimImage(20000);
+
+                            $im->resizeImage($size['w'], $size['h'],Imagick::FILTER_LANCZOS,1, TRUE);
+                            $im->setImageBackgroundColor("white");
+
+                            $w = $im->getImageWidth();
+                            $h = $im->getImageHeight();
+
+                            $off_top  = 0;
+                            $off_left = 0;
+
+                            if ($w > $h) {
+                                $off_top  = ((1200 - $h) / 2) * -1;
+                            } else{
+                                $off_left = ((1200 - $w) / 2) * -1;
+                            }
+
+                            $im->extentImage(1200,1200, $off_left, $off_top);
+
                             $status = Storage::exists($path);
 
                             if ($status) {
