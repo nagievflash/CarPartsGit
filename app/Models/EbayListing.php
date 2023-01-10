@@ -279,7 +279,7 @@ class EbayListing extends Model
     }
 
     public function updatePrice() {
-        if ($this->fixed != 0) {
+        if ($this->fixed == 0) {
             $listingInfo = $this->getPriceGraph(true);
             $listingPrice = DB::table('listing_price')->where('listing_id', $this->id);
             $nums = $listingInfo[0]['nums'];
