@@ -38,8 +38,21 @@ class Setting extends Model
                         'redirect_uri' => env('EBAY_RUNAME'),
                     ]
                 ]);
-                Cache::put('access_token', $oauthToken->json()['access_token'], 7100);
-                return $oauthToken->json()['access_token'];
+                if ($oauthToken->getStatusCode() == 400) {
+                    $oauthToken = Http::withHeaders([
+                        'Accept' => 'application/json',
+                        'Content-Type' => 'application/x-www-form-urlencoded',
+                        'Authorization' => 'Basic ' . base64_encode(env('EBAY_APP_ID').':'.env('EBAY_SECRET')),
+                    ])->send('POST', 'https://api.ebay.com/identity/v1/oauth2/token', [
+                        'form_params' => [
+                            'grant_type' => 'client_credentials',
+                        ]
+                    ]);
+                    $oauthToken = $oauthToken->json()['access_token'];
+                }
+                else $oauthToken = $oauthToken->json()['access_token'];
+                Cache::put('access_token', $oauthToken, 7100);
+                return $oauthToken;
             } catch (\Exception $e) {
                 abort(404);
             }

@@ -55,7 +55,7 @@ trait UpdateInventoryPricing
         catch (Exception $e) {
             return 'Error while sending request to Ebay API';
         }
-        Backlog::createBacklog('update pricing', $listing->ebay_id);
+        // Backlog::createBacklog('update pricing', $listing->ebay_id);
         return $response;
     }
 }
