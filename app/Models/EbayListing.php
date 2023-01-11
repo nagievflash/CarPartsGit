@@ -88,7 +88,7 @@ class EbayListing extends Model
                         $jc = Warehouse::where('sku', $part->sku)->where('supplier_id', 3);
                         if ($jc->exists()) {
                             $jc = $jc->first();
-                            if (($jc->qty - 2) >= $item->quantity) {
+                            if (($jc->qty - 1) >= $item->quantity) {
                                 $partslinks[$key][] = array(
                                     'supplier'  => 'JC',
                                     'sku'       => $jc->sku,
