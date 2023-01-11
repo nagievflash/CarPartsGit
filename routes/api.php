@@ -37,7 +37,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Mail\ThanksForJoining;
 use App\Models\PendingReceipt;
 use Illuminate\Support\Facades\Artisan;
-
+use App\Models\Backlog;
 /*
 |--------------------------------------------------------------------------
 | API Routes

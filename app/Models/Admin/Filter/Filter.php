@@ -34,8 +34,10 @@ abstract class Filter
         $this->builder = $builder;
 
         foreach ($this->fields() as $method => $value) {
-            if (method_exists($this, $method)) {
-                call_user_func_array([$this, $method], (array)$value);
+            if(!is_null($value)){
+                if (method_exists($this, $method)) {
+                    call_user_func_array([$this, $method], (array)$value);
+                }
             }
         }
     }

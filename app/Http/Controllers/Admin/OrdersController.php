@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Cancellations;
 use Exception;
+use App\Models\Admin\Filter\Query\OrderFilter;
 
 class OrdersController extends Controller
 {
@@ -20,9 +21,9 @@ class OrdersController extends Controller
      * @param Request $request
      * @return Application|Factory|View
      */
-    public function index(Request $request): View|Factory|Application
+    public function index(OrderFilter $filter): View|Factory|Application
     {
-        $orders = Order::orderBy('id', 'desc')->paginate(8);
+        $orders = Order::filter($filter)->orderBy('id', 'desc')->paginate(8);
         return view('admin.orders')->with('products', $orders);
     }
 

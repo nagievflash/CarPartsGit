@@ -30,8 +30,8 @@
                                 <option @php if(!empty($_GET) && array_key_exists('value',$_GET)) echo 'selected' @endphp value="value">Value</option>
                             </select>
                             <select id="sort" style="margin-right: 3%" class="form-select">
-                                <option @php if(!empty($_GET) && in_array('asc',$_GET)) echo 'selected' @endphp value="asc" selected>Ascending</option>
-                                <option @php if(!empty($_GET) && in_array('desc',$_GET)) echo 'selected' @endphp value="desc">Descending</option>
+                                <option @php if(!empty($_GET) && in_array('asc',$_GET)) echo 'selected' @endphp value="asc">Ascending</option>
+                                <option @php if(!empty($_GET) && in_array('desc',$_GET)) echo 'selected' @endphp value="desc" selected>Descending</option>
                             </select>
                             <input id="value" type="text" class="form-control" style="width: 150px" placeholder="Sort by selected attribute" aria-label="Sort by selected attribute" name="name" value="{{ app('request')->input('search') }}">
                             <button class="btn submit btn-outline-secondary" type="submit">Search</button>
@@ -59,7 +59,7 @@
                                     <td><button type="button" data-id="{{$backlog->id}}" class="btn btn-danger backlog_delete">Delete</button></td>
                                 </tr>
                             @endforeach
-                            {{ $backlogs->links() }}
+                            {{ $backlogs->appends(request()->input())->links() }}
                         @endif
                         </tbody>
                     </table>

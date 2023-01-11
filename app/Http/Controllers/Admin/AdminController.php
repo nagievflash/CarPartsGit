@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin\Filter\Query\ListingFilter;
 use App\Models\Attribute;
 use App\Models\EbayListing;
 use App\Models\Fitment;
@@ -32,12 +33,9 @@ class AdminController extends Controller
      * @param Request $request
      * @return Factory|View|Application
      */
-    public function ebayListings(Request $request): Factory|View|Application
+    public function ebayListings(ListingFilter $filter): Factory|View|Application
     {
-        if ($request->has('search')) {
-            $listings = EbayListing::where("sku", $request->get("search"))->exists() ? EbayListing::where("sku", $request->get("search"))->paginate(15) : EbayListing::where("ebay_id", $request->get("search"))->paginate(15);
-        }
-        else $listings = EbayListing::paginate(15);
+        $listings = EbayListing::filter($filter)->paginate(8);
         return view('ebay.listings')->with('listings', $listings);
     }
 

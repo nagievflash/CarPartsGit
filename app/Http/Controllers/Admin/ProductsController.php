@@ -8,6 +8,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use App\Models\Admin\Filter\Query\ProductFilter;
 
 class ProductsController extends Controller
 {
@@ -17,12 +18,9 @@ class ProductsController extends Controller
      * @param Request $request
      * @return Application|Factory|View
      */
-    public function index(Request $request): View|Factory|Application
+    public function index(ProductFilter $filter): View|Factory|Application
     {
-        $products = Product::when($request->has("search"), function($q) use($request){
-            if ($q->where("sku", $request->get("search"))->exists()) return $q->where("sku", $request->get("search"));
-            else return \App\Models\Product::where("partslink", $request->get("search"));
-        })->hasFitments()->paginate(10);
+        $products = Product::filter($filter)->orderBy('id', 'desc')->hasFitments()->paginate(10);
         return view('admin.products')->with('products', $products);
     }
 

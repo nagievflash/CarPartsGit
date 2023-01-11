@@ -14,7 +14,7 @@ require( 'datatables.net' );
  * This file sets the defaults and adds options to DataTables to style its
  * controls using Bootstrap. See http://datatables.net/manual/styling/bootstrap
  * for further information.
- * 
+ *
  * Customized for Mazer theme
  */
  (function( factory ){
@@ -167,7 +167,7 @@ DataTable.ext.renderer.pageButton.bootstrap = function ( settings, host, idx, bu
 	};
 
 	// IE9 throws an 'unknown error' if document.activeElement is used
-	// inside an iframe or frame. 
+	// inside an iframe or frame.
 	var activeEl;
 
 	try {

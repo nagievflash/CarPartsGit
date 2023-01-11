@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Admin\Filter\Query\BacklogFilter;
 
 class BacklogsController extends Controller
 {
@@ -20,9 +21,9 @@ class BacklogsController extends Controller
      * @param Request $request
      * @return Application|Factory|View
      */
-    public function index(Request $request): View|Factory|Application
+    public function index(BacklogFilter $filter): View|Factory|Application
     {
-        $backlogs = Backlog::orderBy('id', 'desc')->paginate(8);
+        $backlogs = Backlog::filter($filter)->orderBy('id', 'desc')->paginate(8);
         return view('admin.backlogs')->with('backlogs', $backlogs);
     }
 
