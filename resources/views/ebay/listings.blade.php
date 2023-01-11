@@ -21,28 +21,24 @@
         <section class="section">
             <div class="card">
                 <div class="card-body">
-                    @if (\Session::has('success'))
-                        <div class="alert alert-success">
-                            <ul>
-                                <li>{!! \Session::get('success') !!}</li>
-                            </ul>
-                        </div>
-                    @endif
-
-                    @if (\Session::has('error'))
-                        <div class="alert alert-danger">
-                            <ul>
-                                <li>{!! \Session::get('error') !!}</li>
-                            </ul>
-                        </div>
-                    @endif
+                    <div id="alert" class="alert" role="alert"></div>
                     <div class="col-md-6 mb-1">
-                        <form action="{{Route('ebay.listings')}}" method="GET" class="input-group mb-3 align-items-center">
+                        <div class="input-group mb-3 align-items-center">
                             @csrf
-                            <input type="text" class="form-control" placeholder="Product SKU or Ebay Listing ID" aria-label="Product SKU" name="search" value="{{ app('request')->input('search') }}">
-                            <button class="btn btn-outline-secondary" type="submit">Search</button>
-                        </form>
+                            <select id="key" style="margin-right: 3%" class="form-select">
+                                <option @php if(!empty($_GET) && array_key_exists('id',$_GET)) echo 'selected' @endphp value="id" selected>Id</option>
+                                <option @php if(!empty($_GET) && array_key_exists('type',$_GET)) echo 'selected' @endphp value="type">Type</option>
+                                <option @php if(!empty($_GET) && array_key_exists('value',$_GET)) echo 'selected' @endphp value="value">Value</option>
+                            </select>
+                            <select id="sort" style="margin-right: 3%" class="form-select">
+                                <option @php if(!empty($_GET) && in_array('asc',$_GET)) echo 'selected' @endphp value="asc">Ascending</option>
+                                <option @php if(!empty($_GET) && in_array('desc',$_GET)) echo 'selected' @endphp value="desc" selected>Descending</option>
+                            </select>
+                            <input id="value" type="text" class="form-control" style="width: 150px" placeholder="Sort by selected attribute" aria-label="Sort by selected attribute" name="name" value="{{ app('request')->input('search') }}">
+                            <button class="btn submit btn-outline-secondary" type="submit">Search</button>
+                        </div>
                     </div>
+                    <meta name="csrf-token" content="{{ csrf_token() }}">
                     <table class="table table-striped" id="table1">
                         <thead>
                         <tr>
@@ -87,6 +83,7 @@
                                 </td>
                             </tr>
                         @endforeach
+                        {{ $listings->appends(request()->input())->links() }}
                         </tbody>
                     </table>
                     <div class="dataTable-bottom">
@@ -101,6 +98,12 @@
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
         <script>
             $('document').ready(function(){
+                $(document).on('click', '.submit', function(e){
+                    e.preventDefault();
+                    var baseUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    var newUrl = baseUrl + '?sort=' + $("#sort").val() + '&' + $("#key").val() + '=' + $("#value").val();
+                    location.href = newUrl
+                });
                 $('.remove-listing').click(function(e){
                     let result = confirm('Are you want to remove this listing from CRM system?');
                     if (result) {
